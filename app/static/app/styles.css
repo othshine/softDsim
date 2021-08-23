@@ -106,23 +106,26 @@ button:active{
   color: white;
 }
 
-.button-row-3 {
+.button-row {
   width: 100%;
   display: flex;
   flex-flow: row;
-
 }
 
-.button-row-3 > button {
+.row-3 > button {
   width: calc(100% / 3);
 }
 
+.row-4 > button {
+  width: calc(100% / 4);
+}
 
-.button-row-3 > button:last-child {
+
+.button-row > button:last-child {
   border-radius: 0 1rem 1rem 0;
 }
 
-.button-row-3 > button:first-child {
+.button-row > button:first-child {
   border-radius: 1rem 0 0 1rem;
 }
 
@@ -198,7 +201,19 @@ button:active{
 }
 
 
+/* Continue Button */
 
+#continue-container {
+  width: calc(100% / 3 - 6rem);
+  bottom: 1rem;
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#continue-container > button {
+  width: 100%;
+}
 
 
 

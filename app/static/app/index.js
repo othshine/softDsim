@@ -16,23 +16,21 @@ function pickerSub(n){
 
 /* Model Picker */
 
-function pickModel(n){
-  document.getElementById("model-picker-container").children[n].style.backgroundColor = '#5863f8ff';
-  document.getElementById("model-picker-container").children[n].style.color = '#FFFFFF';
-  
-  for (i of [1,2]){
-    const x = (n+i) % 3
-    document.getElementById("model-picker-container").children[x].style.backgroundColor = "#F0F0F0"
-    document.getElementById("model-picker-container").children[n].style.color = "#22181cff";
+function pickButton(n, element, m){
+  for (let i of Array(m).keys()){
+    const x = (n+i) % m
+    document.getElementById(element).children[x].style.backgroundColor = "#F0F0F0"
+    document.getElementById(element).children[x].style.color = "#22181c";
   }
-  
 
+  document.getElementById(element).children[n].style.backgroundColor = '#5863f8';
+  document.getElementById(element).children[n].style.color = '#FFFFFF';
 }
 
 
 /* Activity Distribution Chart */
 
-function calculateActivityLenght(meetings, trainings){
+function calculateActivityLength(meetings, trainings){
   let m = (meetings / 40)*100;
   let t = (trainings / 40) * 100;
   let d = 100 - m - t;
@@ -40,12 +38,12 @@ function calculateActivityLenght(meetings, trainings){
 }
 
 
-function makeActivityChart(lenghts) {
-  const childs = document.getElementById("activity-distribution-container").children;
+function makeActivityChart(length) {
+  const children = document.getElementById("activity-distribution-container").children;
   const colors = ['#55AAFF', '#AAFF55', '#FF55AA']
-  for (i of [0,1,2]){
-    childs[i].style.backgroundColor = colors[i]
-    childs[i].style.width = "" + lenghts[i] + "%"
+  for (let i of [0,1,2]){
+    children[i].style.backgroundColor = colors[i]
+    children[i].style.width = "" + length[i] + "%"
   }
 }
 
