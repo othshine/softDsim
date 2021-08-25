@@ -1,0 +1,90 @@
+* {
+  padding: 0;
+  margin : 0;
+  border: 0;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  background-color: #FAF0F0;
+}
+
+#myChart {
+  width: 500px;
+  height: 300px;
+  background-color: red;
+}
+
+#chart {
+  width: 100%;
+  height: 100%;
+  background-color: #AAAAF0;
+}
+
+
+.gantt-row {
+  width: 100%;
+  height: 25%;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+.gantt-label {
+  font-size: 0.8rem;
+  width: 20%;
+  height: 100%;
+  background-color: green;
+
+}
+
+.gantt-label > button {
+  width: 100%;
+  height: 100%;
+  background-color: #FAFAFA;
+}
+
+.gantt-seperator {
+  width: 1px;
+  height: 100%;
+  background-color: #CACACA;
+}
+
+.gantt-bar {
+
+  width: 80%;
+  height: 100%;
+  background-color: #FAFAFA;
+  display: table-cell;
+  position: relative;
+}
+
+.gantt-inner-bar-container {
+  width: calc(100% - 1px);
+  height: 80%;
+  background-color: #FAFAFA;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.gantt-inner-bar{
+  height: 50%;
+  width: 100%;
+  background-color: #FAFAFA;
+  display: flex;
+  flex-direction: row;
+}
+
+.gantt-filler {
+  height: 100%;
+  width: 20%;
+  background-color: #FAFAFA;
+}
+
+.gantt-bar-segment {
+  height: 100%;
+  width: 50%;
+  background-color: orange;
+}
