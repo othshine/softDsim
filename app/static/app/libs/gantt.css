@@ -88,3 +88,7 @@ body {
   width: 50%;
   background-color: orange;
 }
+
+.gantt-bar .gantt-bar-segment:first-of-type {
+  background-color: red;
+}
