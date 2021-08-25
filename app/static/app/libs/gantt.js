@@ -58,16 +58,79 @@ function getInfoObejct(data){
 function transformDataToPercentage(data, maxLen){
   for (let d of data.phases){
     for (let value of ["predefined", "scheduled","predefinedStart", "scheduledStart","predefinedEnd", "scheduledEnd"]){
-      d[value] = d[value] / maxLen
+      d[value] = (d[value] / maxLen )*100
     }
   }
 }
 
-function renderGantt(id){
-  const el = docoment.getElementById(id);
-  el.innerHTML = '';
+function generateGanttRow(phase, phaseCount){
+  const row = generateDiv('gantt-row')
+  row.style.height = '' +(100/phaseCount) + '%'
 
-  const chart = document.createElement("div")
+  const label = generateDiv('gantt-label')
+  const btn = document.createElement('button')
+  btn.innerHTML = phase.name;
+  label.appendChild(btn)
+
+  row.appendChild(label)
+
+  const sep = generateDiv('gantt-seperator')
+  row.appendChild(sep)
+
+  const bar = generateDiv('gantt-bar')
+  const innerContainer = generateDiv('gantt-inner-bar-container')
+
+  const innerBar = generateDiv('gantt-inner-bar')
+  const filler = generateDiv('gantt-filler')
+  const segment = generateDiv('gantt-bar-segment')
+  filler.style.width = "" + phase.scheduledStart + "%";
+  segment.style.width = "" + phase.scheduled + "%";
+
+  innerBar.appendChild(filler)
+  innerBar.appendChild(segment)
+
+  innerContainer.appendChild(innerBar)
+
+  const innerBar2 = generateDiv('gantt-inner-bar')
+  const filler2 = generateDiv('gantt-filler')
+  const segment2 = generateDiv('gantt-bar-segment')
+  filler2.style.width = "" + phase.predefinedStart + "%";
+  segment2.style.width = "" + phase.predefined + "%";
+
+  segment2.style.backgroundColor = 'lightblue';
+
+  innerBar2.appendChild(filler2)
+  innerBar2.appendChild(segment2)
+
+  innerContainer.appendChild(innerBar2)
+
+  bar.appendChild(innerContainer)
+
+  row.appendChild(bar)
+
+  return row;
+}
+
+function generateDiv(c){
+  const div = document.createElement('div');
+  if (c){
+    div.setAttribute('class', c)
+  }
+  return div;
+}
+
+function renderGantt(id, data){
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  const chart = generateDiv('chart')
+
+
+  data = transformData(data)
+  const infoObj = getInfoObejct(data)
+  transformDataToPercentage(data, infoObj.totalLenght)
+  for (phase of data.phases){
+    chart.appendChild(generateGanttRow(phase, infoObj.phaseCount))
+  }
 
 
 
