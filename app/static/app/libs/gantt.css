@@ -10,6 +10,14 @@ body {
   background-color: #FAF0F0;
 }
 
+#some {
+  height: 300px;
+  width: 100%;
+}
+
+
+
+
 #myChart {
   width: 700px;
   height: 300px;
@@ -53,7 +61,6 @@ body {
 }
 
 .gantt-bar {
-
   width: 80%;
   height: 100%;
   background-color: #FAFAFA;
@@ -109,7 +116,7 @@ body {
 
 .current-time-line{
   height: 100%;
-  background-color: black;
+  background-color: #909090;
   width: 1px;
   z-index:0;
 }
