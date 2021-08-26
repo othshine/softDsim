@@ -7,6 +7,7 @@
     <meta charset="utf-8">
     <title>SoftDSimulation</title>
     <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'app/libs/gantt/gantt.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.0/chart.min.js"
             integrity="sha512-asxKqQghC1oBShyhiBwA+YgotaSYKxGP1rcSYTDrB0U6DxwlJjU59B67U8+5/++uFjcuVM8Hh5cokLjZlhm3Vg=="
@@ -55,6 +56,11 @@
         <div class="division-title">
             Statistics
         </div>
+        <h3 class="element-header">Project Plan</h3>
+        <div id="gantt-chart" style="width:100%; height: 10rem;">
+
+        </div>
+
         <h3 class="element-header">Cost</h3>
         <div>
             <canvas id="cost-chart"></canvas>
@@ -151,6 +157,7 @@
 </body>
 <script src="{% static 'app/index.js' %}"></script>
 <script src="{% static 'app/model.js' %}"></script>
+<script src="{% static 'app/libs/gantt/gantt.js' %}"></script>
 
 
 </html>

@@ -1,21 +1,7 @@
-* {
-  padding: 0;
-  margin : 0;
-  border: 0;
-}
-
-body {
-  width: 100%;
-  height: 100%;
-  background-color: #FAF0F0;
-}
-
 #some {
   height: 300px;
   width: 100%;
 }
-
-
 
 
 #myChart {
