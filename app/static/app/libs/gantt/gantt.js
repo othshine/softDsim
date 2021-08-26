@@ -116,6 +116,8 @@ function generateGanttRow(phase, phaseCount){
   filler.style.width = "" + phase.scheduledStart + "%";
   segment.style.width = "" + phase.scheduled + "%";
 
+  segment.style.backgroundColor = '#FF55AA';
+
   innerBar.appendChild(filler)
   innerBar.appendChild(segment)
 
@@ -127,7 +129,7 @@ function generateGanttRow(phase, phaseCount){
   filler2.style.width = "" + phase.predefinedStart + "%";
   segment2.style.width = "" + phase.predefined + "%";
 
-  segment2.style.backgroundColor = 'lightblue';
+  segment2.style.backgroundColor = '#54AAFF';
 
   innerBar2.appendChild(filler2)
   innerBar2.appendChild(segment2)
