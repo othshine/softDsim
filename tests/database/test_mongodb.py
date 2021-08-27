@@ -33,7 +33,8 @@ def test_mongo_scenario_can_be_saved_loaded_and_deleted():
 def test_mongo_scenario_saves_decision_tree():
     mongo = ScenarioMongoModel()
     s = Scenario()
-    d = Decision(text="This is a decision")
+    d = Decision()
+    d.add_text_block("Title", "This is some sweet content!")
     d.add(Answer(text="Kanban", points=30))
     d.add(Answer(text="Scrum", points=100))
     s.add(d)
@@ -45,3 +46,21 @@ def test_mongo_scenario_saves_decision_tree():
     answers = [a.text for a in next(result).answers]
     assert "Kanban" in answers
     assert "Scrum" in answers
+
+def test_mongo_scenario_saves_text_blocks():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    d = Decision()
+    d.add_text_block("Title", "This is some sweet content!")
+    d.add_text_block("Title 2", "C2")
+    d.add(Answer(text="Kanban", points=30))
+    d.add(Answer(text="Scrum", points=100))
+    s.add(d)
+    mid = mongo.save(s)
+
+    result = mongo.get(mid)
+    print(result._decisions)
+
+    block = next(result).text[1]
+    assert "Title 2" == block.header
+    assert "C2" == block.content

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
@@ -15,8 +16,21 @@ class Answer:
                 'result_text': self.result_text}
 
 
+@dataclass
+class TextBlock(object):
+    def __init__(self, header: str, content: str):
+        self.header = header
+        self.content = content
+
+    @property
+    def json(self):
+        return {'header': self.header,
+                'content': self.content}
+
+
+@dataclass
 class Decision:
-    def __init__(self, text: str = "", continue_text: str = "Continue"):
+    def __init__(self, text: List[TextBlock] = None, continue_text: str = "Continue"):
         self.text = text
         self.answers = []
         self.continue_text = continue_text
@@ -26,7 +40,7 @@ class Decision:
 
     @property
     def json(self):
-        return {'text': self.text,
+        return {'text': [t.json for t in self.text],
                 'answers': [a.json for a in self.answers],
                 'continue_text': self.continue_text}
 
@@ -38,6 +52,13 @@ class Decision:
 
     def get_max_points(self):
         return max([a.points for a in self.answers])
+
+    def add_text_block(self, header: str, content: str):
+        t = TextBlock(header, content)
+        if self.text:
+            self.text.append(t)
+        else:
+            self.text = [t]
 
 
 @dataclass
@@ -99,7 +120,9 @@ class Scenario:
                       _id=json.get('_id')
                       )
         for d in json.get('decisions'):
-            dec = Decision(d.get('text'), continue_text=d.get('continue_text'))
+            dec = Decision(continue_text=d.get('continue_text'))
+            for t in d.get('text'):
+                dec.add_text_block(t.get('header'), t.get('content'))
             for a in d.get('answers'):
                 dec.add(Answer(text=a.get('text'), points=a.get('points'), result_text=a.get('result_text')))
             self.add(dec)
