@@ -8,6 +8,12 @@ class Answer:
         self.points = points
         self.result_text = result_text
 
+    @property
+    def json(self):
+        return {'text': self.text,
+                'points': self.points,
+                'result_text': self.result_text}
+
 
 class Decision:
     def __init__(self, text: str = "", continue_text: str = "Continue"):
@@ -18,9 +24,10 @@ class Decision:
     def __len__(self):
         return len(self.answers)
 
-    def __dict__(self):
+    @property
+    def json(self):
         return {'text': self.text,
-                'answers': [dict(a) for a in self.answers],
+                'answers': [a.json for a in self.answers],
                 'continue_text': self.continue_text}
 
     def add(self, answer: Answer):
@@ -63,7 +70,7 @@ class Scenario:
     @property
     def json(self):
         d = {'tasks': self.tasks,
-             'decisions': [dict(dec) for dec in self._decisions],
+             'decisions': [dec.json for dec in self._decisions],
              'actual_cost': self.actual_cost,
              'budget': self.budget,
              'counter': self.counter,
@@ -89,6 +96,11 @@ class Scenario:
                       actual_cost=json.get('actual_cost'),
                       current_day=json.get('current_day'),
                       budget=json.get('budget'),
-                      decisions=json.get('decisions'),
                       _id=json.get('_id')
                       )
+        for d in json.get('decisions'):
+            dec = Decision(d.get('text'), continue_text=d.get('continue_text'))
+            for a in d.get('answers'):
+                dec.add(Answer(text=a.get('text'), points=a.get('points'), result_text=a.get('result_text')))
+            self.add(dec)
+

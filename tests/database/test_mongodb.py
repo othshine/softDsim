@@ -1,20 +1,7 @@
 import pytest
 
-from app.src.domain.decision_tree import Scenario
+from app.src.domain.decision_tree import Scenario, Decision, Answer
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
-from utils import get_db_handle
-
-
-
-
-@pytest.mark.django_db
-def test_mongo_can_save_document():
-    db, client = get_db_handle('test', 'localhost', 2717)
-    post = {"info": "test result", "a": "b"}
-    posts = db.posts
-    posts.insert_one(post)
-
-    assert posts.find_one({"info": "test result"})["a"] == "b"
 
 
 def test_mongo_scenario_can_be_saved_loaded_and_deleted():
@@ -41,13 +28,20 @@ def test_mongo_scenario_can_be_saved_loaded_and_deleted():
     mongo.remove(mid=mid2)
     with pytest.raises(NoObjectWithIdException):
         mongo.get(mid)
-    
 
 
+def test_mongo_scenario_saves_decision_tree():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    d = Decision(text="This is a decision")
+    d.add(Answer(text="Kanban", points=30))
+    d.add(Answer(text="Scrum", points=100))
+    s.add(d)
+    mid = mongo.save(s)
 
+    result = mongo.get(mid)
+    print(result._decisions)
 
-
-
-
-
-
+    answers = [a.text for a in next(result).answers]
+    assert "Kanban" in answers
+    assert "Scrum" in answers
