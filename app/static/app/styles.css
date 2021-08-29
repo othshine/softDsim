@@ -110,6 +110,11 @@ button:active{
   color: white;
 }
 
+button.active-button{
+  background-color: var(--neon);
+  color: white;
+}
+
 .button-row {
   width: 100%;
   display: flex;

@@ -19,12 +19,10 @@ function pickerSub(n){
 function pickButton(n, element, m){
   for (let i of Array(m).keys()){
     const x = (n+i) % m
-    document.getElementById(element).children[x].style.backgroundColor = "#F0F0F0"
-    document.getElementById(element).children[x].style.color = "#22181c";
+    document.getElementById(element).children[x].classList.remove("active-button");
   }
 
-  document.getElementById(element).children[n].style.backgroundColor = '#5863f8';
-  document.getElementById(element).children[n].style.color = '#FFFFFF';
+  document.getElementById(element).children[n].classList.add("active-button");
 }
 
 
