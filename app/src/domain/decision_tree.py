@@ -67,12 +67,12 @@ class Scenario:
         if json := kwargs.get('json'):
             self.build(json)
         else:
-            self.tasks = kwargs.get('tasks', 0)
-            self.actual_cost = kwargs.get('actual_cost', 0)
-            self.budget = kwargs.get('budget', 0)
-            self.current_day = kwargs.get('current_day', 0)
-            self.scheduled_days = kwargs.get('scheduled_days', 0)
-            self.counter = kwargs.get('counter', 0)
+            self.tasks = int(kwargs.get('tasks', 0))
+            self.actual_cost = int(kwargs.get('actual_cost', 0))
+            self.budget = int(kwargs.get('budget', 0))
+            self.current_day = int(kwargs.get('current_day', 0))
+            self.scheduled_days = int(kwargs.get('scheduled_days', 0))
+            self.counter = int(kwargs.get('counter', 0))
             self._decisions = kwargs.get('decisions', [])
             self.id_ = kwargs.get('_id', None)
 
@@ -126,4 +126,7 @@ class Scenario:
             for a in d.get('answers'):
                 dec.add(Answer(text=a.get('text'), points=a.get('points'), result_text=a.get('result_text')))
             self.add(dec)
+
+    def get_id(self):
+        return self.id_
 

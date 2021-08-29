@@ -41,11 +41,11 @@ def test_mongo_scenario_saves_decision_tree():
     mid = mongo.save(s)
 
     result = mongo.get(mid)
-    print(result._decisions)
 
     answers = [a.text for a in next(result).answers]
     assert "Kanban" in answers
     assert "Scrum" in answers
+
 
 def test_mongo_scenario_saves_text_blocks():
     mongo = ScenarioMongoModel()
@@ -59,7 +59,6 @@ def test_mongo_scenario_saves_text_blocks():
     mid = mongo.save(s)
 
     result = mongo.get(mid)
-    print(result._decisions)
 
     block = next(result).text[1]
     assert "Title 2" == block.header
