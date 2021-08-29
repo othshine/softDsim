@@ -16,147 +16,153 @@
 
 <body>
 
-
-<nav>
-  <div class="logo">
-    SoftDSim
-  </div>
-  <div class="menu">
-    <a href="#" class="link">
-      <div class="nav-opt">My Account</div>
-    </a>
-    <a href="#" class="link">
-      <div class="nav-opt">Scenarios</div>
-    </a>
-      <a href="#" class="link">
-      <div class="nav-opt">Feedback</div>
-    </a>
-    <a href="#" class="link">
-      <div class="nav-opt">Logout</div>
-    </a>
-  </div>
-</nav>
-
-
-<section id="main">
-    <section class="main-division-third">
-        <div class="division-title">
-            Scenario
+<div id="vue">
+    <nav>
+        <div class="logo">
+            SoftDSim
         </div>
-
-        <ul id="scenario">
-            <li v-for="block in blocks">
-                <h3 class="element-header"> [[ block.header ]] </h3>
-                <p> [[ block.text ]] </p>
-            </li>
-        </ul>
-
-    </section>
-    <section class="main-division-third">
-        <div class="division-title">
-            Statistics
-        </div>
-        <h3 class="element-header">Project Plan</h3>
-        <div id="gantt-chart" style="width:100%; height: 10rem;">
-
-        </div>
-
-        <h3 class="element-header">Cost</h3>
-        <div>
-            <canvas id="cost-chart"></canvas>
-        </div>
-
-        <h3 class="element-header">Tasks / Timeline</h3>
-        <div>
-            <canvas id="tasks-chart"></canvas>
-        </div>
-
-    </section>
-    <section class="main-division-third">
-        <div class="division-title">
-            Actions
-        </div>
-
-        <h3 class="element-header">
-            Model
-        </h3>
-        <div id="model-picker-container" class="button-row row-3">
-            <button onclick="pickButton(0, 'model-picker-container', 3)">Waterfall</button>
-            <button onclick="pickButton(1, 'model-picker-container', 3)">Scrum</button>
-            <button onclick="pickButton(2, 'model-picker-container', 3)">Kanban</button>
-        </div>
-
-        <h3 class="element-header">
-            Product Life Cycle
-        </h3>
-        <div id="lifecycle-picker-container" class="button-row row-4">
-            <button onclick="pickButton(0, 'lifecycle-picker-container', 4)">Incremental</button>
-            <button onclick="pickButton(1, 'lifecycle-picker-container', 4)">Predictive</button>
-            <button onclick="pickButton(2, 'lifecycle-picker-container', 4)">Iterative</button>
-            <button onclick="pickButton(3, 'lifecycle-picker-container', 4)">Agile</button>
-        </div>
-
-        <h3 class="element-header">
-            Staff
-        </h3>
-        <div id="staff-picker-container">
-            <div id="staff-number-container">
-                <div class="staff-number">•</div>
-                <div class="staff-number"></div>
-                <div class="staff-number">•••</div>
-                <div class="staff-number">••</div>
+        <div class="row">
+            <div id="task-container">
+                <button>Tasks: [[ tasks ]] / 400</button>
             </div>
-            <div id="staff-name-container">
-                <div class="staff-name">Junior</div>
-                <div class="staff-name">Senior</div>
-                <div class="staff-name">Expert</div>
-                <div class="staff-name">Consultant</div>
-            </div>
-            <div id="staff-button-container">
-                <div class="staff-button">
-                    <button onclick="pickerAdd(0)">+</button>
-                    <button onclick="pickerSub(0)">-</button>
-                </div>
-                <div class="staff-button">
-                    <button onclick="pickerAdd(1)">+</button>
-                    <button onclick="pickerSub(1)">-</button>
-                </div>
-                <div class="staff-button">
-                    <button onclick="pickerAdd(2)">+</button>
-                    <button onclick="pickerSub(2)">-</button>
-                </div>
-                <div class="staff-button">
-                    <button onclick="pickerAdd(3)">+</button>
-                    <button onclick="pickerSub(3)">-</button>
-                </div>
+            <div class="menu">
+                <a href="#" class="link">
+                    <div class="nav-opt">My Account</div>
+                </a>
+                <a href="#" class="link">
+                    <div class="nav-opt">Scenarios</div>
+                </a>
+                <a href="#" class="link">
+                    <div class="nav-opt">Feedback</div>
+                </a>
+                <a href="#" class="link">
+                    <div class="nav-opt">Logout</div>
+                </a>
             </div>
         </div>
-        <h3 class="element-header">
-            Meetings
-        </h3>
-        <h3 class="element-header">
-            Trainings
-        </h3>
-        <h3 class="element-header">
-            Activity Distribution
-        </h3>
-        <div id="activity-distribution-container">
-            <div class="activity-bar"></div>
-            <div class="activity-bar"></div>
-            <div class="activity-bar"></div>
-        </div>
 
-        <div id="continue-container">
-            <button onclick="cont()">Continue</button>
-        </div>
+    </nav>
+
+
+    <section id="main">
+        <section class="main-division-third">
+            <div class="division-title">
+                Scenario
+            </div>
+
+            <ul id="scenario">
+                <li v-for="block in blocks">
+                    <h3 class="element-header"> [[ block.header ]] </h3>
+                    <p> [[ block.text ]] </p>
+                </li>
+            </ul>
+
+        </section>
+        <section class="main-division-third">
+            <div class="division-title">
+                Statistics
+            </div>
+            <h3 class="element-header">Project Plan</h3>
+            <div id="gantt-chart" style="width:100%; height: 10rem;">
+
+            </div>
+
+            <h3 class="element-header">Cost</h3>
+            <div>
+                <canvas id="cost-chart"></canvas>
+            </div>
+
+            <h3 class="element-header">Tasks / Timeline</h3>
+            <div>
+                <canvas id="tasks-chart"></canvas>
+            </div>
+
+        </section>
+        <section class="main-division-third">
+            <div class="division-title">
+                Actions
+            </div>
+
+            <h3 class="element-header">
+                Model
+            </h3>
+            <div id="model-picker-container" class="button-row row-3">
+                <button onclick="pickButton(0, 'model-picker-container', 3)">Waterfall</button>
+                <button onclick="pickButton(1, 'model-picker-container', 3)">Scrum</button>
+                <button onclick="pickButton(2, 'model-picker-container', 3)">Kanban</button>
+            </div>
+
+            <h3 class="element-header">
+                Product Life Cycle
+            </h3>
+            <div id="lifecycle-picker-container" class="button-row row-4">
+                <button onclick="pickButton(0, 'lifecycle-picker-container', 4)">Incremental</button>
+                <button onclick="pickButton(1, 'lifecycle-picker-container', 4)">Predictive</button>
+                <button onclick="pickButton(2, 'lifecycle-picker-container', 4)">Iterative</button>
+                <button onclick="pickButton(3, 'lifecycle-picker-container', 4)">Agile</button>
+            </div>
+
+            <h3 class="element-header">
+                Staff
+            </h3>
+            <div id="staff-picker-container">
+                <div id="staff-number-container">
+                    <div class="staff-number">•</div>
+                    <div class="staff-number"></div>
+                    <div class="staff-number">•••</div>
+                    <div class="staff-number">••</div>
+                </div>
+                <div id="staff-name-container">
+                    <div class="staff-name">Junior</div>
+                    <div class="staff-name">Senior</div>
+                    <div class="staff-name">Expert</div>
+                    <div class="staff-name">Consultant</div>
+                </div>
+                <div id="staff-button-container">
+                    <div class="staff-button">
+                        <button onclick="pickerAdd(0)">+</button>
+                        <button onclick="pickerSub(0)">-</button>
+                    </div>
+                    <div class="staff-button">
+                        <button onclick="pickerAdd(1)">+</button>
+                        <button onclick="pickerSub(1)">-</button>
+                    </div>
+                    <div class="staff-button">
+                        <button onclick="pickerAdd(2)">+</button>
+                        <button onclick="pickerSub(2)">-</button>
+                    </div>
+                    <div class="staff-button">
+                        <button onclick="pickerAdd(3)">+</button>
+                        <button onclick="pickerSub(3)">-</button>
+                    </div>
+                </div>
+            </div>
+            <h3 class="element-header">
+                Meetings
+            </h3>
+            <h3 class="element-header">
+                Trainings
+            </h3>
+            <h3 class="element-header">
+                Activity Distribution
+            </h3>
+            <div id="activity-distribution-container">
+                <div class="activity-bar"></div>
+                <div class="activity-bar"></div>
+                <div class="activity-bar"></div>
+            </div>
+
+            <div id="continue-container">
+                <button onclick="cont()">[[ continue_text ]]</button>
+            </div>
+
+        </section>
 
     </section>
-
-</section>
-
+</div>
 </body>
-<script src="{% static 'app/index.js' %}"></script>
 <script src="{% static 'app/model.js' %}"></script>
+<script src="{% static 'app/index.js' %}"></script>
 <script src="{% static 'app/libs/gantt/gantt.js' %}"></script>
 
 

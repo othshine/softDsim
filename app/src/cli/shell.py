@@ -1,7 +1,7 @@
 """
 
 """
-from app.src.domain.decision_tree import Scenario, Decision, TextBlock
+from app.src.domain.decision_tree import Scenario, Decision
 from mongo_models import ScenarioMongoModel
 
 PROMPT = "-> "
