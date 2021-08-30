@@ -5,6 +5,7 @@
   --black: #22181cff;
   --jet: #312f2fff;
   --red: #d7263dff;
+  --light: #F0F0F0;
   }
 
 /* ======== GENERAL  ======== */
@@ -63,7 +64,6 @@ ul {
   height: 100%;
   display: flex;
   width: calc(100% / 3);
-  display: flex;
   flex-direction: column;
   padding-left: 3rem;
   padding-right: 3rem;

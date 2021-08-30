@@ -31,14 +31,21 @@ class ScenarioMongoModel(MongoConnection):
         return self.collection.insert_one(obj.json).inserted_id
 
     def update(self, obj):
-        if self.collection.find({'id': obj.id_}).count():
-            return self.collection.update({"id": obj.id_}, obj.json)
+        if self.collection.find({'id': obj._id}).count():
+            return self.collection.update({"id": obj._id}, obj.json)
         else:
             return self.save(obj)
 
     def remove(self, obj=None, mid=None):
         if obj:
-            mid = obj.id_
-        if self.collection.find({'id': mid}).count():
-            return self.collection.delete_many({"id": mid})
+            mid = obj._id
+        if self.collection.find({'_id': mid}).count():
+            return self.collection.delete_many({"_id": mid})
+        raise NoObjectWithIdException()
+
+    def find_all(self):
+        col = []
+        for s in self.collection.find():
+            col.append(Scenario(json=s))
+        return col
 

@@ -1,0 +1,44 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Instructor Interface</title>
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'app/instructor/instructor.css' %}">
+</head>
+<body>
+<section>
+    <div class="row">
+        <h1>SoftDSimulator Instructor Interface</h1>
+    </div>
+    <div class="row">
+
+        <div class="xsm"></div>
+        <div id="login">
+            <div class="row">
+                <h1>Add Scenario</h1>
+            </div>
+            <div class="row"></div>
+            <div class="row">
+                <p>To create a new <strong>Scenario</strong> start by defining a unique name that acts as the scenarios identifier. This name may not contain spaces.</p>
+            </div>
+            <div class="row"></div>
+            <div class="row">
+                <label for="SID">Unique Name / ID</label>
+                <input id="name-input" name="SID" type="text">
+            </div>
+            <div class="row">
+                <button id="add-sc-btn">
+                    Create Scenario
+                </button>
+            </div>
+
+        </div>
+        <div class="xsm"></div>
+    </div>
+</section>
+<script src="{% static 'app/instructor/add_scenario.js' %}"></script>
+</body>
+</html>

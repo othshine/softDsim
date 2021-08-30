@@ -80,15 +80,16 @@ class Scenario:
         if json := kwargs.get('json'):
             self.build(json)
         else:
-            self.tasks_done = int(kwargs.get('tasks_done', 0))
-            self.tasks_total = int(kwargs.get('tasks_total', 0))
-            self.actual_cost = int(kwargs.get('actual_cost', 0))
-            self.budget = int(kwargs.get('budget', 0))
-            self.current_day = int(kwargs.get('current_day', 0))
-            self.scheduled_days = int(kwargs.get('scheduled_days', 0))
-            self.counter = int(kwargs.get('counter', 0))
-            self._decisions = kwargs.get('decisions', [])
-            self.id_ = kwargs.get('_id', None)
+            self.tasks_done = int(kwargs.get('tasks_done', 0) or 0)
+            self.tasks_total = int(kwargs.get('tasks_total', 0) or 0)
+            self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
+            self.budget = int(kwargs.get('budget', 0) or 0)
+            self.current_day = int(kwargs.get('current_day', 0) or 0)
+            self.scheduled_days = int()
+            self.counter = int(kwargs.get('counter', 0) or 0)
+            self._decisions = kwargs.get('decisions', []) or []
+            self._id = kwargs.get('_id', None)
+            self.desc = kwargs.get('desc', 0) or ""
 
     def __iter__(self):
         return self
@@ -112,9 +113,10 @@ class Scenario:
              'counter': self.counter,
              'current_day': self.current_day,
              'scheduled_days': self.scheduled_days,
+             'desc': self.desc
              }
-        if self.id_:
-            d['id'] = self.id_
+        if self._id:
+            d['_id'] = str(self._id)
         return d
 
     def add(self, decision: Decision):
@@ -127,15 +129,17 @@ class Scenario:
         return sum([d.get_max_points() for d in self._decisions])
 
     def build(self, json):
+        print(json)
         self.__init__(tasks_done=json.get('tasks_done'),
                       tasks_total=json.get('tasks_total'),
                       scheduled_days=json.get('scheduled_days'),
                       actual_cost=json.get('actual_cost'),
                       current_day=json.get('current_day'),
                       budget=json.get('budget'),
-                      _id=json.get('_id')
+                      _id=json.get('_id'),
+                      desc=json.get('desc')
                       )
-        for d in json.get('decisions'):
+        for d in json.get('decisions') or []:
             dec = Decision(continue_text=d.get('continue_text'), dtype=d.get('dtype'), points=d.get('points'))
             for t in d.get('text'):
                 dec.add_text_block(t.get('header'), t.get('content'))
@@ -144,5 +148,5 @@ class Scenario:
             self.add(dec)
 
     def get_id(self):
-        return self.id_
+        return self._id
 
