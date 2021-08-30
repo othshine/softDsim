@@ -30,10 +30,12 @@ class TextBlock(object):
 
 @dataclass
 class Decision:
-    def __init__(self, text: List[TextBlock] = None, continue_text: str = "Continue"):
+    def __init__(self, text: List[TextBlock] = None, continue_text: str = "Continue", dtype: str = None, points: int = 0):
         self.text = text
         self.answers = []
         self.continue_text = continue_text
+        self.dtype = dtype
+        self.points = points
 
     def __len__(self):
         return len(self.answers)
@@ -42,7 +44,9 @@ class Decision:
     def json(self):
         return {'text': [t.json for t in self.text],
                 'answers': [a.json for a in self.answers],
-                'continue_text': self.continue_text}
+                'continue_text': self.continue_text,
+                'dtype': self.dtype,
+                'points': self.points}
 
     def add(self, answer: Answer):
         self.answers.append(answer)
@@ -59,6 +63,15 @@ class Decision:
             self.text.append(t)
         else:
             self.text = [t]
+
+    def evaluate(self, answer_text):
+        self.points = self.get_points_for(answer_text)
+
+    def get_points_for(self, answer_text: str) -> int:
+        for a in self.answers:
+            if answer_text == a.text:
+                return a.points
+        return 0
 
 
 @dataclass
@@ -120,7 +133,7 @@ class Scenario:
                       _id=json.get('_id')
                       )
         for d in json.get('decisions'):
-            dec = Decision(continue_text=d.get('continue_text'))
+            dec = Decision(continue_text=d.get('continue_text'), dtype=d.get('dtype'), points=d.get('points'))
             for t in d.get('text'):
                 dec.add_text_block(t.get('header'), t.get('content'))
             for a in d.get('answers'):

@@ -12,18 +12,26 @@ from mongo_models import ScenarioMongoModel
 
 
 def index(request):
-    s = Scenario()
-    s.add(Decision("This is Question number one"))
     return render(request, "app/index.html")
+
+
+def evaluate_decision(data, decision):
+    decision.evaluate(data.get(decision.dtype))
+
+
+def get_scenario_cookie() -> ObjectId:
+    return ObjectId("612d1a2c87b29722e1f39871")
 
 
 @csrf_exempt
 def click_continue(request):
-    if request.method == 'POST':
-        print(request.body)
     counter = int(request.GET.get("counter"))
     model = ScenarioMongoModel()
-    s = model.get(ObjectId("612baed001cb8bc5e9cb2cb8"))
+    s = model.get(get_scenario_cookie())
+
+    if request.method == 'POST':
+        evaluate_decision(json.loads(request.body.decode('utf-8')), s._decisions[counter-2])
+
     d = s._decisions[counter]
     context = {
         "continue_text": d.continue_text,
@@ -34,3 +42,6 @@ def click_continue(request):
         context.get('blocks').append({'header': t.header, 'text': t.content})
 
     return HttpResponse(json.dumps(context), content_type="application/json")
+
+
+

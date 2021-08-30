@@ -14,6 +14,7 @@ def build_decision():
         h = input("Header: ")
         c = input("Content: ")
         d.add_text_block(h, c)
+    d.dtype = input("Decision Type: ")
     if ask("Set Continue Button Text? "):
         d.continue_text = input("Text: ")
 

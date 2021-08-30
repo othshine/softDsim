@@ -63,3 +63,22 @@ def test_mongo_scenario_saves_text_blocks():
     block = next(result).text[1]
     assert "Title 2" == block.header
     assert "C2" == block.content
+
+
+def test_decision_saves_dtype_and_points():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    d = Decision(points=200)
+    d.add_text_block("Title", "This is some sweet content!")
+    d.add_text_block("Title 2", "C2")
+    d.add(Answer(text="Kanban", points=30))
+    d.add(Answer(text="Scrum", points=100))
+    d.dtype = "model"
+    s.add(d)
+    mid = mongo.save(s)
+
+    result = mongo.get(mid)
+
+    dec = result._decisions[0]
+    assert dec.dtype == "model"
+    assert dec.points == 200
