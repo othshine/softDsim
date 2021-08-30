@@ -13,7 +13,8 @@ let x = new Vue({
                     text: "You are at the throttle"
                 }
             ],
-        tasks: 0,
+        tasks_total: 0,
+        tasks_done: 0,
         continue_text: "Continue"
     }
 });
@@ -70,7 +71,8 @@ async function cont() {
     );
     const data = await response.json();
     x._data.blocks = data.blocks;
-    x._data.tasks = data.tasks;
+    x._data.tasks_done = data.tasks_done;
+    x._data.tasks_total = data.tasks_total;
     x._data.continue_text = data.continue_text
     COUNTER += 1;
 }

@@ -80,7 +80,8 @@ class Scenario:
         if json := kwargs.get('json'):
             self.build(json)
         else:
-            self.tasks = int(kwargs.get('tasks', 0))
+            self.tasks_done = int(kwargs.get('tasks_done', 0))
+            self.tasks_total = int(kwargs.get('tasks_total', 0))
             self.actual_cost = int(kwargs.get('actual_cost', 0))
             self.budget = int(kwargs.get('budget', 0))
             self.current_day = int(kwargs.get('current_day', 0))
@@ -103,7 +104,8 @@ class Scenario:
 
     @property
     def json(self):
-        d = {'tasks': self.tasks,
+        d = {'tasks_done': self.tasks_done,
+             'tasks_total': self.tasks_total,
              'decisions': [dec.json for dec in self._decisions],
              'actual_cost': self.actual_cost,
              'budget': self.budget,
@@ -125,7 +127,8 @@ class Scenario:
         return sum([d.get_max_points() for d in self._decisions])
 
     def build(self, json):
-        self.__init__(tasks=json.get('tasks'),
+        self.__init__(tasks_done=json.get('tasks_done'),
+                      tasks_total=json.get('tasks_total'),
                       scheduled_days=json.get('scheduled_days'),
                       actual_cost=json.get('actual_cost'),
                       current_day=json.get('current_day'),

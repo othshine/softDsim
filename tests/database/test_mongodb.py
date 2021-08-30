@@ -7,7 +7,7 @@ from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 def test_mongo_scenario_can_be_saved_loaded_and_deleted():
     mongo = ScenarioMongoModel()
     s = Scenario(budget=100000, scheduled_days=40, tasks=300)
-    s2 = Scenario(budget=215, scheduled_days=677, tasks=2, current_day=30, actual_cost=300000, counter=4)
+    s2 = Scenario(budget=215, scheduled_days=677, tasks_total=2, tasks_done=30, current_day=30, actual_cost=300000, counter=4)
 
     mid = mongo.save(s)
     result = mongo.get(mid)
