@@ -7,6 +7,7 @@
     <title>Instructor Interface</title>
     <link rel="stylesheet" href="{% static 'app/styles.css' %}">
     <link rel="stylesheet" href="{% static 'app/instructor/instructor.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 </head>
 <body>
 <section>
@@ -22,23 +23,119 @@
             </div>
             <div class="row"></div>
             <div class="row">
-                <p>To create a new <strong>Scenario</strong> start by defining a unique name that acts as the scenarios identifier. This name may not contain spaces.</p>
+                <p>To create a new <strong>Scenario</strong> start by defining a unique name that acts as the scenarios
+                    identifier. This name may not contain spaces.</p>
             </div>
             <div class="row"></div>
             <div class="row">
                 <label for="SID">Unique Name / ID</label>
                 <input id="name-input" name="SID" type="text">
             </div>
-            <div class="row">
-                <button id="add-sc-btn">
+            <div id="app" class="row">
+                <button id="add-sc-btn" @click="showModal = true">
                     Create Scenario
                 </button>
+                <modal v-if="showModal" @close="showModal = false">
+                    <h3 slot="header">Creating a scenario</h3>
+                </modal>
+                <modal v-if="showModal2" @close="showModal2 = false">
+                    <h3 slot="header">Creating a decision</h3>
+                </modal>
             </div>
 
         </div>
         <div class="xsm"></div>
     </div>
 </section>
+<script type="text/x-template" id="modal-template">
+    <transition name="modal">
+        <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="modal-container">
+
+                    <div class="modal-header">
+                        <slot name="header">
+                            Creating a scenario
+                        </slot>
+                    </div>
+
+                    <div class="modal-body">
+                        <slot name="body">
+                            <div class="row">
+                                <label for="tnumt">Total Number of Tasks:</label>
+                                <input name="tnumt"  type="number" min="0" step="10">
+                            </div>
+                            <div class="row">
+                                <label for="budget">Budget</label>
+                                <input name="budget" type="number" min="0" step="1000">
+                            </div>
+                            <div class="row">
+                                <label for="days">Scheduled Days</label>
+                                <input name="days" type="number" min="0" step="5">
+                            </div>
+                        </slot>
+                    </div>
+
+                    <div class="modal-footer">
+                        <slot name="footer">
+                            <button style="width: 50%" @click="$emit('close'); showModal2 = true">
+                                Add Decision
+                            </button>
+                            <button style="width: 50%" @click="$emit('close')">
+                                Finish
+                            </button>
+                        </slot>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </transition>
+</script>
+
+<script type="text/x-template" id="modal-template">
+    <transition name="modal">
+        <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="modal-container">
+
+                    <div class="modal-header">
+                        <slot name="header">
+                            Creating a scenario
+                        </slot>
+                    </div>
+
+                    <div class="modal-body">
+                        <slot name="body">
+                            <div class="row">
+                                <label for="tnumt">Decision Type:</label>
+                                <input name="tnumt"  type="number" min="0" step="10">
+                            </div>
+                            <div class="row">
+                                <label for="budget">Add Answer</label>
+                                <input name="budget" type="number" min="0" step="1000">
+                            </div>
+                            <div class="row">
+                                <label for="days">Scheduled Days</label>
+                                <input name="days" type="number" min="0" step="5">
+                            </div>
+                        </slot>
+                    </div>
+
+                    <div class="modal-footer">
+                        <slot name="footer">
+
+                            <button style="width: 50%" @click="$emit('close')">
+                                Finish
+                            </button>
+                        </slot>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </transition>
+</script>
+
+
 <script src="{% static 'app/instructor/add_scenario.js' %}"></script>
 </body>
 </html>
