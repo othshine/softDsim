@@ -1,3 +1,6 @@
+from math import floor
+from typing import Tuple
+
 import pytest
 
 from app.src.domain.team import SkillType, Member, NotAValidSkillTypeException, Team
@@ -99,3 +102,35 @@ def test_teams_salary():
     team += Member(skill_type='expert')
     salary += yaml_reader.read('skill-levels', 'expert', 'salary')
     assert team.salary == salary
+
+
+def test_member_efficiency():
+    t = 'junior'
+    m = Member(skill_type=t, xp_factor=1, motivation=1, familiarity=1)
+    thr = yaml_reader.read('skill-levels', t, 'throughput')
+    eff = 1 * thr  # 1 = (1 + 1 + 1) / 3
+    assert m.efficiency == eff
+
+    t = 'senior'
+    m = Member(skill_type=t, xp_factor=0.5, motivation=1, familiarity=0)
+    thr = yaml_reader.read('skill-levels', t, 'throughput')
+    eff = 0.5 * thr
+    assert m.efficiency == eff
+
+
+def test_member_solve_tasks_returns_int_tuple():
+    m = Member()
+    assert isinstance(m.solve_tasks(0), Tuple)
+    assert isinstance(m.solve_tasks(8)[0], int)
+
+
+def test_member_solves_tasks_and_makes_errors():
+    t = 'senior'
+    time = 5
+    m = Member(skill_type=t, xp_factor=0.5, motivation=1, familiarity=0)
+    thr = yaml_reader.read('skill-levels', t, 'throughput')
+    err = yaml_reader.read('skill-levels', t, 'error-rate')
+    eff = 0.5 * thr
+    num_t = floor(eff * time * yaml_reader.read('task-completion-coefficient'))
+    num_e = round(num_t * err)
+    assert m.solve_tasks(time) == (num_t, num_e)

@@ -1,13 +1,15 @@
 skill-levels:
   junior:
     salary: 3000
-    error-rate: 0.5
+    error-rate: 0.33
     throughput: 3
   senior:
     salary: 4500
-    error-rate: 0.33
+    error-rate: 0.2
     throughput: 7
   expert:
     salary: 7000
     error-rate: 0.05
     throughput: 7
+
+task-completion-coefficient: 0.2

@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from math import floor
 from statistics import mean
 from typing import List
 
@@ -7,6 +8,10 @@ from django.conf import settings
 
 from utils import YAMLReader
 
+# ToDo: Config Path should be a env variable. Or better Singleton that is imported from one file by every other.
+CONFIG_PATH = os.path.join(settings.BASE_DIR, 'parameter.yaml')  # YAML File that contains the parameters for the simulation
+
+# ToDo: Finish logic in team. Then save team in DB.
 
 class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
@@ -16,6 +21,25 @@ class Member:
         self.motivation = motivation
         self.familiarity = familiarity
         self.halted = False
+
+    @property
+    def efficiency(self) -> float:
+        """
+        Efficiency of a Member. Throughput (of SkillType) * Mean of xp, motivation and familiarity.
+        :return: float
+        """
+        return self.skill_type.throughput * mean([self.xp_factor, self.motivation, self.familiarity])
+
+    def solve_tasks(self, time: float) -> (int, int):
+        """
+        Simulates a member solving tasks for <time> hours.
+        :param time: Number of hours.
+        :return: Tuple of (Number of tasks solved, Number of these tasks that have errors)
+        """
+        yr = YAMLReader(CONFIG_PATH)
+        number_tasks = floor(self.efficiency * time * yr.read('task-completion-coefficient'))
+        number_tasks_with_unidentified_errors = round(number_tasks * self.skill_type.error_rate)  # Introduce fatigue?
+        return number_tasks, number_tasks_with_unidentified_errors
 
 
 class Team:
@@ -62,7 +86,7 @@ class SkillType:
     Represents a level of skill that a member can have. (Junior, Senior, Expert). A skill type object contains all
     relevant information on a particular skill type.
     """
-    def __init__(self, name: str, config_path=os.path.join(settings.BASE_DIR, 'parameter.yaml')):
+    def __init__(self, name: str, config_path=CONFIG_PATH):
         self.name = name
         yr = YAMLReader(config_path)
         try:
