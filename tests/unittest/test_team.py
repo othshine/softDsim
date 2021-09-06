@@ -6,13 +6,11 @@ import pytest
 from app.src.domain.team import SkillType, Member, NotAValidSkillTypeException, Team
 from utils import YAMLReader
 
-yaml_reader = YAMLReader('../../parameter.yaml')
-
 
 def test_skill_type_reads_parameter_from_yaml():
     t = 'senior'
     sl = SkillType(t)
-    data = yaml_reader.read('skill-levels', t)
+    data = YAMLReader.read('skill-levels', t)
     assert sl.salary == data['salary']
     assert sl.error_rate == data['error-rate']
     assert sl.throughput == data['throughput']
@@ -94,26 +92,26 @@ def test_teams_salary():
     salary = 0
     assert team.salary == salary
     team += Member(skill_type='expert')
-    salary += yaml_reader.read('skill-levels', 'expert', 'salary')
+    salary += YAMLReader.read('skill-levels', 'expert', 'salary')
     assert team.salary == salary
     team += Member(skill_type='senior')
-    salary += yaml_reader.read('skill-levels', 'senior', 'salary')
+    salary += YAMLReader.read('skill-levels', 'senior', 'salary')
     assert team.salary == salary
     team += Member(skill_type='expert')
-    salary += yaml_reader.read('skill-levels', 'expert', 'salary')
+    salary += YAMLReader.read('skill-levels', 'expert', 'salary')
     assert team.salary == salary
 
 
 def test_member_efficiency():
     t = 'junior'
     m = Member(skill_type=t, xp_factor=1, motivation=1, familiarity=1)
-    thr = yaml_reader.read('skill-levels', t, 'throughput')
+    thr = YAMLReader.read('skill-levels', t, 'throughput')
     eff = 1 * thr  # 1 = (1 + 1 + 1) / 3
     assert m.efficiency == eff
 
     t = 'senior'
     m = Member(skill_type=t, xp_factor=0.5, motivation=1, familiarity=0)
-    thr = yaml_reader.read('skill-levels', t, 'throughput')
+    thr = YAMLReader.read('skill-levels', t, 'throughput')
     eff = 0.5 * thr
     assert m.efficiency == eff
 
@@ -128,9 +126,9 @@ def test_member_solves_tasks_and_makes_errors():
     t = 'senior'
     time = 5
     m = Member(skill_type=t, xp_factor=0.5, motivation=1, familiarity=0)
-    thr = yaml_reader.read('skill-levels', t, 'throughput')
-    err = yaml_reader.read('skill-levels', t, 'error-rate')
+    thr = YAMLReader.read('skill-levels', t, 'throughput')
+    err = YAMLReader.read('skill-levels', t, 'error-rate')
     eff = 0.5 * thr
-    num_t = floor(eff * time * yaml_reader.read('task-completion-coefficient'))
+    num_t = floor(eff * time * YAMLReader.read('task-completion-coefficient'))
     num_e = round(num_t * err)
     assert m.solve_tasks(time) == (num_t, num_e)

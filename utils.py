@@ -1,5 +1,7 @@
 from pymongo import MongoClient
 from yaml import load, FullLoader
+import os
+from django.conf import settings
 
 
 def get_db_handle(db_name, host, port):
@@ -10,7 +12,7 @@ def get_db_handle(db_name, host, port):
     return db_handle, client
 
 
-class YAMLReader:
+class _YAMLReader:
     def __init__(self, path):
         self.path = path
 
@@ -20,3 +22,6 @@ class YAMLReader:
             for arg in args:
                 data = data[arg]
         return data
+
+
+YAMLReader = _YAMLReader(path=os.path.join(settings.BASE_DIR, 'parameter.yaml'))
