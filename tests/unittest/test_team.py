@@ -3,7 +3,7 @@ from typing import Tuple
 
 import pytest
 
-from app.src.domain.team import SkillType, Member, NotAValidSkillTypeException, Team
+from app.src.domain.team import SkillType, Member, NotAValidSkillTypeException, Team, MemberIsHalted
 from utils import YAMLReader
 
 
@@ -162,10 +162,42 @@ def test_team_solves_tasks():
     assert e == em1 + em2
 
 
-
 def test_member_training():
-    pass
+    m = Member()
+    xp1 = m.xp_factor
+    m.train()
+    xp2 = m.xp_factor
+    assert xp1 < xp2
+
+
+def test_team_solve_tasks_halted_member():
+    t = Team()
+    m = Member(xp_factor=1, motivation=1, familiarity=1)
+    mh = Member(xp_factor=1, motivation=1, familiarity=1)
+    mh.halt()
+    t += m
+    t += mh
+
+    t, e = t.solve_tasks(time=4)
+
+    tm1, em1 = m.solve_tasks(4)
+
+    assert t == tm1
+    assert e == em1
+
+
+def test_halted_member_raises_exception_when_solve_tasks():
+    m = Member()
+    m.halt()
+    with pytest.raises(MemberIsHalted):
+        m.solve_tasks(8)
 
 
 def test_team_meeting():
-    pass
+    t = Team()
+    m = Member()
+    t += m
+    f1 = m.familiarity
+    t.meeting()
+    f2 = m.familiarity
+    assert f1 < f2

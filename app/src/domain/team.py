@@ -1,12 +1,14 @@
 from dataclasses import dataclass
-from math import floor
+from math import floor, sqrt
 from statistics import mean
 from typing import List
 
 from utils import YAMLReader, value_or_error
 
-
 # ToDo: Finish logic in team. Then save team in DB.
+
+inc = lambda x: min([x + 0.1, 1.0])  # ToDo: Find a fitting function that approaches 1
+
 
 class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
@@ -31,9 +33,27 @@ class Member:
         :param time: Number of hours.
         :return: Tuple of (Number of tasks solved, Number of these tasks that have errors)
         """
+        if self.halted:
+            raise MemberIsHalted
         number_tasks = floor(self.efficiency * time * YAMLReader.read('task-completion-coefficient'))
         number_tasks_with_unidentified_errors = round(number_tasks * self.skill_type.error_rate)  # Introduce fatigue?
         return number_tasks, number_tasks_with_unidentified_errors
+
+    def train(self):
+        """
+        Training a member increases it's xp factor.
+        :return: float - new xp factor value
+        """
+        self.xp_factor = inc(self.xp_factor)
+        return self.xp_factor
+
+    def halt(self):
+        """
+        Sets halted value to True.
+        :return: True - halted value
+        """
+        self.halted = True
+        return self.halted
 
 
 class Team:
@@ -77,10 +97,20 @@ class Team:
         num_tasks = 0
         num_errs = 0
         for member in self.staff:
-            t, e = member.solve_tasks(time)
-            num_tasks += t
-            num_errs += e
+            if not member.halted:
+                t, e = member.solve_tasks(time)
+                num_tasks += t
+                num_errs += e
         return num_tasks, num_errs
+
+    def meeting(self):
+        """
+        A meeting increases every members familiarity.
+        :return: None
+        """
+        for member in self.staff:
+            if not member.halted:
+                member.familiarity = inc(member.familiarity)
 
 
 @dataclass
@@ -103,3 +133,7 @@ class SkillType:
 
 class NotAValidSkillTypeException(Exception):
     """Exception raised when a skill type is created with an invalid name."""
+
+
+class MemberIsHalted(Exception):
+    """Exception raised when a halted member is called to work."""
