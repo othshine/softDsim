@@ -3,7 +3,7 @@ from math import floor
 from statistics import mean
 from typing import List
 
-from utils import YAMLReader
+from utils import YAMLReader, value_or_error
 
 
 # ToDo: Finish logic in team. Then save team in DB.
@@ -12,9 +12,9 @@ class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
                  familiarity: float = 0.):
         self.skill_type = SkillType(skill_type)
-        self.xp_factor = xp_factor
-        self.motivation = motivation
-        self.familiarity = familiarity
+        self.xp_factor = value_or_error(xp_factor)
+        self.motivation = value_or_error(motivation)
+        self.familiarity = value_or_error(familiarity)
         self.halted = False
 
     @property
@@ -72,6 +72,15 @@ class Team:
         :return: int
         """
         return sum([m.skill_type.salary for m in self.staff] or [0])
+
+    def solve_tasks(self, time):
+        num_tasks = 0
+        num_errs = 0
+        for member in self.staff:
+            t, e = member.solve_tasks(time)
+            num_tasks += t
+            num_errs += e
+        return num_tasks, num_errs
 
 
 @dataclass

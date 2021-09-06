@@ -12,6 +12,19 @@ def get_db_handle(db_name, host, port):
     return db_handle, client
 
 
+def value_or_error(val, lower: float = 0.0, upper: float = 1.0):
+    """
+    Used to validate that numeric value is in bound.
+    :param val: the value that need to be validated.
+    :param lower: lower bound
+    :param upper: upper bound
+    :return: either value if in bounds or raises ValueError
+    """
+    if lower <= val <= upper:
+        return val
+    raise ValueError
+
+
 class _YAMLReader:
     def __init__(self, path):
         self.path = path

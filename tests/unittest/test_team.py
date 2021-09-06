@@ -132,3 +132,40 @@ def test_member_solves_tasks_and_makes_errors():
     num_t = floor(eff * time * YAMLReader.read('task-completion-coefficient'))
     num_e = round(num_t * err)
     assert m.solve_tasks(time) == (num_t, num_e)
+
+
+def test_member_factors_are_between_zero_and_one():
+    m = Member(xp_factor=0.5, motivation=1, familiarity=0)
+    with pytest.raises(ValueError):
+        m = Member(xp_factor=1.1)
+    with pytest.raises(ValueError):
+        m = Member(motivation=-0.1)
+    with pytest.raises(ValueError):
+        m = Member(familiarity=3000)
+    with pytest.raises(ValueError):
+        m = Member(motivation=0.2, familiarity=2, xp_factor=.1)
+
+
+def test_team_solves_tasks():
+    t = Team()
+    m1 = Member(xp_factor=1, motivation=1, familiarity=1)
+    m2 = Member(xp_factor=0.5, motivation=0.5, familiarity=0.5)
+    t += m1
+    t += m2
+
+    t, e = t.solve_tasks(time=4)
+
+    tm1, em1 = m1.solve_tasks(4)
+    tm2, em2 = m2.solve_tasks(4)
+
+    assert t == tm1 + tm2
+    assert e == em1 + em2
+
+
+
+def test_member_training():
+    pass
+
+
+def test_team_meeting():
+    pass
