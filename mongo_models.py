@@ -30,7 +30,7 @@ class ScenarioMongoModel(MongoConnection):
     def save(self, obj) -> ObjectId:
         return self.collection.insert_one(obj.json).inserted_id
 
-    def update(self, obj):
+    def update(self, obj):  # ToDo: Tests for updating Scenarios.
         if self.collection.find({'id': obj._id}).count():
             return self.collection.update({"id": obj._id}, obj.json)
         else:

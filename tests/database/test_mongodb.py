@@ -1,33 +1,39 @@
 import pytest
 
 from app.src.domain.decision_tree import Scenario, Decision, Answer
+from app.src.domain.team import Member, SkillType
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 
 
 def test_mongo_scenario_can_be_saved_loaded_and_deleted():
     mongo = ScenarioMongoModel()
-    s = Scenario(budget=100000, scheduled_days=40, tasks=300)
-    s2 = Scenario(budget=215, scheduled_days=677, tasks_total=2, tasks_done=30, current_day=30, actual_cost=300000, counter=4)
+    s = Scenario(budget=100000, scheduled_days=40, tasks_done=300)
+    s2 = Scenario(budget=215, scheduled_days=677, tasks_total=2, tasks_done=30, current_day=30, actual_cost=300000,
+                  counter=4)
 
     mid = mongo.save(s)
     result = mongo.get(mid)
-    assert result == s
+    assert result.budget == s.budget
+    assert result.tasks_done == s.tasks_done
+    assert result.counter == s.counter
 
     mid2 = mongo.save(s2)
     result2 = mongo.get(mid2)
-    assert result2 == s2
+    assert result2.budget == s2.budget
+    assert result2.current_day == s2.current_day
 
-    mongo.remove(obj=s)
+    mongo.remove(mid=mid)
     with pytest.raises(NoObjectWithIdException):
         mongo.get(mid)
 
-    mid2 = mongo.save(s2)
-    result2 = mongo.get(mid2)
-    assert result2 == s2
+    mid2 = mongo.save(result2)
+    result3 = mongo.get(mid2)
+    assert result2.get_id() == result3.get_id()
+    assert result2.budget == s2.budget == result3.budget
 
     mongo.remove(mid=mid2)
     with pytest.raises(NoObjectWithIdException):
-        mongo.get(mid)
+        mongo.get(mid2)
 
 
 def test_mongo_scenario_saves_decision_tree():
@@ -82,3 +88,64 @@ def test_decision_saves_dtype_and_points():
     dec = result._decisions[0]
     assert dec.dtype == "model"
     assert dec.points == 200
+
+
+def test_team_members_are_saved():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    s.team += Member(xp_factor=1, motivation=0.5, familiarity=0)
+
+    mid = mongo.save(s)
+
+    result = mongo.get(mid)
+    team = result.team
+
+    m = team.staff[0]
+
+    assert m.xp_factor == 1
+    assert m.motivation == 0.5
+    assert m.familiarity == 0
+    assert m.halted is False
+
+    assert m.skill_type == SkillType('junior')
+
+
+def test_halted_team_members_are_saved():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    m = Member()
+    m.halt()
+    s.team += m
+
+    mid = mongo.save(s)
+
+    result = mongo.get(mid)
+    team = result.team
+
+    m = team.staff[0]
+
+    assert m.halted is True
+
+
+def test_team_members_skill_type_are_saved():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    s.team += Member('senior')
+    s.team += Member('expert')
+
+    mid = mongo.save(s)
+
+    result = mongo.get(mid)
+    team = result.team
+
+    stypes = [m.skill_type for m in team.staff]
+    print([s.name for s in stypes])
+
+    assert SkillType('senior') in stypes
+    assert SkillType('expert') in stypes
+    assert (SkillType('junior') in stypes) is False
+
+
+def test_t():
+    assert Scenario(budget=100) == Scenario(budget=300)
+    assert SkillType('expert') != SkillType("junior")

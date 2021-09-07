@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
+from app.src.domain.team import Team, Member
+
 
 @dataclass
 class Answer:
@@ -28,9 +30,9 @@ class TextBlock(object):
                 'content': self.content}
 
 
-@dataclass
 class Decision:
-    def __init__(self, text: List[TextBlock] = None, continue_text: str = "Continue", dtype: str = None, points: int = 0):
+    def __init__(self, text: List[TextBlock] = None, continue_text: str = "Continue", dtype: str = None,
+                 points: int = 0):
         self.text = text
         self.answers = []
         self.continue_text = continue_text
@@ -74,7 +76,6 @@ class Decision:
         return 0
 
 
-@dataclass
 class Scenario:
     def __init__(self, **kwargs):
         if json := kwargs.get('json'):
@@ -88,8 +89,9 @@ class Scenario:
             self.scheduled_days = int()
             self.counter = int(kwargs.get('counter', 0) or 0)
             self._decisions = kwargs.get('decisions', []) or []
-            self._id = kwargs.get('_id', None)
+            self._id = kwargs.get('_id', None)  # ToDo: Refactor ID to properly use ObjectId.
             self.desc = kwargs.get('desc', 0) or ""
+            self.team = Team()
 
     def __iter__(self):
         return self
@@ -113,7 +115,8 @@ class Scenario:
              'counter': self.counter,
              'current_day': self.current_day,
              'scheduled_days': self.scheduled_days,
-             'desc': self.desc
+             'desc': self.desc,
+             'team': self.team.json
              }
         if self._id:
             d['_id'] = str(self._id)
@@ -128,7 +131,7 @@ class Scenario:
     def get_max_points(self) -> int:
         return sum([d.get_max_points() for d in self._decisions])
 
-    def build(self, json):
+    def build(self, json):  # ToDo: Refactor.
         print(json)
         self.__init__(tasks_done=json.get('tasks_done'),
                       tasks_total=json.get('tasks_total'),
@@ -137,7 +140,7 @@ class Scenario:
                       current_day=json.get('current_day'),
                       budget=json.get('budget'),
                       _id=json.get('_id'),
-                      desc=json.get('desc')
+                      desc=json.get('desc'),
                       )
         for d in json.get('decisions') or []:
             dec = Decision(continue_text=d.get('continue_text'), dtype=d.get('dtype'), points=d.get('points'))
@@ -146,7 +149,13 @@ class Scenario:
             for a in d.get('answers'):
                 dec.add(Answer(text=a.get('text'), points=a.get('points'), result_text=a.get('result_text')))
             self.add(dec)
+        if t := json.get('team'):
+            for m in t.get('staff'):
+                member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
+                                familiarity=m.get('familiarity'))
+                if m.get('halted'):
+                    member.halt()
+                self.team += member
 
     def get_id(self):
         return self._id
-

@@ -28,7 +28,7 @@ def test_member_has_skill_type():
 
 def test_member_has_all_params():
     x = 0.4
-    y = 99
+    y = 0.99
     z = 0.1
     m = Member(skill_type='expert', xp_factor=x, motivation=y, familiarity=z)
 
@@ -82,9 +82,9 @@ def test_team_size():
 def test_teams_motivation():
     team = Team()
     assert team.motivation == 0
-    team += Member(motivation=10)
+    team += Member(motivation=0.10)
     team += Member(motivation=0)
-    assert 5. >= team.motivation >= 5.
+    assert .05 >= team.motivation >= .05
 
 
 def test_teams_salary():

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from math import floor, sqrt
+from math import floor
 from statistics import mean
 from typing import List
 
@@ -18,6 +18,16 @@ class Member:
         self.motivation = value_or_error(motivation)
         self.familiarity = value_or_error(familiarity)
         self.halted = False
+
+    @property
+    def json(self):
+        return {
+            'skill-type': self.skill_type.name,
+            'xp': self.xp_factor,
+            'motivation': self.motivation,
+            'familiarity': self.familiarity,
+            'halted': self.halted
+        }
 
     @property
     def efficiency(self) -> float:
@@ -64,7 +74,7 @@ class Team:
         self.staff.append(member)
         return self
 
-    def __isub__(self, member: Member):
+    def __isub__(self, member: Member):  # ToDo: This does not work when the model was saved to the db.
         try:
             self.staff.remove(member)
         except ValueError:
@@ -76,6 +86,12 @@ class Team:
 
     def __len__(self):
         return len(self.staff)
+
+    @property
+    def json(self):
+        return {
+            'staff': [m.json for m in self.staff]
+        }
 
     @property
     def motivation(self):
@@ -129,6 +145,9 @@ class SkillType:
         self.salary = data['salary']
         self.error_rate = data['error-rate']
         self.throughput = data['throughput']
+
+    def __str__(self):
+        return "SkillType: " + self.name
 
 
 class NotAValidSkillTypeException(Exception):
