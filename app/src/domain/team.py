@@ -3,6 +3,7 @@ from math import floor
 from statistics import mean
 from typing import List
 
+from app.src.domain.dataObjects import WorkPackage, WorkResult
 from utils import YAMLReader, value_or_error
 
 # ToDo: Finish logic in team. Then save team in DB.
@@ -15,7 +16,7 @@ class Member:
                  familiarity: float = 0.):
         self.skill_type = SkillType(skill_type)
         self.xp_factor = value_or_error(xp_factor)
-        self.motivation = value_or_error(motivation)
+        self.motivation = value_or_error(motivation)  # ToDo: Calculate Motivation.
         self.familiarity = value_or_error(familiarity)
         self.halted = False
 
@@ -119,14 +120,22 @@ class Team:
                 num_errs += e
         return num_tasks, num_errs
 
-    def meeting(self):
+    def work(self, work_package: WorkPackage):  # ToDo: Write Tests.
+        wr = WorkResult()
+        for _ in range(work_package.days):
+            self.solve_tasks(work_package.work_hours)
+            self.meeting(work_package.daily_meeting_hours)
+
+
+    def meeting(self, time):
         """
         A meeting increases every members familiarity.
         :return: None
         """
         for member in self.staff:
             if not member.halted:
-                member.familiarity = inc(member.familiarity)
+                for _ in range(time):  # ToDo: This can be included in the the improved inc function.
+                    member.familiarity = inc(member.familiarity)
 
 
 class SkillType:
