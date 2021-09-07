@@ -135,15 +135,15 @@ def test_member_solves_tasks_and_makes_errors():
 
 
 def test_member_factors_are_between_zero_and_one():
-    m = Member(xp_factor=0.5, motivation=1, familiarity=0)
+    Member(xp_factor=0.5, motivation=1, familiarity=0)
     with pytest.raises(ValueError):
-        m = Member(xp_factor=1.1)
+        Member(xp_factor=1.1)
     with pytest.raises(ValueError):
-        m = Member(motivation=-0.1)
+        Member(motivation=-0.1)
     with pytest.raises(ValueError):
-        m = Member(familiarity=3000)
+        Member(familiarity=3000)
     with pytest.raises(ValueError):
-        m = Member(motivation=0.2, familiarity=2, xp_factor=.1)
+        Member(motivation=0.2, familiarity=2, xp_factor=.1)
 
 
 def test_team_solves_tasks():
