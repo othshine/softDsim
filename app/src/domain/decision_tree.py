@@ -1,15 +1,16 @@
 from dataclasses import dataclass
 from typing import List
 
+from bson import ObjectId
+
 from app.src.domain.team import Team, Member
 
 
 @dataclass
 class Answer:
-    def __init__(self, text: str, points: int, result_text: str = ""):
-        self.text = text
-        self.points = points
-        self.result_text = result_text
+    text: str
+    points: int
+    result_text: str = None
 
     @property
     def json(self):
@@ -20,9 +21,8 @@ class Answer:
 
 @dataclass
 class TextBlock(object):
-    def __init__(self, header: str, content: str):
-        self.header = header
-        self.content = content
+    header: str
+    content: str
 
     @property
     def json(self):
@@ -89,7 +89,7 @@ class Scenario:
             self.scheduled_days = int()
             self.counter = int(kwargs.get('counter', 0) or 0)
             self._decisions = kwargs.get('decisions', []) or []
-            self._id = kwargs.get('_id', None)  # ToDo: Refactor ID to properly use ObjectId.
+            self._id = ObjectId(kwargs.get('_id')) or ObjectId
             self.desc = kwargs.get('desc', 0) or ""
             self.team = Team()
 
@@ -105,6 +105,11 @@ class Scenario:
     def __len__(self) -> int:
         return len(self._decisions)
 
+    def __eq__(self, other):
+        if isinstance(other, Scenario):
+            return self._id == other._id
+        return False
+
     @property
     def json(self):
         d = {'tasks_done': self.tasks_done,
@@ -116,10 +121,9 @@ class Scenario:
              'current_day': self.current_day,
              'scheduled_days': self.scheduled_days,
              'desc': self.desc,
-             'team': self.team.json
+             'team': self.team.json,
+             '_id': str(self._id)
              }
-        if self._id:
-            d['_id'] = str(self._id)
         return d
 
     def add(self, decision: Decision):
@@ -132,7 +136,6 @@ class Scenario:
         return sum([d.get_max_points() for d in self._decisions])
 
     def build(self, json):  # ToDo: Refactor.
-        print(json)
         self.__init__(tasks_done=json.get('tasks_done'),
                       tasks_total=json.get('tasks_total'),
                       scheduled_days=json.get('scheduled_days'),
@@ -157,5 +160,5 @@ class Scenario:
                     member.halt()
                 self.team += member
 
-    def get_id(self):
-        return self._id
+    def get_id(self) -> str:
+        return str(self._id)

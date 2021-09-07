@@ -129,7 +129,6 @@ class Team:
                 member.familiarity = inc(member.familiarity)
 
 
-@dataclass
 class SkillType:
     """
     Represents a level of skill that a member can have. (Junior, Senior, Expert). A skill type object contains all
@@ -148,6 +147,11 @@ class SkillType:
 
     def __str__(self):
         return "SkillType: " + self.name
+
+    def __eq__(self, other):
+        if isinstance(other, SkillType):
+            return other.name == self.name
+        return False
 
 
 class NotAValidSkillTypeException(Exception):

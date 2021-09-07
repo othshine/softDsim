@@ -5,6 +5,29 @@ from app.src.domain.team import Member, SkillType
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 
 
+def test_mongo_scenario_update():
+    mongo = ScenarioMongoModel()
+    s = Scenario(budget=300)
+    mid = mongo.save(s)
+    result = mongo.get(mid)
+    assert result == s
+    assert result.budget == s.budget
+    assert result.get_id() == s.get_id()
+    assert len(result.team) == 0
+
+    result.team += Member()
+    result.current_day = 7
+
+    mongo.update(result)
+
+    result = mongo.get(mid)
+
+    assert len(result.team) == 1
+    assert result.current_day == 7
+    assert result.budget == 300
+    assert result.get_id() == s.get_id()
+
+
 def test_mongo_scenario_can_be_saved_loaded_and_deleted():
     mongo = ScenarioMongoModel()
     s = Scenario(budget=100000, scheduled_days=40, tasks_done=300)
@@ -16,20 +39,23 @@ def test_mongo_scenario_can_be_saved_loaded_and_deleted():
     assert result.budget == s.budget
     assert result.tasks_done == s.tasks_done
     assert result.counter == s.counter
+    assert result == s
 
     mid2 = mongo.save(s2)
     result2 = mongo.get(mid2)
     assert result2.budget == s2.budget
     assert result2.current_day == s2.current_day
+    assert result2 == s2
 
     mongo.remove(mid=mid)
     with pytest.raises(NoObjectWithIdException):
         mongo.get(mid)
 
-    mid2 = mongo.save(result2)
+    mid2 = mongo.update(result2)
     result3 = mongo.get(mid2)
     assert result2.get_id() == result3.get_id()
     assert result2.budget == s2.budget == result3.budget
+    assert result2 == result3 == s2
 
     mongo.remove(mid=mid2)
     with pytest.raises(NoObjectWithIdException):
@@ -77,8 +103,8 @@ def test_decision_saves_dtype_and_points():
     d = Decision(points=200)
     d.add_text_block("Title", "This is some sweet content!")
     d.add_text_block("Title 2", "C2")
-    d.add(Answer(text="Kanban", points=30))
-    d.add(Answer(text="Scrum", points=100))
+    a = Answer(text="Scrum", points=100)
+    d.add(a)
     d.dtype = "model"
     s.add(d)
     mid = mongo.save(s)
@@ -88,6 +114,9 @@ def test_decision_saves_dtype_and_points():
     dec = result._decisions[0]
     assert dec.dtype == "model"
     assert dec.points == 200
+    assert dec.answers[0] == Answer(text='Scrum', points=100)
+    assert dec.answers[0] != Answer(text='Kanban', points=0)
+    assert dec.answers[0].json == a.json
 
 
 def test_team_members_are_saved():
@@ -139,13 +168,9 @@ def test_team_members_skill_type_are_saved():
     team = result.team
 
     stypes = [m.skill_type for m in team.staff]
-    print([s.name for s in stypes])
 
     assert SkillType('senior') in stypes
     assert SkillType('expert') in stypes
-    assert (SkillType('junior') in stypes) is False
+    assert SkillType('junior') not in stypes
 
 
-def test_t():
-    assert Scenario(budget=100) == Scenario(budget=300)
-    assert SkillType('expert') != SkillType("junior")
