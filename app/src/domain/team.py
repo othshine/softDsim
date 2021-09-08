@@ -7,9 +7,15 @@ from bson import ObjectId
 from app.src.domain.dataObjects import WorkPackage, WorkResult
 from utils import YAMLReader, value_or_error
 
+
 # ToDo: Finish logic in team. Then save team in DB.
 
-inc = lambda x: min([x + 0.1, 1.0])  # ToDo: Find a fitting function that approaches 1
+def inc(x: float):
+    """
+    Increase function for increasing member values (xp, motivation, familiarity). Currently just adds 0.1 with a
+    limit of 1. :param x: current value  :return: float - x + 0.1
+    """
+    return min([x + 0.1, 1.0])  # ToDo: Find a fitting function that approaches 1
 
 
 class Member:
