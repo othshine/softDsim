@@ -221,3 +221,22 @@ def test_members_have_different_id():
     m2n = team.get_member(id2)
     assert m2n.get_id() == m2.get_id()
     assert m2n.motivation == m2.motivation
+
+
+def test_remove_member_saved_in_database():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    s.team += Member()
+    m = Member('expert', motivation=0.5, xp_factor=0, familiarity=0)
+    s.team += m
+    s.team += Member('expert')
+
+    sid = mongo.save(s)
+    result = mongo.get(sid)
+    team = result.team
+
+    assert m in team
+    assert len(team) == 3
+    team -= m
+    assert m not in team
+    assert len(team) == 2

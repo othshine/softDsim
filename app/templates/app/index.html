@@ -22,8 +22,11 @@
             SoftDSim
         </div>
         <div class="row">
-            <div id="task-container">
+            <div id="task-container" class="row-container">
                 <button>Tasks: [[ tasks_done ]] / [[ tasks_total ]]</button>
+            </div>
+            <div class="row-container">
+                <button>Monthly Expenditure: [[ cost | toCurrency ]]</button>
             </div>
             <div class="menu">
                 <a href="#" class="link">
@@ -107,10 +110,10 @@
             </h3>
             <div id="staff-picker-container">
                 <div id="staff-number-container">
-                    <div id="staff-number-junior" class="staff-number">•</div>
-                    <div id="staff-number-senior" class="staff-number"></div>
-                    <div id="staff-number-expert" class="staff-number">•••</div>
-                    <div id="staff-number-consultant" class="staff-number">••</div>
+                    <div id="staff-number-junior" class="staff-number">[[ staff.junior ]]</div>
+                    <div id="staff-number-senior" class="staff-number">[[ staff.senior ]]</div>
+                    <div id="staff-number-expert" class="staff-number">[[ staff.expert ]]</div>
+                    <div id="staff-number-consultant" class="staff-number"></div>
                 </div>
                 <div id="staff-name-container">
                     <div class="staff-name">Junior</div>
@@ -120,16 +123,16 @@
                 </div>
                 <div id="staff-button-container">
                     <div class="staff-button">
-                        <button onclick="pickerAdd(0)">+</button>
-                        <button onclick="pickerSub(0)">-</button>
+                        <button onclick="pickerAdd('junior')">+</button>
+                        <button onclick="pickerSub('junior')">-</button>
                     </div>
                     <div class="staff-button">
-                        <button onclick="pickerAdd(1)">+</button>
-                        <button onclick="pickerSub(1)">-</button>
+                        <button onclick="pickerAdd('senior')">+</button>
+                        <button onclick="pickerSub('senior')">-</button>
                     </div>
                     <div class="staff-button">
-                        <button onclick="pickerAdd(2)">+</button>
-                        <button onclick="pickerSub(2)">-</button>
+                        <button onclick="pickerAdd('expert')">+</button>
+                        <button onclick="pickerSub('expert')">-</button>
                     </div>
                     <div class="staff-button">
                         <button onclick="pickerAdd(3)">+</button>
@@ -154,6 +157,7 @@
 
             <div id="continue-container">
                 <button onclick="cont()">[[ continue_text ]]</button>
+                <button onclick="simulate()">Simulate</button>
             </div>
 
         </section>

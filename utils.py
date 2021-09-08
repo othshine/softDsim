@@ -25,6 +25,25 @@ def value_or_error(val, lower: float = 0.0, upper: float = 1.0):
     raise ValueError
 
 
+def dots(n: int):
+    """
+    Returns a string with n dots: •
+    :param n: int - number of desired dots
+    :return: str - •••
+    """
+    return "•"*n
+
+
+def month_to_day(value: float, num_days: int = 1) -> float:
+    """
+    Turns a value that refers to a timespan of one month to the time in days. Assumes that a month is 30 days long.
+    :param value: e.g. 3000 ($ per month)
+    :param num_days: e.g. 15 (days)
+    :return: 1500 ($ per 15 days)
+    """
+    return value * (num_days / 30)
+
+
 class _YAMLReader:
     def __init__(self, path):
         self.path = path

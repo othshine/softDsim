@@ -288,7 +288,7 @@ nav .menu {
   width: 50%;
 }
 
-#task-container > button {
+.row-container > button {
   width: 100%;
   height: 100%;
 }

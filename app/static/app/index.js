@@ -5,12 +5,12 @@
 
 
 function pickerAdd(n){
-  document.getElementById("staff-number-container").children[n].innerText += "•"
+  x._data.staff[n] += "•";
 }
 
 function pickerSub(n){
-  const str = document.getElementById("staff-number-container").children[n].innerText;
-  document.getElementById("staff-number-container").children[n].innerText = str.substring(0, str.length - 1)
+  const str = x._data.staff[n];
+  x._data.staff[n] = str.substring(0, str.length - 1)
 }
 
 

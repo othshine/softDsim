@@ -3,7 +3,9 @@ from typing import List
 
 from bson import ObjectId
 
+from app.src.domain.dataObjects import WorkPackage, WorkResult
 from app.src.domain.team import Team, Member
+from utils import month_to_day
 
 
 @dataclass
@@ -134,6 +136,15 @@ class Scenario:
 
     def get_max_points(self) -> int:
         return sum([d.get_max_points() for d in self._decisions])
+
+    def work(self, days, meeting):
+        wp = WorkPackage(days=days, daily_meeting_hours=meeting)
+        self.apply_work_result(self.team.work(wp))
+        self.actual_cost += month_to_day(self.team.salary, days)
+        self.current_day += days
+
+    def apply_work_result(self, wr: WorkResult):
+        self.tasks_done += wr.tasks_completed
 
     def build(self, json):  # ToDo: Refactor.
         self.__init__(tasks_done=json.get('tasks_done'),

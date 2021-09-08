@@ -28,6 +28,11 @@ class Member:
         self.halted = False
         self.id = ObjectId() if id is None else ObjectId(id) if isinstance(id, str) else id
 
+    def __eq__(self, other):
+        if isinstance(other, Member):
+            return self.id == other.id
+        return False
+
     @property
     def json(self):
         return {
@@ -87,7 +92,7 @@ class Team:
         self.staff.append(member)
         return self
 
-    def __isub__(self, member: Member):  # ToDo: This does not work when the model was saved to the db.
+    def __isub__(self, member: Member):
         try:
             self.staff.remove(member)
         except ValueError:
@@ -157,6 +162,25 @@ class Team:
             if m.get_id() == _id:
                 return m
         raise ValueError
+
+    def count(self, skill_type_name):
+        """
+        Returns the number of
+        :param skill_type_name:
+        :return:
+        """
+        c = 0
+        for m in self.staff:
+            if m.skill_type.name == skill_type_name:
+                c += 1
+        return c
+
+    def remove_weakest(self, skill_type_name: str):
+        w = None
+        for m in self.staff:
+            if m.skill_type.name == skill_type_name and (w is None or w.efficiency > m.efficiency):
+                w = m
+        self.__isub__(w)
 
 
 class SkillType:

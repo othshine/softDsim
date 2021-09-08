@@ -217,3 +217,40 @@ def test_team_get_member_by_id():
     assert m2.xp_factor == m.xp_factor
     assert m2.motivation == m.motivation
     assert m2.familiarity == m.familiarity
+
+def test_team_count_types():
+    t = Team()
+    t += Member("junior")
+    t += Member("senior")
+    t += Member("senior")
+    t += Member("junior")
+    t += Member("expert")
+    assert t.count("junior") == 2
+    assert t.count("senior") == 2
+    assert t.count("expert") == 1
+
+
+def test_remove_weakest_member():
+    t = Team()
+    m1 = Member(skill_type='junior', xp_factor=0.1, motivation=1, familiarity=0)
+    m2 = Member(skill_type='senior', xp_factor=1, motivation=1, familiarity=1)
+    m3 = Member(skill_type='senior', xp_factor=0.1, motivation=1, familiarity=0)
+    m4 = Member(skill_type='junior', xp_factor=1, motivation=1, familiarity=0)
+    t += m1
+    t += m2
+    t += m3
+    t += m4
+    assert m1 in t
+    assert m2 in t
+    assert m3 in t
+    assert m4 in t
+    t.remove_weakest('senior')
+    assert m1 in t
+    assert m2 in t
+    assert m3 not in t
+    assert m4 in t
+    t.remove_weakest('junior')
+    assert m1 not in t
+    assert m2 in t
+    assert m3 not in t
+    assert m4 in t
