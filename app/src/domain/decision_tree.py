@@ -89,7 +89,7 @@ class Scenario:
             self.scheduled_days = int()
             self.counter = int(kwargs.get('counter', 0) or 0)
             self._decisions = kwargs.get('decisions', []) or []
-            self._id = ObjectId(kwargs.get('_id')) or ObjectId
+            self.id = ObjectId(kwargs.get('id')) or ObjectId
             self.desc = kwargs.get('desc', 0) or ""
             self.team = Team()
 
@@ -107,7 +107,7 @@ class Scenario:
 
     def __eq__(self, other):
         if isinstance(other, Scenario):
-            return self._id == other._id
+            return self.id == other.id
         return False
 
     @property
@@ -122,7 +122,7 @@ class Scenario:
              'scheduled_days': self.scheduled_days,
              'desc': self.desc,
              'team': self.team.json,
-             '_id': str(self._id)
+             '_id': str(self.id)
              }
         return d
 
@@ -142,7 +142,7 @@ class Scenario:
                       actual_cost=json.get('actual_cost'),
                       current_day=json.get('current_day'),
                       budget=json.get('budget'),
-                      _id=json.get('_id'),
+                      id=json.get('_id'),
                       desc=json.get('desc'),
                       )
         for d in json.get('decisions') or []:
@@ -155,10 +155,10 @@ class Scenario:
         if t := json.get('team'):
             for m in t.get('staff'):
                 member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
-                                familiarity=m.get('familiarity'))
+                                familiarity=m.get('familiarity'), id=m.get('_id'))
                 if m.get('halted'):
                     member.halt()
                 self.team += member
 
     def get_id(self) -> str:
-        return str(self._id)
+        return str(self.id)

@@ -201,3 +201,19 @@ def test_team_meeting():
     t.meeting(5)
     f2 = m.familiarity
     assert f1 < f2
+
+
+def test_team_get_member_by_id():
+    t = Team()
+    t += Member(xp_factor=1)
+    t += Member(skill_type='expert')
+    m = Member(skill_type='senior', xp_factor=0.1, motivation=1, familiarity=0)
+    _id = m.get_id()
+    t += m
+    t += Member(xp_factor=0)
+    m2 = t.get_member(_id)
+    assert m2.get_id() == m.get_id()
+    assert m2.skill_type == m.skill_type
+    assert m2.xp_factor == m.xp_factor
+    assert m2.motivation == m.motivation
+    assert m2.familiarity == m.familiarity

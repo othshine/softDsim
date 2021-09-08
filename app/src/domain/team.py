@@ -1,7 +1,8 @@
-from dataclasses import dataclass
 from math import floor
 from statistics import mean
 from typing import List
+
+from bson import ObjectId
 
 from app.src.domain.dataObjects import WorkPackage, WorkResult
 from utils import YAMLReader, value_or_error
@@ -13,12 +14,13 @@ inc = lambda x: min([x + 0.1, 1.0])  # ToDo: Find a fitting function that approa
 
 class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
-                 familiarity: float = 0.):
+                 familiarity: float = 0., id=None):
         self.skill_type = SkillType(skill_type)
         self.xp_factor = value_or_error(xp_factor)
         self.motivation = value_or_error(motivation)  # ToDo: Calculate Motivation.
         self.familiarity = value_or_error(familiarity)
         self.halted = False
+        self.id = ObjectId() if id is None else ObjectId(id) if isinstance(id, str) else id
 
     @property
     def json(self):
@@ -27,7 +29,8 @@ class Member:
             'xp': self.xp_factor,
             'motivation': self.motivation,
             'familiarity': self.familiarity,
-            'halted': self.halted
+            'halted': self.halted,
+            '_id': str(self.id)
         }
 
     @property
@@ -65,6 +68,9 @@ class Member:
         """
         self.halted = True
         return self.halted
+
+    def get_id(self) -> ObjectId:
+        return self.id
 
 
 class Team:
@@ -122,13 +128,13 @@ class Team:
 
     def work(self, work_package: WorkPackage) -> WorkResult:
         wr = WorkResult()
-        # ToDo: Change back to simulate every single day because if there are meetings the member improves over time.
-        nt, ne = self.solve_tasks(work_package.total_work_hours)
-        wr.tasks_completed += nt
-        wr.unidentified_errors += ne
-        self.meeting(work_package.daily_meeting_hours*work_package.days)
-        return wr
+        for day in range(work_package.days):
+            self.meeting(work_package.daily_meeting_hours)
+            nt, ne = self.solve_tasks(work_package.daily_work_hours)
+            wr.tasks_completed += nt
+            wr.unidentified_errors += ne
 
+        return wr
 
     def meeting(self, time):
         """
@@ -139,6 +145,12 @@ class Team:
             if not member.halted:
                 for _ in range(time):  # ToDo: This can be included in the the improved inc function.
                     member.familiarity = inc(member.familiarity)
+
+    def get_member(self, _id: ObjectId) -> Member:
+        for m in self.staff:
+            if m.get_id() == _id:
+                return m
+        raise ValueError
 
 
 class SkillType:
