@@ -198,6 +198,6 @@ def test_team_meeting():
     m = Member()
     t += m
     f1 = m.familiarity
-    t.meeting()
+    t.meeting(5)
     f2 = m.familiarity
     assert f1 < f2

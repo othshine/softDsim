@@ -7,8 +7,12 @@ class WorkPackage:
     daily_meeting_hours: int
 
     @property
-    def work_hours(self):
-        return 8 - (self.daily_meeting_hours)
+    def total_work_hours(self):
+        return (8 - self.daily_meeting_hours) * self.days
+
+    @property
+    def total_meeting_hours(self):
+        return self.daily_meeting_hours*self.days
 
 
 @dataclass(frozen=False)

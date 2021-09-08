@@ -120,11 +120,14 @@ class Team:
                 num_errs += e
         return num_tasks, num_errs
 
-    def work(self, work_package: WorkPackage):  # ToDo: Write Tests.
+    def work(self, work_package: WorkPackage) -> WorkResult:
         wr = WorkResult()
-        for _ in range(work_package.days):
-            self.solve_tasks(work_package.work_hours)
-            self.meeting(work_package.daily_meeting_hours)
+        # ToDo: Change back to simulate every single day because if there are meetings the member improves over time.
+        nt, ne = self.solve_tasks(work_package.total_work_hours)
+        wr.tasks_completed += nt
+        wr.unidentified_errors += ne
+        self.meeting(work_package.daily_meeting_hours*work_package.days)
+        return wr
 
 
     def meeting(self, time):
