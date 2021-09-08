@@ -174,3 +174,50 @@ def test_team_members_skill_type_are_saved():
     assert SkillType('junior') not in stypes
 
 
+def test_member_id_is_same_when_saved():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    s.team += Member()
+    m = Member(skill_type='senior', xp_factor=0.1, motivation=1, familiarity=0)
+    _id = m.get_id()
+    s.team += m
+    s.team += Member(skill_type='senior')
+
+    mid = mongo.save(s)
+    result = mongo.get(mid)
+    team = result.team
+
+    m2 = team.get_member(_id)
+
+    assert m2.get_id() == m.get_id()
+    assert m2.skill_type == m.skill_type
+    assert m2.xp_factor == m.xp_factor
+    assert m2.motivation == m.motivation
+    assert m2.familiarity == m.familiarity
+
+
+def test_members_have_different_id():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+
+    m1 = Member(skill_type='senior', xp_factor=0.1, motivation=1, familiarity=0)
+    id1 = m1.get_id()
+    s.team += m1
+
+    m2 = Member(skill_type='expert', xp_factor=0.5, motivation=0, familiarity=0.099)
+    id2 = m2.get_id()
+    s.team += m2
+
+    sid = mongo.save(s)
+
+    result = mongo.get(sid)
+
+    team = result.team
+
+    m1n = team.get_member(id1)
+    assert m1n.get_id() == m1.get_id()
+    assert m1n.motivation == m1.motivation
+
+    m2n = team.get_member(id2)
+    assert m2n.get_id() == m2.get_id()
+    assert m2n.motivation == m2.motivation
