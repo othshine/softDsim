@@ -21,7 +21,8 @@ let x = new Vue({
             senior: "•••",
             expert: "•"
         },
-        cost: 0
+        cost: 0,
+        meetings: 1
     },
     filters: {
     toCurrency (value) {
@@ -58,6 +59,7 @@ function getSettings() {
     return {
         'model': readButton('model-picker-container'),
         'lifecycle': readButton('lifecycle-picker-container'),
+        'meetings': x._data.meetings,
         'staff': {
             'junior': countStaff('junior'),
             'senior': countStaff('senior'),

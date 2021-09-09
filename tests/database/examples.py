@@ -14,3 +14,4 @@ def add():
 
 if __name__ == "__main__":
     print(add())
+    print(add())

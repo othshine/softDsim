@@ -7,6 +7,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
+from app.src.domain.dataObjects import WorkPackage
 from app.src.domain.decision_tree import Scenario, Decision
 from app.src.domain.team import Member
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
@@ -33,7 +34,6 @@ def adjust_staff(s, staff):
             s.team += Member(t)
 
 
-
 @csrf_exempt
 def click_continue(request):
     counter = int(request.GET.get("counter"))
@@ -46,9 +46,11 @@ def click_continue(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         adjust_staff(s, data['staff'])
+        print(data)
+        s.apply_work_result(s.team.work(WorkPackage(5, int(data['meetings']))))
 
 
-    d = s._decisions[0]
+    d = s._decisions[0]  # ToDo: if decision is Done: next()
     context = {
         "continue_text": d.continue_text,
         "tasks_done": s.tasks_done,
@@ -59,11 +61,13 @@ def click_continue(request):
             "senior": dots(s.team.count('senior')),
             "expert": dots(s.team.count('expert'))
         },
-        "cost": s.team.salary
+        "cost": s.team.salary,
+
     }
     for t in d.text:
         context.get('blocks').append({'header': t.header, 'text': t.content})
     print(context)
+    model.update(s)
     return HttpResponse(json.dumps(context), content_type="application/json")
 
 

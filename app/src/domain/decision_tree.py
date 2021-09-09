@@ -91,7 +91,7 @@ class Scenario:
             self.scheduled_days = int()
             self.counter = int(kwargs.get('counter', 0) or 0)
             self._decisions = kwargs.get('decisions', []) or []
-            self.id = ObjectId(kwargs.get('id')) or ObjectId
+            self.id = ObjectId(kwargs.get('id')) or ObjectId()
             self.desc = kwargs.get('desc', 0) or ""
             self.team = Team()
 

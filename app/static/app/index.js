@@ -13,6 +13,19 @@ function pickerSub(n){
   x._data.staff[n] = str.substring(0, str.length - 1)
 }
 
+/* Meetings */
+function addMeeting(){
+  if (x._data.meetings < 8){
+    x._data.meetings += 1
+  }
+}
+
+function subMeeting(){
+  if (x._data.meetings > 0){
+    x._data.meetings -= 1
+  }
+
+}
 
 /* Model Picker */
 
@@ -45,11 +58,13 @@ function makeActivityChart(length) {
   }
 }
 
+
+
 /* Graphs */
 const ctxCost = document.getElementById("cost-chart").getContext("2d");
 const labels = ["Week 0", "Week 1", "Week 2", "Week 3", "Week 4", "Week 5"]
 
-new Chart(ctxCost, {
+const costChart = new Chart(ctxCost, {
   type: 'line',
   data: {
     labels: labels,
@@ -59,7 +74,7 @@ new Chart(ctxCost, {
         borderColor: "#55AAFF",
         fill: false
       }, { 
-        data: [0, 10, 40, 65, 95, 128],
+        data: [0, 10, 40, 65, 95],
         label: "Actual",
         borderColor: "#FF55AA",
         fill: false
@@ -74,8 +89,19 @@ new Chart(ctxCost, {
   }
 });
 
-const ctxTasks = document.getElementById("tasks-chart").getContext("2d");
+function addWeek(chart, value, week, label="Actual"){
+  if (chart.data.labels.length <= week){
+    chart.data.labels.push("Week " + week);
+  }
+  chart.data.datasets.forEach((dataset) => {
+    if (dataset.label === label){
+      dataset.data.push(value)
+    }
+  })
+  chart.update()
+}
 
+const ctxTasks = document.getElementById("tasks-chart").getContext("2d");
 new Chart(ctxTasks, {
   type: 'line',
   data: {

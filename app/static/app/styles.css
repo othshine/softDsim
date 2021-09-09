@@ -99,10 +99,16 @@ button {
   border:  0;
   cursor: pointer;
   height: 1.5rem;
+  background-color: var(--light);
 }
 
 button:hover{
   background-color: var(--blue);
+}
+
+button:disabled:hover {
+  background-color: var(--light);
+  cursor: auto;
 }
 
 button:active{
