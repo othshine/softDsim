@@ -40,14 +40,14 @@ def click_continue(request):
     model = ScenarioMongoModel()
     s_id = request.COOKIES.get('scenario')
     if s_id is None:
-        s_id = '613927888e8faa586c05644a'
+        s_id = '613a2d46763e702e2dac8e9e'
     s = model.get(s_id)
 
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         adjust_staff(s, data['staff'])
         print(data)
-        s.apply_work_result(s.team.work(WorkPackage(5, int(data['meetings']))))
+        s.work(5, int(data['meetings']))
 
 
     d = s._decisions[0]  # ToDo: if decision is Done: next()
@@ -62,6 +62,7 @@ def click_continue(request):
             "expert": dots(s.team.count('expert'))
         },
         "cost": s.team.salary,
+        "actual_cost": s.actual_cost
 
     }
     for t in d.text:
@@ -71,30 +72,6 @@ def click_continue(request):
     return HttpResponse(json.dumps(context), content_type="application/json")
 
 
-@csrf_exempt
-def click_simulate(request):
-    model = ScenarioMongoModel()
-    s = model.get(get_scenario_cookie())
-
-    if request.method == 'POST':
-        pass
-
-    d = s._decisions[0]
-    context = {
-        "continue_text": d.continue_text,
-        "tasks_done": s.tasks_done,
-        "tasks_total": s.tasks_total,
-        "blocks": [],
-        "staff": {
-            "junior": dots(s.team.count('junior')),
-            "senior": dots(s.team.count('senior')),
-            "expert": dots(s.team.count('expert'))
-        }
-    }
-    for t in d.text:
-        context.get('blocks').append({'header': t.header, 'text': t.content})
-
-    return HttpResponse(json.dumps(context), content_type="application/json")
 
 
 def instructor(request):

@@ -69,12 +69,12 @@ const costChart = new Chart(ctxCost, {
   data: {
     labels: labels,
     datasets: [{ 
-        data: [0, 20, 40, 60, 80, 100],
+        data: [0, 20000, 40000, 60000, 80000, 100000],
         label: "Management Goals",
         borderColor: "#55AAFF",
         fill: false
       }, { 
-        data: [0, 10, 40, 65, 95],
+        data: [0],
         label: "Actual",
         borderColor: "#FF55AA",
         fill: false
@@ -112,7 +112,7 @@ new Chart(ctxTasks, {
         borderColor: "#55AAFF",
         fill: false
       }, { 
-        data: [0, 5, 15, 40, 75, 100],
+        data: [],
         label: "Actual",
         borderColor: "#FF55AA",
         fill: false

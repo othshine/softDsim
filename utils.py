@@ -36,12 +36,10 @@ def dots(n: int):
 
 def month_to_day(value: float, num_days: int = 1) -> float:
     """
-    Turns a value that refers to a timespan of one month to the time in days. Assumes that a month is 30 days long.
-    :param value: e.g. 3000 ($ per month)
-    :param num_days: e.g. 15 (days)
-    :return: 1500 ($ per 15 days)
+    Turns a value that refers to a timespan of one month to the time in days. Assumes that a month is 20 business
+    days long. :param value: e.g. 3000 ($ per month) :param num_days: e.g. 15 (days) :return: 1500 ($ per 15 days)
     """
-    return value * (num_days / 30)
+    return value * (num_days / 20)
 
 
 class _YAMLReader:

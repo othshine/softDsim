@@ -90,26 +90,7 @@ async function cont() {
     x._data.staff.senior = data.staff.senior
     x._data.staff.expert = data.staff.expert
     x._data.cost = data.cost
-    COUNTER += 1;
-}
-
-async function simulate() {
-    const response = await fetch('simulate/?counter=' + COUNTER,
-        {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            body: JSON.stringify(getSettings())
-        }
-    );
-    const data = await response.json();
-    x._data.blocks = data.blocks;
-    x._data.tasks_done = data.tasks_done;
-    x._data.tasks_total = data.tasks_total;
-    x._data.continue_text = data.continue_text
-
-    console.log(x._data)
+    addWeek(costChart, data.actual_cost, COUNTER)
+    console.log(data.actual_cost)
     COUNTER += 1;
 }
