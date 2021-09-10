@@ -1,17 +1,20 @@
 import json
 
 from bson import ObjectId
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
+from app.forms import ScenarioNameForm, ScenarioEditForm
 from app.src.domain.dataObjects import WorkPackage
 from app.src.domain.decision_tree import Scenario, Decision
 from app.src.domain.team import Member
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 from utils import dots
+
+
 
 
 def index(request):
@@ -113,4 +116,38 @@ def get_scenario(request, sid):
 
 
 def add_scenario(request):
-    return render(request, "app/instructor/add_scenario.html")
+    if request.method == 'POST':
+        form = ScenarioNameForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            s = Scenario(name=form.cleaned_data['name'])
+            mongo = ScenarioMongoModel()
+            mid = mongo.save(s)
+            print("XXX")
+            return HttpResponseRedirect("/instructor/edit/" + s.get_id(),)  # ToDo: use reverse.
+    context = {
+        'form': ScenarioNameForm(),
+        'info': 'To create a new Scenario start by defining a name.',
+        'header': 'Add Scenario',
+        'url': '/instructor/add/scenario',
+        'btntext': 'Create Scenario'
+    }
+    return render(request, "app/instructor/add_scenario.html", context)
+
+
+def edit(request, sid):
+    mongo = ScenarioMongoModel()
+    s = mongo.get(sid)
+
+    if request.method == 'POST':
+        form = ScenarioNameForm(request.POST)
+        if form.is_valid():
+            pass
+    context = {
+        'form': ScenarioEditForm({'name': s.name}),
+        'info': 'Edit values of the Scenario.',
+        'header': 'Edit Scenario',
+        'url': '/instructor/edit/',
+        'btntext': 'Save'
+    }
+    return render(request, "app/instructor/add_scenario.html", context)

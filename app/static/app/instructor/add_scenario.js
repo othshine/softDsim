@@ -1,3 +1,5 @@
+// ToDo: This may be deleted!
+
 const input = document.getElementById('name-input');
 const btn = document.getElementById('add-sc-btn');
 

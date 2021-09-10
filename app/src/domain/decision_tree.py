@@ -119,6 +119,7 @@ class Scenario:
             self.id = ObjectId(kwargs.get('id')) or ObjectId()
             self.desc = kwargs.get('desc', 0) or ""
             self.team = Team()
+            self.name = kwargs.get("name", "DefaultName")
 
     def __iter__(self):
         return self
@@ -149,7 +150,8 @@ class Scenario:
              'scheduled_days': self.scheduled_days,
              'desc': self.desc,
              'team': self.team.json,
-             '_id': str(self.id)
+             '_id': str(self.id),
+             'name': self.name
              }
         return d
 
@@ -180,6 +182,7 @@ class Scenario:
                       budget=json.get('budget'),
                       id=json.get('_id'),
                       desc=json.get('desc'),
+                      name=json.get('name')
                       )
         for d in json.get('decisions') or []:
             self.add(build_decision(d))

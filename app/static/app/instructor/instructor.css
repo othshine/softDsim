@@ -12,7 +12,7 @@
     border: 1px solid var(--black);
 }
 
-.row {
+.row{
     width: 100%;
     min-height: 3rem;
     text-align: center;
@@ -127,4 +127,20 @@ button[disabled]:hover{
 .modal-leave-active .modal-container {
   -webkit-transform: scale(1.1);
   transform: scale(1.1);
+}
+
+#scenario > li:nth-of-type(even) .scenario-row{
+    background-color: var(--light);
+}
+
+.scenario-row > * {
+    vertical-align: center;
+}
+
+#scenario {
+    align-items: center; /* align vertical */
+}
+
+.errorlist {
+    display: none;
 }

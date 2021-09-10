@@ -14,12 +14,22 @@
     <div class="row">
         <h1>SoftDSimulator Instructor Interface</h1>
     </div>
+    <div class="row">
+                <h2>ID</h2>
+                <h2>Budget</h2>
+                <h2>Tasks</h2>
+            </div>
     <div class="row" id="vue">
+
         <ul id="scenario">
             <li v-for="se in scenarios">
-                <h3 class="element-header"> [[ se._id ]] </h3>
+                <div class="row scenario-row">
+                <h3> [[ se._id ]] </h3>
                 <p> [[ se.budget ]] </p>
+                    <p> [[ se.tasks_done ]] </p>
+                </div>
             </li>
+
         </ul>
     </div>
 </section>

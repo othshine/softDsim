@@ -17,6 +17,7 @@
   padding: 0;
   font-family: 'Noto Sans', sans-serif;
   color:  var(--black);
+  list-style-type: none;
 }
 
 html, body {
@@ -273,9 +274,8 @@ nav .logo {
   color: var(--neon);
 }
 
-.row {
+.row{
   width: 80%;
-  height: 100%;
   float: right;
   display: flex;
   flex-direction: row;

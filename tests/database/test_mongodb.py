@@ -268,3 +268,12 @@ def test_can_save_different_decision_types():
     assert isinstance(d, Decision)
     assert not isinstance(d, AnsweredDecision)
     assert isinstance(d, SimulationDecision)
+
+def test_custom_name_for_scenario():
+    s = Scenario(name="CoolName")
+    mongo = ScenarioMongoModel()
+    mid = mongo.save(s)
+
+    res = mongo.get(mid)
+
+    assert res.name == 'CoolName'
