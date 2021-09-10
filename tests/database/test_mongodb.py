@@ -1,5 +1,6 @@
 import pytest
 
+from app.src.domain.dataObjects import SimulationGoal
 from app.src.domain.decision_tree import Scenario, Decision, Answer, AnsweredDecision, SimulationDecision
 from app.src.domain.team import Member, SkillType
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
@@ -241,3 +242,29 @@ def test_remove_member_saved_in_database():
     team -= m
     assert m not in team
     assert len(team) == 2
+
+
+def test_can_save_different_decision_types():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    s.add(AnsweredDecision())
+    s.add(Decision())
+    s.add(SimulationDecision(goal=SimulationGoal(tasks=2)))
+
+    sid = mongo.save(s)
+    result = mongo.get(sid)
+
+    d = next(s)
+    assert isinstance(d, Decision)
+    assert isinstance(d, AnsweredDecision)
+    assert not isinstance(d, SimulationDecision)
+
+    d = next(s)
+    assert isinstance(d, Decision)
+    assert not isinstance(d, AnsweredDecision)
+    assert not isinstance(d, SimulationDecision)
+
+    d = next(s)
+    assert isinstance(d, Decision)
+    assert not isinstance(d, AnsweredDecision)
+    assert isinstance(d, SimulationDecision)

@@ -41,9 +41,11 @@ class Decision(ABC):
 
     @property
     def json(self):
-        return {'text': [t.json for t in self.text],
-                'continue_text': self.continue_text,
+        data = {'continue_text': self.continue_text,
                 'points': self.points}
+        if self.text:
+            data = {**data, 'text': [t.json for t in self.text]}
+        return data
 
     def get_max_points(self):
         pass
@@ -122,7 +124,7 @@ class Scenario:
         return self
 
     def __next__(self) -> Decision:
-        if self.counter >= len(self._decisions)-1:
+        if self.counter >= len(self._decisions) - 1:
             raise StopIteration
         self._eval_counter()
         return self._decisions[self.counter]
@@ -200,7 +202,8 @@ class Scenario:
             self.counter = 0
         else:
             d = self._decisions[self.counter]
-            if isinstance(d, AnsweredDecision) or (isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.tasks_done)):
+            if not isinstance(d, SimulationDecision) or (
+                    isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.tasks_done)):
                 self.counter += 1
 
 
@@ -212,7 +215,7 @@ def build_decision(d):
         for a in d.get('answers') or []:
             dec.add(Answer(text=a.get('text'), points=a.get('points'), result_text=a.get('result_text')))
 
-    for t in d.get('text'):
+    for t in d.get('text') or []:
         dec.add_text_block(t.get('header'), t.get('content'))
     dec.points = d.get('points', 0)
 
