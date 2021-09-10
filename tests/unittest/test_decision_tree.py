@@ -22,48 +22,25 @@ def test_scenario_get_next_decision():
     assert d.points == 0
     assert d.continue_text == "Continue"
 
-    d = next(s)
+    def check():
+        d = next(s)
 
-    assert isinstance(d, Decision)
-    assert not isinstance(d, AnsweredDecision)
-    assert isinstance(d, SimulationDecision)
-    assert d.goal == SimulationGoal(tasks=350)
-    assert "a" in [t.header for t in d.text]
-    assert "c" in [t.header for t in d.text]
-    assert "b" in [t.content for t in d.text]
-    assert "y" in [t.content for t in d.text]
-    assert d.continue_text == "Week"
-    assert d.points == 100
-    assert d.get_max_points() == 200
+        assert isinstance(d, Decision)
+        assert not isinstance(d, AnsweredDecision)
+        assert isinstance(d, SimulationDecision)
+        assert d.goal == SimulationGoal(tasks=350)
+        assert "a" in [t.header for t in d.text]
+        assert "c" in [t.header for t in d.text]
+        assert "b" in [t.content for t in d.text]
+        assert "y" in [t.content for t in d.text]
+        assert d.continue_text == "Week"
+        assert d.points == 100
+        assert d.get_max_points() == 200
 
-    d = next(s)
-
-    assert isinstance(d, Decision)
-    assert not isinstance(d, AnsweredDecision)
-    assert isinstance(d, SimulationDecision)
-    assert d.goal == SimulationGoal(tasks=350)
-    assert "a" in [t.header for t in d.text]
-    assert "c" in [t.header for t in d.text]
-    assert "b" in [t.content for t in d.text]
-    assert "y" in [t.content for t in d.text]
-    assert d.continue_text == "Week"
-    assert d.points == 100
-    assert d.get_max_points() == 200
-
+    check()
+    check()
     s.tasks_done = 349
-    d = next(s)
-
-    assert isinstance(d, Decision)
-    assert not isinstance(d, AnsweredDecision)
-    assert isinstance(d, SimulationDecision)
-    assert d.goal == SimulationGoal(tasks=350)
-    assert "a" in [t.header for t in d.text]
-    assert "c" in [t.header for t in d.text]
-    assert "b" in [t.content for t in d.text]
-    assert "y" in [t.content for t in d.text]
-    assert d.continue_text == "Week"
-    assert d.points == 100
-    assert d.get_max_points() == 200
+    check()
 
     s.tasks_done = 350
     d = next(s)
