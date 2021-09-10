@@ -11,9 +11,18 @@ class WorkPackage:
         return 8 - self.daily_meeting_hours
 
 
-
 @dataclass(frozen=False)
 class WorkResult:
     tasks_completed: int = 0
     unidentified_errors: int = 0
     fixed_errors: int = 0
+
+
+@dataclass(frozen=True)
+class SimulationGoal:
+    tasks: int = None
+
+    def reached(self, tasks: int = 0):
+        if self.tasks and self.tasks > tasks:
+            return False
+        return True

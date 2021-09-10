@@ -1,9 +1,10 @@
+from abc import ABC
 from dataclasses import dataclass
 from typing import List
 
 from bson import ObjectId
 
-from app.src.domain.dataObjects import WorkPackage, WorkResult
+from app.src.domain.dataObjects import WorkPackage, WorkResult, SimulationGoal
 from app.src.domain.team import Team, Member
 from utils import month_to_day
 
@@ -32,25 +33,44 @@ class TextBlock(object):
                 'content': self.content}
 
 
-class Decision:
-    def __init__(self, text: List[TextBlock] = None, continue_text: str = "Continue", dtype: str = None,
-                 points: int = 0):
-        self.text = text
-        self.answers = []
-        self.continue_text = continue_text
-        self.dtype = dtype
-        self.points = points
+class Decision(ABC):
+    def __init__(self, **kwargs):
+        self.text: List[TextBlock] = kwargs.get('text', None)
+        self.continue_text: str = kwargs.get('continue_text', "Continue")
+        self.points = kwargs.get('points', 0)
+
+    @property
+    def json(self):
+        return {'text': [t.json for t in self.text],
+                'continue_text': self.continue_text,
+                'points': self.points}
+
+    def get_max_points(self):
+        pass
+
+    def add_text_block(self, header: str, content: str):
+        t = TextBlock(header, content)
+        if self.text:
+            self.text.append(t)
+        else:
+            self.text = [t]
+
+    def evaluate(self, answer_text):
+        # self.points = self.get_points_for(answer_text)
+        pass
+
+
+class AnsweredDecision(Decision):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.answers = kwargs.get('answers', [])
 
     def __len__(self):
         return len(self.answers)
 
     @property
     def json(self):
-        return {'text': [t.json for t in self.text],
-                'answers': [a.json for a in self.answers],
-                'continue_text': self.continue_text,
-                'dtype': self.dtype,
-                'points': self.points}
+        return {**super().json, 'answers': [a.json for a in self.answers]}
 
     def add(self, answer: Answer):
         self.answers.append(answer)
@@ -61,21 +81,24 @@ class Decision:
     def get_max_points(self):
         return max([a.points for a in self.answers])
 
-    def add_text_block(self, header: str, content: str):
-        t = TextBlock(header, content)
-        if self.text:
-            self.text.append(t)
-        else:
-            self.text = [t]
-
-    def evaluate(self, answer_text):
-        self.points = self.get_points_for(answer_text)
-
     def get_points_for(self, answer_text: str) -> int:
         for a in self.answers:
             if answer_text == a.text:
                 return a.points
         return 0
+
+
+class SimulationDecision(Decision):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.goal: SimulationGoal = kwargs.get('goal')
+        self.max_points: int = kwargs.get('max_points', 0)
+
+    def set_goal(self, goal: SimulationGoal):
+        self.goal = goal
+
+    def get_max_points(self) -> int:
+        return self.max_points
 
 
 class Scenario:
@@ -89,7 +112,7 @@ class Scenario:
             self.budget = int(kwargs.get('budget', 0) or 0)
             self.current_day = int(kwargs.get('current_day', 0) or 0)
             self.scheduled_days = int()
-            self.counter = int(kwargs.get('counter', 0) or 0)
+            self.counter = int(kwargs.get('counter', -1) or -1)
             self._decisions = kwargs.get('decisions', []) or []
             self.id = ObjectId(kwargs.get('id')) or ObjectId()
             self.desc = kwargs.get('desc', 0) or ""
@@ -99,10 +122,10 @@ class Scenario:
         return self
 
     def __next__(self) -> Decision:
-        if self.counter >= len(self._decisions):
+        if self.counter >= len(self._decisions)-1:
             raise StopIteration
-        self.counter += 1
-        return self._decisions[self.counter - 1]
+        self._eval_counter()
+        return self._decisions[self.counter]
 
     def __len__(self) -> int:
         return len(self._decisions)
@@ -139,11 +162,11 @@ class Scenario:
 
     def work(self, days, meeting):
         wp = WorkPackage(days=days, daily_meeting_hours=meeting)
-        self.apply_work_result(self.team.work(wp))
+        self._apply_work_result(self.team.work(wp))
         self.actual_cost += month_to_day(self.team.salary, days)
         self.current_day += days
 
-    def apply_work_result(self, wr: WorkResult):
+    def _apply_work_result(self, wr: WorkResult):
         self.tasks_done += wr.tasks_completed
 
     def build(self, json):  # ToDo: Refactor.
@@ -157,12 +180,7 @@ class Scenario:
                       desc=json.get('desc'),
                       )
         for d in json.get('decisions') or []:
-            dec = Decision(continue_text=d.get('continue_text'), dtype=d.get('dtype'), points=d.get('points'))
-            for t in d.get('text'):
-                dec.add_text_block(t.get('header'), t.get('content'))
-            for a in d.get('answers'):
-                dec.add(Answer(text=a.get('text'), points=a.get('points'), result_text=a.get('result_text')))
-            self.add(dec)
+            self.add(build_decision(d))
         if t := json.get('team'):
             for m in t.get('staff'):
                 member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
@@ -173,3 +191,29 @@ class Scenario:
 
     def get_id(self) -> str:
         return str(self.id)
+
+    def _eval_counter(self):
+        """
+        Increases the value of the counter by one of the current decision is done.
+        """
+        if self.counter == -1:
+            self.counter = 0
+        else:
+            d = self._decisions[self.counter]
+            if isinstance(d, AnsweredDecision) or (isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.tasks_done)):
+                self.counter += 1
+
+
+def build_decision(d):
+    if d.get('goal'):
+        dec = SimulationDecision(goal=SimulationGoal(**d.get('goal')))
+    else:
+        dec = AnsweredDecision()
+        for a in d.get('answers') or []:
+            dec.add(Answer(text=a.get('text'), points=a.get('points'), result_text=a.get('result_text')))
+
+    for t in d.get('text'):
+        dec.add_text_block(t.get('header'), t.get('content'))
+    dec.points = d.get('points', 0)
+
+    return dec

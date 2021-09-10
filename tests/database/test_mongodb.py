@@ -1,6 +1,6 @@
 import pytest
 
-from app.src.domain.decision_tree import Scenario, Decision, Answer
+from app.src.domain.decision_tree import Scenario, Decision, Answer, AnsweredDecision, SimulationDecision
 from app.src.domain.team import Member, SkillType
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 
@@ -65,7 +65,7 @@ def test_mongo_scenario_can_be_saved_loaded_and_deleted():
 def test_mongo_scenario_saves_decision_tree():
     mongo = ScenarioMongoModel()
     s = Scenario()
-    d = Decision()
+    d = AnsweredDecision()
     d.add_text_block("Title", "This is some sweet content!")
     d.add(Answer(text="Kanban", points=30))
     d.add(Answer(text="Scrum", points=100))
@@ -82,7 +82,7 @@ def test_mongo_scenario_saves_decision_tree():
 def test_mongo_scenario_saves_text_blocks():
     mongo = ScenarioMongoModel()
     s = Scenario()
-    d = Decision()
+    d = AnsweredDecision()
     d.add_text_block("Title", "This is some sweet content!")
     d.add_text_block("Title 2", "C2")
     d.add(Answer(text="Kanban", points=30))
@@ -100,19 +100,20 @@ def test_mongo_scenario_saves_text_blocks():
 def test_decision_saves_dtype_and_points():
     mongo = ScenarioMongoModel()
     s = Scenario()
-    d = Decision(points=200)
+    d = AnsweredDecision(points=200)
     d.add_text_block("Title", "This is some sweet content!")
     d.add_text_block("Title 2", "C2")
     a = Answer(text="Scrum", points=100)
     d.add(a)
-    d.dtype = "model"
     s.add(d)
     mid = mongo.save(s)
 
     result = mongo.get(mid)
 
     dec = result._decisions[0]
-    assert dec.dtype == "model"
+    assert isinstance(dec, AnsweredDecision)
+    assert isinstance(dec, Decision)
+    assert not isinstance(dec, SimulationDecision)
     assert dec.points == 200
     assert dec.answers[0] == Answer(text='Scrum', points=100)
     assert dec.answers[0] != Answer(text='Kanban', points=0)
