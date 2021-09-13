@@ -254,20 +254,30 @@ def test_can_save_different_decision_types():
     sid = mongo.save(s)
     result = mongo.get(sid)
 
-    d = next(s)
+    d = next(result)
     assert isinstance(d, Decision)
     assert isinstance(d, AnsweredDecision)
     assert not isinstance(d, SimulationDecision)
 
-    d = next(s)
+    d = next(result)
     assert isinstance(d, Decision)
-    assert not isinstance(d, AnsweredDecision)
     assert not isinstance(d, SimulationDecision)
 
-    d = next(s)
+    d = next(result)
     assert isinstance(d, Decision)
     assert not isinstance(d, AnsweredDecision)
     assert isinstance(d, SimulationDecision)
+
+
+def test_simulation_goal_is_saved():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    s.add(SimulationDecision(goal=SimulationGoal(tasks=2)))
+    sid = mongo.save(s)
+    result = mongo.get(sid)
+    d = next(result)
+    assert d.goal == SimulationGoal(tasks=2)
+
 
 def test_custom_name_for_scenario():
     s = Scenario(name="CoolName")
@@ -277,3 +287,24 @@ def test_custom_name_for_scenario():
     res = mongo.get(mid)
 
     assert res.name == 'CoolName'
+
+
+def test_change_decision():
+    s = Scenario()
+    mongo = ScenarioMongoModel()
+
+    s.add(Decision())
+
+    mid = mongo.save(s)
+
+    res = mongo.get(mid)
+
+    d = res.get_decision(0)
+
+    d.add_text_block(header="hi", content="None")
+
+    mongo.update(res)
+
+    res2 = mongo.get(mid)
+
+    assert res2.get_decision(0).text[0].header == "hi"

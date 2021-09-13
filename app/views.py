@@ -7,14 +7,12 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
-from app.forms import ScenarioNameForm, ScenarioEditForm
+from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm, TextBlockForm
 from app.src.domain.dataObjects import WorkPackage
 from app.src.domain.decision_tree import Scenario, Decision
 from app.src.domain.team import Member
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 from utils import dots
-
-
 
 
 def index(request):
@@ -52,7 +50,6 @@ def click_continue(request):
         print(data)
         s.work(5, int(data['meetings']))
 
-
     d = s._decisions[0]  # ToDo: if decision is Done: next()
     context = {
         "continue_text": d.continue_text,
@@ -73,8 +70,6 @@ def click_continue(request):
     print(context)
     model.update(s)
     return HttpResponse(json.dumps(context), content_type="application/json")
-
-
 
 
 def instructor(request):
@@ -124,15 +119,18 @@ def add_scenario(request):
             mongo = ScenarioMongoModel()
             mid = mongo.save(s)
             print("XXX")
-            return HttpResponseRedirect("/instructor/edit/" + s.get_id(),)  # ToDo: use reverse.
+            return HttpResponseRedirect("/instructor/edit/" + s.get_id(), )  # ToDo: use reverse.
     context = {
         'form': ScenarioNameForm(),
         'info': 'To create a new Scenario start by defining a name.',
         'header': 'Add Scenario',
         'url': '/instructor/add/scenario',
-        'btntext': 'Create Scenario'
+        'btntext': 'Create Scenario',
+        'snippets': [
+            'app/snippets/basic_form.html'
+        ]
     }
-    return render(request, "app/instructor/add_scenario.html", context)
+    return render(request, "app/instructor/instructor_edit.html", context)
 
 
 def edit(request, sid):
@@ -140,14 +138,51 @@ def edit(request, sid):
     s = mongo.get(sid)
 
     if request.method == 'POST':
-        form = ScenarioNameForm(request.POST)
+        form = ScenarioEditForm(request.POST)
         if form.is_valid():
-            pass
+            data = form.cleaned_data
+            print(data)
+            s.budget = float(data.get('budget'))
+            s.tasks_total = int(data.get('tasks'))
+            mongo.update(s)
     context = {
-        'form': ScenarioEditForm({'name': s.name}),
+        'form': ScenarioEditForm({'name': s.name, 'tasks': s.tasks_total, 'budget': s.budget}),
         'info': 'Edit values of the Scenario.',
         'header': 'Edit Scenario',
-        'url': '/instructor/edit/',
-        'btntext': 'Save'
+        'url': '/instructor/edit/' + sid,
+        'btntext': 'Save',
+        'snippets': [
+            'app/snippets/basic_form.html',
+            'app/snippets/add_decision_btn.html'
+        ]
     }
-    return render(request, "app/instructor/add_scenario.html", context)
+    return render(request, "app/instructor/instructor_edit.html", context)
+
+
+def add_decision(request, sid):
+    mongo = ScenarioMongoModel()
+    s = mongo.get(sid)
+    nr = len(s)
+    s.add(Decision())
+    mongo.update(s)
+    return HttpResponseRedirect("/instructor/edit/" + sid + "/" + str(nr))
+
+
+def edit_decision(request, sid, nr):
+    mongo = ScenarioMongoModel()
+    d = mongo.get(sid).get_decision(int(nr))
+
+    context = {
+        'form': DecisionEditForm({'continue_text': d.continue_text}),
+        'info': 'Edit values of the decision.',
+        'header': 'Edit Decision',
+        'url': '/instructor/edit/' + sid,
+        'btntext': 'Save',
+        'btn_url': 'instructor/edit/' + sid + "/" + str(nr),
+        'snippets': [
+            'app/snippets/basic_form.html',
+            'app/snippets/add_text_btn.html'
+        ]
+    }
+    return render(request, "app/instructor/instructor_edit.html", context)
+

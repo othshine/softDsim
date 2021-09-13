@@ -22,6 +22,10 @@ class WorkResult:
 class SimulationGoal:
     tasks: int = None
 
+    @property
+    def json(self):
+        return {'tasks': self.tasks}
+
     def reached(self, tasks: int = 0):
         if self.tasks and self.tasks > tasks:
             return False

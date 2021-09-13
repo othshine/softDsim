@@ -11,5 +11,7 @@ urlpatterns = [
     path('scenarios/<sid>', views.get_scenario),
     path('instructor/search/scenarios', views.scenario_search_result),
     path('instructor/add/scenario', views.add_scenario),
-    path('instructor/edit/<sid>', views.edit)
+    path('instructor/edit/<sid>', views.edit),
+    path('instructor/add/decision/<sid>', views.add_decision),
+    path('instructor/edit/<sid>/<nr>', views.edit_decision)
 ]

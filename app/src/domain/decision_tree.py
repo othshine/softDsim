@@ -96,6 +96,11 @@ class SimulationDecision(Decision):
         self.goal: SimulationGoal = kwargs.get('goal')
         self.max_points: int = kwargs.get('max_points', 0)
 
+    @property
+    def json(self):
+        print({**super().json, 'goal': self.goal.json})
+        return {**super().json, 'goal': self.goal.json}
+
     def set_goal(self, goal: SimulationGoal):
         self.goal = goal
 
@@ -208,6 +213,9 @@ class Scenario:
             if not isinstance(d, SimulationDecision) or (
                     isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.tasks_done)):
                 self.counter += 1
+
+    def get_decision(self, nr) -> Decision:
+        return self._decisions[nr]
 
 
 def build_decision(d):
