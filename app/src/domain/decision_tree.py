@@ -156,6 +156,7 @@ class Scenario:
              'desc': self.desc,
              'team': self.team.json,
              '_id': str(self.id),
+             'id': str(self.id),
              'name': self.name
              }
         return d
