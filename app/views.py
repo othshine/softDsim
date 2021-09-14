@@ -28,11 +28,6 @@ def index(request):
     return render(request, "app/index.html", context)
 
 
-@login_required
-def app(request, sid):
-    return render(request, "app/app.html")
-
-
 def evaluate_decision(data, decision):
     decision.evaluate(data.get(decision.dtype))
 
@@ -46,22 +41,22 @@ def adjust_staff(s, staff):
 
 
 @login_required
+def app(request, sid):
+    return render(request, "app/app.html")
+
+
+@login_required
 @csrf_exempt
-def click_continue(request):
-    counter = int(request.GET.get("counter"))
+def click_continue(request, sid):
     model = ScenarioMongoModel()
-    s_id = request.COOKIES.get('scenario')
-    if s_id is None:
-        s_id = '613a2d46763e702e2dac8e9e'
-    s = model.get(s_id)
+    s = model.get(sid)
 
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         adjust_staff(s, data['staff'])
         print(data)
         s.work(5, int(data['meetings']))
-
-    d = s._decisions[0]  # ToDo: if decision is Done: next()
+    d = next(s)
     print(request.user)
     context = {
         "continue_text": d.continue_text,

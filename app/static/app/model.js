@@ -5,24 +5,20 @@ let x = new Vue({
         blocks:
             [
                 {
-                    header: "Story",
-                    text: "You are the Engineer!"
-                },
-                {
-                    header: "Time Line",
-                    text: "You are at the throttle"
+                    header: "Welcome to this Scenario",
+                    text: "Start the simulation by pressing Start in the lower right corner."
                 }
             ],
         tasks_total: 0,
         tasks_done: 0,
-        continue_text: "Continue",
+        continue_text: "Start",
         staff: {
-            junior: "••••",
-            senior: "•••",
-            expert: "•"
+            junior: "",
+            senior: "",
+            expert: ""
         },
         cost: 0,
-        meetings: 1
+        meetings: 0
     },
     filters: {
     toCurrency (value) {
@@ -71,7 +67,8 @@ function getSettings() {
 }
 
 async function cont() {
-    const response = await fetch('continue/?counter=' + COUNTER,
+    const s = window.location.pathname.split('/').slice(-1)[0]
+    const response = await fetch('/continue/'+ s,
         {
             headers: {
                 'Accept': 'application/json',
@@ -91,6 +88,5 @@ async function cont() {
     x._data.staff.expert = data.staff.expert
     x._data.cost = data.cost
     addWeek(costChart, data.actual_cost, COUNTER)
-    console.log(data.actual_cost)
     COUNTER += 1;
 }
