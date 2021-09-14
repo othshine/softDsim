@@ -2,14 +2,14 @@
 {% load static %}
 
 {% block nav-content %}
-        <div class="row">
-            <div id="task-container" class="row-container">
-                <button>Tasks: [[ tasks_done ]] / [[ tasks_total ]]</button>
-            </div>
-            <div class="row-container">
-                <button>Monthly Expenditure: [[ cost | toCurrency ]]</button>
-            </div>
-            {% endblock %}
+    <div class="row">
+    <div id="task-container" class="row-container">
+        <button>Tasks: [[ tasks_done ]] / [[ tasks_total ]]</button>
+    </div>
+    <div class="row-container">
+        <button>Monthly Expenditure: [[ cost | toCurrency ]]</button>
+    </div>
+{% endblock %}
 
 {% block content %}
     <section id="main">
@@ -51,24 +51,24 @@
                 Actions
             </div>
 
-            <h3 class="element-header">
-                Model
-            </h3>
-            <div id="model-picker-container" class="button-row row-3">
-                <button onclick="pickButton(0, 'model-picker-container', 3)">Waterfall</button>
-                <button onclick="pickButton(1, 'model-picker-container', 3)">Scrum</button>
-                <button onclick="pickButton(2, 'model-picker-container', 3)">Kanban</button>
-            </div>
 
-            <h3 class="element-header">
-                Product Life Cycle
-            </h3>
-            <div id="lifecycle-picker-container" class="button-row row-4">
-                <button onclick="pickButton(0, 'lifecycle-picker-container', 4)">Incremental</button>
-                <button onclick="pickButton(1, 'lifecycle-picker-container', 4)">Predictive</button>
-                <button onclick="pickButton(2, 'lifecycle-picker-container', 4)">Iterative</button>
-                <button onclick="pickButton(3, 'lifecycle-picker-container', 4)">Agile</button>
-            </div>
+            <ul id="someid">
+                <li v-for="row in button_rows">
+                    <h3 class="element-header">
+                        [[ row.title ]]
+                    </h3>
+                        <ul :id="row.id" class="button-row">
+                            <li v-for="l, i in row.labels">
+                                <button @click="vuePickButton(i, row.id, 3)">[[ l ]]</button>
+                            </li>
+                        </ul>
+
+
+                </li>
+            </ul>
+
+
+
 
             <h3 class="element-header">
                 Staff
@@ -132,7 +132,7 @@
         </section>
 
     </section>
-</div>
+    </div>
 
 {% endblock %}
 

@@ -21,7 +21,6 @@ from utils import dots
 
 @login_required
 def index(request):
-    print("XEXEXEXEXEX")
     mongo = ScenarioMongoModel()
     sc = mongo.find_all()
     context = {'scenarios': [s.json for s in sc]}
@@ -69,7 +68,39 @@ def click_continue(request, sid):
             "expert": dots(s.team.count('expert'))
         },
         "cost": s.team.salary,
-        "actual_cost": s.actual_cost
+        "actual_cost": s.actual_cost,
+        'hallo': "HILO",
+        'button_rows': [
+            {
+                'title': 'Model',
+                'labels': [
+                    'Waterfall',
+                    'Kanban',
+                    'Spiral'
+                ],
+                'id': 'model-pick'
+            },
+            {
+                'title': 'Extra',
+                'labels': [
+                    'Weed',
+                    'Coke',
+                    'LSD',
+                    'Speed'
+                ],
+                'id': 'drug-pick'
+            },
+            {
+                'title': 'Product Life Cycle',
+                'labels': [
+                    'Incremental',
+                    'Predictive',
+                    'Iterative',
+                    'Agile'
+                ],
+                'id': 'life-cycle-pick'
+            }
+        ]
 
     }
     for t in d.text:

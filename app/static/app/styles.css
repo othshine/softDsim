@@ -128,20 +128,17 @@ button.active-button{
   flex-flow: row;
 }
 
-.row-3 > button {
-  width: calc(100% / 3);
-}
-
-.row-4 > button {
-  width: calc(100% / 4);
+.button-row > button {
+  width: 100%;
 }
 
 
-.button-row > button:last-child {
+
+.button-row > li:last-child  button, .button-row > button:last-child {
   border-radius: 0 1rem 1rem 0;
 }
 
-.button-row > button:first-child {
+.button-row > li:first-child  button,.button-row > button:first-child {
   border-radius: 1rem 0 0 1rem;
 }
 

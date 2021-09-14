@@ -18,13 +18,26 @@ let x = new Vue({
             expert: ""
         },
         cost: 0,
-        meetings: 0
+        meetings: 0,
+        button_rows: [],
+        q: [{
+            label: [1, 2, 3]
+        },
+            {
+                label: [1, 2, 5]
+            }]
     },
     filters: {
-    toCurrency (value) {
-      return `${value.toLocaleString('de-DE', {style:'currency', currency:'EUR'})}`
+        toCurrency(value) {
+            return `${value.toLocaleString('de-DE', {style: 'currency', currency: 'EUR'})}`
+        }
+
+    },
+    methods: {
+        vuePickButton(i, id, m) {
+            pickButton(i, id, m)
+        }
     }
-  }
 });
 
 
@@ -32,8 +45,8 @@ let x = new Vue({
 let COUNTER = 0 // ToDo: Count on server side by having a flag at the current decision.
 
 function readButton(elementId) {
-    for (const button of document.getElementById(elementId).children){
-        if (button.classList.contains('active-button')){
+    for (const button of document.getElementById(elementId).children) {
+        if (button.classList.contains('active-button')) {
             return button.innerText;
         }
     }
@@ -42,7 +55,7 @@ function readButton(elementId) {
 
 
 function countStaff(staffType) {
-    return document.getElementById("staff-number-"+staffType).innerText.length;
+    return document.getElementById("staff-number-" + staffType).innerText.length;
 }
 
 /**
@@ -53,8 +66,8 @@ function countStaff(staffType) {
 function getSettings() {
 
     return {
-        'model': readButton('model-picker-container'),
-        'lifecycle': readButton('lifecycle-picker-container'),
+        //'model': readButton('model-picker-container'),
+        //'lifecycle': readButton('lifecycle-picker-container'),
         'meetings': x._data.meetings,
         'staff': {
             'junior': countStaff('junior'),
@@ -68,7 +81,7 @@ function getSettings() {
 
 async function cont() {
     const s = window.location.pathname.split('/').slice(-1)[0]
-    const response = await fetch('/continue/'+ s,
+    const response = await fetch('/continue/' + s,
         {
             headers: {
                 'Accept': 'application/json',
@@ -87,6 +100,7 @@ async function cont() {
     x._data.staff.senior = data.staff.senior
     x._data.staff.expert = data.staff.expert
     x._data.cost = data.cost
+    x._data.button_rows = data.button_rows
     addWeek(costChart, data.actual_cost, COUNTER)
     COUNTER += 1;
 }
