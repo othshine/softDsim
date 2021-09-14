@@ -10,7 +10,7 @@ class NoObjectWithIdException(Exception):
 
 class MongoConnection(object):
     def __init__(self):
-        client = MongoClient('localhost', 2717)
+        client = MongoClient('localhost', 27017)
         self.db = client['softdsim']
 
     def get_collection(self, name):

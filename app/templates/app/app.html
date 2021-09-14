@@ -1,0 +1,141 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block nav-content %}
+        <div class="row">
+            <div id="task-container" class="row-container">
+                <button>Tasks: [[ tasks_done ]] / [[ tasks_total ]]</button>
+            </div>
+            <div class="row-container">
+                <button>Monthly Expenditure: [[ cost | toCurrency ]]</button>
+            </div>
+            {% endblock %}
+
+{% block content %}
+    <section id="main">
+        <section class="main-division-third">
+            <div class="division-title">
+                Scenario
+            </div>
+
+            <ul id="scenario">
+                <li v-for="block in blocks">
+                    <h3 class="element-header"> [[ block.header ]] </h3>
+                    <p> [[ block.text ]] </p>
+                </li>
+            </ul>
+
+        </section>
+        <section class="main-division-third">
+            <div class="division-title">
+                Statistics
+            </div>
+            <h3 class="element-header">Project Plan</h3>
+            <div id="gantt-chart" style="width:100%; height: 10rem;">
+
+            </div>
+
+            <h3 class="element-header">Cost</h3>
+            <div>
+                <canvas id="cost-chart"></canvas>
+            </div>
+
+            <h3 class="element-header">Tasks / Timeline</h3>
+            <div>
+                <canvas id="tasks-chart"></canvas>
+            </div>
+
+        </section>
+        <section class="main-division-third">
+            <div class="division-title">
+                Actions
+            </div>
+
+            <h3 class="element-header">
+                Model
+            </h3>
+            <div id="model-picker-container" class="button-row row-3">
+                <button onclick="pickButton(0, 'model-picker-container', 3)">Waterfall</button>
+                <button onclick="pickButton(1, 'model-picker-container', 3)">Scrum</button>
+                <button onclick="pickButton(2, 'model-picker-container', 3)">Kanban</button>
+            </div>
+
+            <h3 class="element-header">
+                Product Life Cycle
+            </h3>
+            <div id="lifecycle-picker-container" class="button-row row-4">
+                <button onclick="pickButton(0, 'lifecycle-picker-container', 4)">Incremental</button>
+                <button onclick="pickButton(1, 'lifecycle-picker-container', 4)">Predictive</button>
+                <button onclick="pickButton(2, 'lifecycle-picker-container', 4)">Iterative</button>
+                <button onclick="pickButton(3, 'lifecycle-picker-container', 4)">Agile</button>
+            </div>
+
+            <h3 class="element-header">
+                Staff
+            </h3>
+            <div id="staff-picker-container">
+                <div id="staff-number-container">
+                    <div id="staff-number-junior" class="staff-number">[[ staff.junior ]]</div>
+                    <div id="staff-number-senior" class="staff-number">[[ staff.senior ]]</div>
+                    <div id="staff-number-expert" class="staff-number">[[ staff.expert ]]</div>
+                    <div id="staff-number-consultant" class="staff-number"></div>
+                </div>
+                <div id="staff-name-container">
+                    <div class="staff-name">Junior</div>
+                    <div class="staff-name">Senior</div>
+                    <div class="staff-name">Expert</div>
+                    <div class="staff-name">Consultant</div>
+                </div>
+                <div id="staff-button-container">
+                    <div class="staff-button">
+                        <button onclick="pickerAdd('junior')">+</button>
+                        <button onclick="pickerSub('junior')">-</button>
+                    </div>
+                    <div class="staff-button">
+                        <button onclick="pickerAdd('senior')">+</button>
+                        <button onclick="pickerSub('senior')">-</button>
+                    </div>
+                    <div class="staff-button">
+                        <button onclick="pickerAdd('expert')">+</button>
+                        <button onclick="pickerSub('expert')">-</button>
+                    </div>
+                    <div class="staff-button">
+                        <button onclick="pickerAdd(3)">+</button>
+                        <button onclick="pickerSub(3)">-</button>
+                    </div>
+                </div>
+            </div>
+            <h3 class="element-header">
+                Meetings
+            </h3>
+            <div class="button-row row-3">
+                <button onclick="subMeeting()">-</button>
+                <button onclick="" disabled><strong>[[ meetings ]]</strong></button>
+                <button onclick="addMeeting()">+</button>
+            </div>
+            <h3 class="element-header">
+                Trainings
+            </h3>
+            <h3 class="element-header">
+                Activity Distribution
+            </h3>
+            <div id="activity-distribution-container">
+                <div class="activity-bar"></div>
+                <div class="activity-bar"></div>
+                <div class="activity-bar"></div>
+            </div>
+
+            <div id="continue-container">
+                <button onclick="cont()">[[ continue_text ]]</button>
+            </div>
+
+        </section>
+
+    </section>
+</div>
+
+{% endblock %}
+
+
+
+

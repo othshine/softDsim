@@ -1,13 +1,17 @@
 import json
 
 from bson import ObjectId
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
-from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm, TextBlockForm
+from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm, TextBlockForm, NewUserForm
 from app.src.domain.dataObjects import WorkPackage
 from app.src.domain.decision_tree import Scenario, Decision
 from app.src.domain.team import Member
@@ -15,16 +19,22 @@ from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 from utils import dots
 
 
+@login_required
 def index(request):
-    return render(request, "app/index.html")
+    print("XEXEXEXEXEX")
+    mongo = ScenarioMongoModel()
+    sc = mongo.find_all()
+    context = {'scenarios': [s.json for s in sc]}
+    return render(request, "app/index.html", context)
+
+
+@login_required
+def app(request, sid):
+    return render(request, "app/app.html")
 
 
 def evaluate_decision(data, decision):
     decision.evaluate(data.get(decision.dtype))
-
-
-def get_scenario_cookie() -> str:
-    return "61392659574bdd0855cc45c8"
 
 
 def adjust_staff(s, staff):
@@ -35,6 +45,7 @@ def adjust_staff(s, staff):
             s.team += Member(t)
 
 
+@login_required
 @csrf_exempt
 def click_continue(request):
     counter = int(request.GET.get("counter"))
@@ -51,6 +62,7 @@ def click_continue(request):
         s.work(5, int(data['meetings']))
 
     d = s._decisions[0]  # ToDo: if decision is Done: next()
+    print(request.user)
     context = {
         "continue_text": d.continue_text,
         "tasks_done": s.tasks_done,
@@ -186,3 +198,39 @@ def edit_decision(request, sid, nr):
     }
     return render(request, "app/instructor/instructor_edit.html", context)
 
+
+def register_request(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Registration successful.")
+            return redirect("/")
+        messages.error(request, "Unsuccessful registration. Invalid information.")
+    form = UserCreationForm()
+    return render(request=request, template_name="app/register.html", context={"form": form})
+
+
+def login_request(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.info(request, f"You are now logged in as {username}.")
+                return redirect("/")
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid username or password.")
+    form = AuthenticationForm()
+    return render(request=request, template_name="app/login.html", context={"login_form": form})
+
+
+def logout_request(request):
+    logout(request)
+    return redirect('/')

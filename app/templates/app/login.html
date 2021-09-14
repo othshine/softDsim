@@ -1,0 +1,22 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<!--Login-->
+<div class="container py-5">
+    <div class="row">
+          <h1>Login</h1>
+    </div>
+
+  <form method="POST">
+    {% csrf_token %}
+      <div class="row">
+          {{ login_form }}
+      </div>
+    <div class="row">
+         <button class="btn btn-primary" type="submit">Login</button>
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}

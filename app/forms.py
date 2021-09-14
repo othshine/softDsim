@@ -1,8 +1,20 @@
 from typing import List
 
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.db.models import BigAutoField
 
 std_widget = forms.TextInput(attrs={'autocomplete': 'off'})
+
+
+class NewUserForm(UserCreationForm):
+    id = BigAutoField(primary_key=True)
+
+    class Meta:
+        model = User
+        fields = ("username", "password1")
+
 
 
 class ScenarioNameForm(forms.Form):
@@ -21,9 +33,8 @@ class TextBlockForm(forms.Form):
 
 
 class DecisionEditForm(forms.Form):
-    continue_text = forms.CharField(max_length=32, label="Continue Button Text",  widget=std_widget)
+    continue_text = forms.CharField(max_length=32, label="Continue Button Text", widget=std_widget)
     text = List[TextBlockForm]
-
 
 
 class AnswerForm(forms.Form):
