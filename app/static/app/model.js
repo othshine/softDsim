@@ -36,6 +36,9 @@ let x = new Vue({
     methods: {
         vuePickButton(i, id, m) {
             pickButton(i, id, m)
+        },
+        getNumOfAnswers(arr){
+            return arr.length
         }
     }
 });

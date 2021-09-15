@@ -73,30 +73,64 @@ def click_continue(request, sid):
         'button_rows': [
             {
                 'title': 'Model',
-                'labels': [
-                    'Waterfall',
-                    'Kanban',
-                    'Spiral'
+                'answers': [
+                    {
+                        'label': 'Waterfall',
+                        'points': 0,
+                        'active': False
+                    },
+                    {
+                        'label': 'Kanban',
+                        'points': 100,
+                        'active': False
+                    },
+                    {
+                        'label': 'Spiral',
+                        'points': 0,
+                        'active': True
+                    },
                 ],
                 'id': 'model-pick'
             },
             {
                 'title': 'Extra',
-                'labels': [
-                    'Weed',
-                    'Coke',
-                    'LSD',
-                    'Speed'
+                'answers': [
+                    {
+                        'label': 'Average Salary',
+                        'points': 0,
+                        'active': True
+                    },
+                    {
+                        'label': 'Pay extra',
+                        'points': 100,
+                        'active': False
+                    },
                 ],
                 'id': 'drug-pick'
             },
             {
                 'title': 'Product Life Cycle',
-                'labels': [
-                    'Incremental',
-                    'Predictive',
-                    'Iterative',
-                    'Agile'
+                'answers': [
+                    {
+                        'label': 'Incremental',
+                        'points': 0,
+                        'active': False
+                    },
+                    {
+                        'label': 'Predictive',
+                        'points': 0,
+                        'active': False
+                    },
+                    {
+                        'label': 'Iterative',
+                        'points': 0,
+                        'active': False
+                    },
+                    {
+                        'label': 'Agile',
+                        'points': 100,
+                        'active': False
+                    }
                 ],
                 'id': 'life-cycle-pick'
             }

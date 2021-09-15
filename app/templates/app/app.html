@@ -58,8 +58,8 @@
                         [[ row.title ]]
                     </h3>
                         <ul :id="row.id" class="button-row">
-                            <li v-for="l, i in row.labels">
-                                <button @click="vuePickButton(i, row.id, 3)">[[ l ]]</button>
+                            <li v-for="a, i in row.answers">
+                                <button @click="vuePickButton(i, row.id, getNumOfAnswers(row.answers))" v-bind:class="{ 'active-button': a.active }" >[[ a.label ]]</button>
                             </li>
                         </ul>
 
