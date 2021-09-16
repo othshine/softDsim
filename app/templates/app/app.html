@@ -53,13 +53,13 @@
 
 
             <ul id="someid">
-                <li v-for="row in button_rows">
+                <li v-for="row, i in button_rows">
                     <h3 class="element-header">
                         [[ row.title ]]
                     </h3>
                         <ul :id="row.id" class="button-row">
-                            <li v-for="a, i in row.answers">
-                                <button @click="vuePickButton(i, row.id, getNumOfAnswers(row.answers))" v-bind:class="{ 'active-button': a.active }" >[[ a.label ]]</button>
+                            <li v-for="a, j in row.answers">
+                                <button @click="vuePickButton(i, j)" v-bind:class="{ 'active-button': a.active }" >[[ a.label ]]</button>
                             </li>
                         </ul>
 

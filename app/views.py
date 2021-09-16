@@ -1,6 +1,5 @@
 import json
 
-from bson import ObjectId
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -11,8 +10,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.views.decorators.csrf import csrf_exempt
 
-from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm, TextBlockForm, NewUserForm
-from app.src.domain.dataObjects import WorkPackage
+from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm
 from app.src.domain.decision_tree import Scenario, Decision
 from app.src.domain.team import Member
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
@@ -33,15 +31,25 @@ def evaluate_decision(data, decision):
 
 def adjust_staff(s, staff):
     for t in ['junior', 'senior', 'expert']:
-        while s.team.count(t) > staff[t]:
+        while s.team.count(t) > len(staff[t]):
             s.team.remove_weakest(t)
-        while s.team.count(t) < staff[t]:
+        while s.team.count(t) < len(staff[t]):
             s.team += Member(t)
 
 
 @login_required
 def app(request, sid):
     return render(request, "app/app.html")
+
+
+def get_points(param, data):
+    points = 0
+    for row in data['button_rows']:
+        for answer in row['answers']:
+            if answer['active'] is True:
+                points += answer['points']
+
+    return points
 
 
 @login_required
@@ -53,10 +61,12 @@ def click_continue(request, sid):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         adjust_staff(s, data['staff'])
+        print("DATA")
         print(data)
         s.work(5, int(data['meetings']))
-    d = next(s)
-    print(request.user)
+        p = get_points(s.get_decision(), data)  # ToDo: implement this.
+        print('points:', p)
+        d = next(s)
     context = {
         "continue_text": d.continue_text,
         "tasks_done": s.tasks_done,
@@ -139,7 +149,6 @@ def click_continue(request, sid):
     }
     for t in d.text:
         context.get('blocks').append({'header': t.header, 'text': t.content})
-    print(context)
     model.update(s)
     return HttpResponse(json.dumps(context), content_type="application/json")
 

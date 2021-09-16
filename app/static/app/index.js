@@ -27,17 +27,6 @@ function subMeeting(){
 
 }
 
-/* Model Picker */
-
-function pickButton(n, element, m){
-  for (let i of Array(m).keys()){
-    const x = (n+i) % m
-    document.getElementById(element).children[x].children[0].classList.remove("active-button");
-  }
-
-  document.getElementById(element).children[n].children[0].classList.add("active-button");
-}
-
 
 /* Activity Distribution Chart */
 

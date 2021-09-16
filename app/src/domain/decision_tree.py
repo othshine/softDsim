@@ -215,7 +215,9 @@ class Scenario:
                     isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.tasks_done)):
                 self.counter += 1
 
-    def get_decision(self, nr) -> Decision:
+    def get_decision(self, nr: int = None) -> Decision:
+        if not nr:
+            nr = self.counter
         return self._decisions[nr]
 
 

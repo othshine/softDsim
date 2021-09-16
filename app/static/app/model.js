@@ -20,12 +20,7 @@ let x = new Vue({
         cost: 0,
         meetings: 0,
         button_rows: [],
-        q: [{
-            label: [1, 2, 3]
-        },
-            {
-                label: [1, 2, 5]
-            }]
+
     },
     filters: {
         toCurrency(value) {
@@ -34,8 +29,16 @@ let x = new Vue({
 
     },
     methods: {
-        vuePickButton(i, id, m) {
-            pickButton(i, id, m)
+        /**
+         * Activates an answer of a button row. Sets the active attr of that answer to true.
+         * @param row_index the index of the button row in vue data button_rows
+         * @param answer_index the index of the answer in that row.
+         */
+        vuePickButton(row_index, answer_index) {
+            const answers = this.button_rows[row_index]['answers']
+            for (let k = 0; k < answers.length; k++) {
+                answers[k].active = k === answer_index;
+            }
         },
         getNumOfAnswers(arr){
             return arr.length
@@ -91,7 +94,7 @@ async function cont() {
                 'Content-Type': 'application/json'
             },
             method: 'POST',
-            body: JSON.stringify(getSettings())
+            body: JSON.stringify(x._data)
         }
     );
     const data = await response.json();
