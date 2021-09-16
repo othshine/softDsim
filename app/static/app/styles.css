@@ -152,20 +152,15 @@ button.active-button{
 
 
 
-/* Staff Picker */
-#staff-picker-container {
-  width: 100%;
-}
-
-#staff-number-container {
-  width: 100%;
-  display: flex;
-  flex-flow: row;
-}
-
-#staff-number-container > .staff-number {
-  width: calc(100% / 4);
+/* numeric fields */
+.numeric-field{
   text-align: center;
+  width: 100%;
+}
+
+.staff-number {
+  text-align: center;
+  height: 1rem;
 }
 
 
@@ -180,24 +175,20 @@ button.active-button{
   text-align: center;
 }
 
-#staff-button-container {
+.staff-button {
   width: 100%;
   display: flex;
   flex-flow: row;
+  justify-content: center;
 }
 
 
-#staff-button-container > .staff-button {
-  width: calc(100% / 4);
-  text-align: center;
-}
-
-
-#staff-button-container > .staff-button > button {
+.staff-button > button {
   width: 1.5rem;
   height:  1.5rem;
-  border-radius: 1rem;
-  text-align: center;
+  border-radius: 1rem; !important;
+  align-items: center;
+  justify-content: center;
 }
 
 
@@ -272,10 +263,12 @@ nav .logo {
 }
 
 .row{
-  width: 80%;
-  float: right;
+  width: 100%;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
   margin: 0;
   padding: 0;
   border: 0;

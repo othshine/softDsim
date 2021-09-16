@@ -20,6 +20,7 @@ let x = new Vue({
         cost: 0,
         meetings: 0,
         button_rows: [],
+        numeric_rows: [], // ToDo: Make sure values cant be below 0.
 
     },
     filters: {
@@ -40,9 +41,35 @@ let x = new Vue({
                 answers[k].active = k === answer_index;
             }
         },
-        getNumOfAnswers(arr){
+        getNumOfAnswers(arr) {
             return arr.length
+        },
+        /**
+         * Returns a string with n dots • .
+         * @param n Number of dots.
+         * @returns {string}
+         */
+        dots(n) {
+            let d = "";
+            for (let i = 0; i < n; i++) {
+                d += "•"
+            }
+            return d;
+        },
+        numericPicker(i, j, op) {
+            let v = -1
+            if (op === "add"){
+                v = 1
+            }
+            let count = this.numeric_rows[i]['values'][j]['count'];
+            if (!(count < 1 && v === -1)){
+                this.numeric_rows[i]['values'][j]['count'] += v;
+            }
+
+
         }
+
+
     }
 });
 
@@ -75,13 +102,13 @@ function getSettings() {
         //'model': readButton('model-picker-container'),
         //'lifecycle': readButton('lifecycle-picker-container'),
         'meetings': x._data.meetings,
-        'staff': {
-            'junior': countStaff('junior'),
-            'senior': countStaff('senior'),
-            'expert': countStaff('expert'),
-            'consultant': countStaff('consultant')
-
-        }
+        // 'staff': {
+        //     'junior': countStaff('junior'),
+        //     'senior': countStaff('senior'),
+        //     'expert': countStaff('expert'),
+        //     'consultant': countStaff('consultant')
+        //
+        // }
     };
 }
 
@@ -102,11 +129,12 @@ async function cont() {
     x._data.tasks_done = data.tasks_done;
     x._data.tasks_total = data.tasks_total;
     x._data.continue_text = data.continue_text
-    x._data.staff.junior = data.staff.junior
-    x._data.staff.senior = data.staff.senior
-    x._data.staff.expert = data.staff.expert
+    //x._data.staff.junior = data.staff.junior
+    //x._data.staff.senior = data.staff.senior
+    //x._data.staff.expert = data.staff.expert
     x._data.cost = data.cost
     x._data.button_rows = data.button_rows
+    x._data.numeric_rows = data.numeric_rows
     addWeek(costChart, data.actual_cost, COUNTER)
     COUNTER += 1;
 }

@@ -52,59 +52,42 @@
             </div>
 
 
-            <ul id="someid">
+            <ul>
                 <li v-for="row, i in button_rows">
                     <h3 class="element-header">
                         [[ row.title ]]
                     </h3>
-                        <ul :id="row.id" class="button-row">
-                            <li v-for="a, j in row.answers">
-                                <button @click="vuePickButton(i, j)" v-bind:class="{ 'active-button': a.active }" >[[ a.label ]]</button>
-                            </li>
-                        </ul>
+                    <ul :id="row.id" class="button-row">
+                        <li v-for="a, j in row.answers">
+                            <button @click="vuePickButton(i, j)" v-bind:class="{ 'active-button': a.active }">[[ a.label
+                                ]]
+                            </button>
+                        </li>
+                    </ul>
 
 
                 </li>
             </ul>
 
+            <ul>
+                <li v-for="row, i in numeric_rows">
+                    <h3 class="element-header">
+                        [[ row.title ]]
+                    </h3>
+                    <ul :id="row.id" class="row">
+                        <li v-for="a, j in row.values" class="numeric-field">
+                            <div class="staff-number">[[ dots(a.count) ]]</div>
+                            <div class="staff-name">[[ a.name ]]</div>
+                            <div class="staff-button">
+                                <button @click="numericPicker(i, j, 'sub')">-</button>
+                                <button @click="numericPicker(i, j, 'add')">+</button>
+                            </div>
 
+                        </li>
+                    </ul>
+                </li>
+            </ul>
 
-
-            <h3 class="element-header">
-                Staff
-            </h3>
-            <div id="staff-picker-container">
-                <div id="staff-number-container">
-                    <div id="staff-number-junior" class="staff-number">[[ staff.junior ]]</div>
-                    <div id="staff-number-senior" class="staff-number">[[ staff.senior ]]</div>
-                    <div id="staff-number-expert" class="staff-number">[[ staff.expert ]]</div>
-                    <div id="staff-number-consultant" class="staff-number"></div>
-                </div>
-                <div id="staff-name-container">
-                    <div class="staff-name">Junior</div>
-                    <div class="staff-name">Senior</div>
-                    <div class="staff-name">Expert</div>
-                    <div class="staff-name">Consultant</div>
-                </div>
-                <div id="staff-button-container">
-                    <div class="staff-button">
-                        <button onclick="pickerAdd('junior')">+</button>
-                        <button onclick="pickerSub('junior')">-</button>
-                    </div>
-                    <div class="staff-button">
-                        <button onclick="pickerAdd('senior')">+</button>
-                        <button onclick="pickerSub('senior')">-</button>
-                    </div>
-                    <div class="staff-button">
-                        <button onclick="pickerAdd('expert')">+</button>
-                        <button onclick="pickerSub('expert')">-</button>
-                    </div>
-                    <div class="staff-button">
-                        <button onclick="pickerAdd(3)">+</button>
-                        <button onclick="pickerSub(3)">-</button>
-                    </div>
-                </div>
-            </div>
             <h3 class="element-header">
                 Meetings
             </h3>

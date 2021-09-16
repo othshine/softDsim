@@ -72,11 +72,6 @@ def click_continue(request, sid):
         "tasks_done": s.tasks_done,
         "tasks_total": s.tasks_total,
         "blocks": [],
-        "staff": {
-            "junior": dots(s.team.count('junior')),
-            "senior": dots(s.team.count('senior')),
-            "expert": dots(s.team.count('expert'))
-        },
         "cost": s.team.salary,
         "actual_cost": s.actual_cost,
         'hallo': "HILO",
@@ -143,6 +138,27 @@ def click_continue(request, sid):
                     }
                 ],
                 'id': 'life-cycle-pick'
+            }
+        ],
+        'numeric_rows': [
+            {
+                'title': "staff",
+                'values':
+                    [
+                        {
+                            'name': 'junior',
+                            'count': 2
+                        },
+                        {
+                            'name': 'senior',
+                            'count': 0
+                        },
+                        {
+                            'name': 'expert',
+                            'count': 1
+                        }
+
+                    ]
             }
         ]
 
