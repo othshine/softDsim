@@ -14,7 +14,7 @@ from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm
 from app.src.domain.decision_tree import Scenario, Decision
 from app.src.domain.team import Member
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
-from utils import dots
+from utils import data_get
 
 
 @login_required
@@ -31,9 +31,9 @@ def evaluate_decision(data, decision):
 
 def adjust_staff(s, staff):
     for t in ['junior', 'senior', 'expert']:
-        while s.team.count(t) > len(staff[t]):
+        while s.team.count(t) > staff.get(t):
             s.team.remove_weakest(t)
-        while s.team.count(t) < len(staff[t]):
+        while s.team.count(t) < staff.get(t):
             s.team += Member(t)
 
 
@@ -52,6 +52,11 @@ def get_points(param, data):
     return points
 
 
+def apply_changes(s: Scenario, data: dict):
+    if staff := data_get(data['numeric_rows'], 'staff'):
+        adjust_staff(s, staff.get('values'))
+
+
 @login_required
 @csrf_exempt
 def click_continue(request, sid):
@@ -60,12 +65,9 @@ def click_continue(request, sid):
 
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        adjust_staff(s, data['staff'])
-        print("DATA")
-        print(data)
+        apply_changes(s, data)
         s.work(5, int(data['meetings']))
-        p = get_points(s.get_decision(), data)  # ToDo: implement this.
-        print('points:', p)
+        p = get_points(s.get_decision(), data)
         d = next(s)
     context = {
         "continue_text": d.continue_text,
@@ -74,91 +76,16 @@ def click_continue(request, sid):
         "blocks": [],
         "cost": s.team.salary,
         "actual_cost": s.actual_cost,
-        'hallo': "HILO",
-        'button_rows': [
-            {
-                'title': 'Model',
-                'answers': [
-                    {
-                        'label': 'Waterfall',
-                        'points': 0,
-                        'active': False
-                    },
-                    {
-                        'label': 'Kanban',
-                        'points': 100,
-                        'active': False
-                    },
-                    {
-                        'label': 'Spiral',
-                        'points': 0,
-                        'active': True
-                    },
-                ],
-                'id': 'model-pick'
-            },
-            {
-                'title': 'Extra',
-                'answers': [
-                    {
-                        'label': 'Average Salary',
-                        'points': 0,
-                        'active': True
-                    },
-                    {
-                        'label': 'Pay extra',
-                        'points': 100,
-                        'active': False
-                    },
-                ],
-                'id': 'drug-pick'
-            },
-            {
-                'title': 'Product Life Cycle',
-                'answers': [
-                    {
-                        'label': 'Incremental',
-                        'points': 0,
-                        'active': False
-                    },
-                    {
-                        'label': 'Predictive',
-                        'points': 0,
-                        'active': False
-                    },
-                    {
-                        'label': 'Iterative',
-                        'points': 0,
-                        'active': False
-                    },
-                    {
-                        'label': 'Agile',
-                        'points': 100,
-                        'active': False
-                    }
-                ],
-                'id': 'life-cycle-pick'
-            }
-        ],
+        'button_rows': d.buttons,
         'numeric_rows': [
             {
                 'title': "staff",
                 'values':
-                    [
-                        {
-                            'name': 'junior',
-                            'count': 2
-                        },
-                        {
-                            'name': 'senior',
-                            'count': 0
-                        },
-                        {
-                            'name': 'expert',
-                            'count': 1
-                        }
-
-                    ]
+                    {
+                        'junior': s.team.count('junior'),
+                        'senior': s.team.count('senior'),
+                        'expert': s.team.count('expert')
+                    }
             }
         ]
 

@@ -31,7 +31,7 @@ def dots(n: int):
     :param n: int - number of desired dots
     :return: str - •••
     """
-    return "•"*n
+    return "•" * n
 
 
 def month_to_day(value: float, num_days: int = 1) -> float:
@@ -42,11 +42,25 @@ def month_to_day(value: float, num_days: int = 1) -> float:
     return value * (num_days / 20)
 
 
+def data_get(data, title) -> dict:
+    """
+    Searches in list data for a dict that has a attr 'title' that equals <title>.
+    :param data: A list of dicts.
+    :param title: A string that is the title of the dict that is searched.
+    :return: dict
+    """
+    for obj in data:
+        if obj.get('title') == title:
+            return obj
+    return {}
+
+
 class _YAMLReader:
     def __init__(self, path):
         self.path = path
 
     def read(self, *args):
+        print(self.path)
         with open(self.path) as y:
             data = load(y, Loader=FullLoader)
             for arg in args:

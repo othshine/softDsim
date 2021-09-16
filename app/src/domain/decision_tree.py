@@ -6,7 +6,7 @@ from bson import ObjectId
 
 from app.src.domain.dataObjects import WorkPackage, WorkResult, SimulationGoal
 from app.src.domain.team import Team, Member
-from utils import month_to_day
+from utils import month_to_day, YAMLReader
 
 
 @dataclass
@@ -38,11 +38,13 @@ class Decision(ABC):
         self.text: List[TextBlock] = kwargs.get('text', None)
         self.continue_text: str = kwargs.get('continue_text', "Continue")
         self.points = kwargs.get('points', 0)
+        self.buttons = kwargs.get('button_rows', [])
 
     @property
     def json(self):
         data = {'continue_text': self.continue_text,
-                'points': self.points}
+                'points': self.points,
+                'buttons': self.buttons}
         if self.text:
             data = {**data, 'text': [t.json for t in self.text]}
         return data
@@ -57,9 +59,11 @@ class Decision(ABC):
         else:
             self.text = [t]
 
-    def evaluate(self, answer_text):
-        # self.points = self.get_points_for(answer_text)
-        pass
+    def evaluate(self):
+        for row in self.buttons:
+            for answer in row.get('answers') or []:
+                if answer['active']:
+                    self.points += answer['points']
 
 
 class AnsweredDecision(Decision):
@@ -108,8 +112,31 @@ class SimulationDecision(Decision):
         return self.max_points
 
 
+class Actions:
+    ids = []
+    json = {'button_rows': [], 'numeric_rows': []}
+
+    def add(self, id_: str):
+        self.ids.append(id_)
+
+    def load(self):
+        for id_ in self.ids:
+            if id_ not in self.json:
+                print(1)
+                entry = YAMLReader.read('actions', 'button-rows', id_)
+                print(2)
+                print(entry)
+                self.json['button_rows'].append(
+                    {
+                        'title': entry['title'],
+                        'answers': [{'label': v, 'active': False} for v in entry['values']]
+                    }
+                )
+
+
 class Scenario:
     def __init__(self, **kwargs):
+        self.actions = None
         if json := kwargs.get('json'):
             self.build(json)
         else:
@@ -123,6 +150,7 @@ class Scenario:
             self._decisions = kwargs.get('decisions', []) or []
             self.id = ObjectId(kwargs.get('id')) or ObjectId()
             self.desc = kwargs.get('desc', 0) or ""
+            self.actions = kwargs.get('actions', Actions())
             self.team = Team()
             self.name = kwargs.get("name", "DefaultName")
 
@@ -228,7 +256,7 @@ def build_decision(d):
         dec = AnsweredDecision()
         for a in d.get('answers') or []:
             dec.add(Answer(text=a.get('text'), points=a.get('points'), result_text=a.get('result_text')))
-
+    dec.buttons = d.get('buttons')
     for t in d.get('text') or []:
         dec.add_text_block(t.get('header'), t.get('content'))
     dec.points = d.get('points', 0)

@@ -1,5 +1,5 @@
 {
-  "_id": "613fa185a0f3c239dbc17e00",
+  "_id": "613fa185a0f3c239dbc17e04",
   "tasks_done": 0,
   "tasks_total": 400,
   "decisions": [
@@ -20,21 +20,69 @@
           "content": "Choose a suitable project management model."
         }
       ],
-      "answers": [
+      "buttons": [
         {
-          "text": "Kanban",
-          "points": 30,
-          "result_text": null
+          "title": "Model",
+          "answers": [
+            {
+              "label": "Waterfall",
+              "points": 0,
+              "active": false
+            },
+            {
+              "label": "Kanban",
+              "points": 100,
+              "active": false
+            },
+            {
+              "label": "Spiral",
+              "points": 0,
+              "active": false
+            }
+          ],
+          "id": "model-pick"
         },
         {
-          "text": "Scrum",
-          "points": 100,
-          "result_text": null
+          "title": "Extra",
+          "answers": [
+            {
+              "label": "Average Salary",
+              "points": 0,
+              "active": false
+            },
+            {
+              "label": "Pay extra",
+              "points": 100,
+              "active": false
+            }
+          ],
+          "id": "drug-pick"
         },
         {
-          "text": "Waterfall",
-          "points": 0,
-          "result_text": null
+          "title": "Product Life Cycle",
+          "answers": [
+            {
+              "label": "Incremental",
+              "points": 0,
+              "active": false
+            },
+            {
+              "label": "Predictive",
+              "points": 0,
+              "active": false
+            },
+            {
+              "label": "Iterative",
+              "points": 0,
+              "active": false
+            },
+            {
+              "label": "Agile",
+              "points": 100,
+              "active": false
+            }
+          ],
+          "id": "life-cycle-pick"
         }
       ]
     },
@@ -87,5 +135,5 @@
   "team": {
     "staff": []
   },
-  "name": "Test Scenario"
+  "name": "Scenario with new Decisions"
 }

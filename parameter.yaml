@@ -13,3 +13,34 @@ skill-levels:
     throughput: 7
 
 task-completion-coefficient: 0.2
+
+
+
+actions:
+  button-rows:
+    model-pick:
+      title: Model
+      values:
+        - Waterfall
+        - Kanban
+        - Scrum
+    salary-pick:
+      title: Salary
+      values:
+        - Below average
+        - Average
+        - Above Average
+    life-cycle-pick:
+      title: Life Cycle
+      values:
+        - Incremental
+        - Predictive
+        - Iterative
+        - Agile
+  numeric-rows:
+    staff-pick:
+      title: Staff
+      values:
+        - junior
+        - senior
+        - expert

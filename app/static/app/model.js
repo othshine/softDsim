@@ -12,11 +12,6 @@ let x = new Vue({
         tasks_total: 0,
         tasks_done: 0,
         continue_text: "Start",
-        staff: {
-            junior: "",
-            senior: "",
-            expert: ""
-        },
         cost: 0,
         meetings: 0,
         button_rows: [],
@@ -61,9 +56,9 @@ let x = new Vue({
             if (op === "add"){
                 v = 1
             }
-            let count = this.numeric_rows[i]['values'][j]['count'];
+            let count = this.numeric_rows[i]['values'][j];
             if (!(count < 1 && v === -1)){
-                this.numeric_rows[i]['values'][j]['count'] += v;
+                this.numeric_rows[i]['values'][j] += v;
             }
 
 
@@ -91,27 +86,6 @@ function countStaff(staffType) {
     return document.getElementById("staff-number-" + staffType).innerText.length;
 }
 
-/**
- * Reads the current setting that the user as applied.
- * (Status of all buttons etc.)
- * @returns {*}
- */
-function getSettings() {
-
-    return {
-        //'model': readButton('model-picker-container'),
-        //'lifecycle': readButton('lifecycle-picker-container'),
-        'meetings': x._data.meetings,
-        // 'staff': {
-        //     'junior': countStaff('junior'),
-        //     'senior': countStaff('senior'),
-        //     'expert': countStaff('expert'),
-        //     'consultant': countStaff('consultant')
-        //
-        // }
-    };
-}
-
 async function cont() {
     const s = window.location.pathname.split('/').slice(-1)[0]
     const response = await fetch('/continue/' + s,
@@ -125,16 +99,10 @@ async function cont() {
         }
     );
     const data = await response.json();
-    x._data.blocks = data.blocks;
-    x._data.tasks_done = data.tasks_done;
-    x._data.tasks_total = data.tasks_total;
-    x._data.continue_text = data.continue_text
-    //x._data.staff.junior = data.staff.junior
-    //x._data.staff.senior = data.staff.senior
-    //x._data.staff.expert = data.staff.expert
-    x._data.cost = data.cost
-    x._data.button_rows = data.button_rows
-    x._data.numeric_rows = data.numeric_rows
+    console.log(data)
+    for (const dataKey in data) {
+        x._data[dataKey] = data[dataKey]
+    }
     addWeek(costChart, data.actual_cost, COUNTER)
     COUNTER += 1;
 }

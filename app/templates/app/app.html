@@ -75,12 +75,12 @@
                         [[ row.title ]]
                     </h3>
                     <ul :id="row.id" class="row">
-                        <li v-for="a, j in row.values" class="numeric-field">
-                            <div class="staff-number">[[ dots(a.count) ]]</div>
-                            <div class="staff-name">[[ a.name ]]</div>
+                        <li v-for="(val, key) in row.values" class="numeric-field">
+                            <div class="staff-number">[[ dots(val) ]]</div>
+                            <div class="staff-name">[[ key ]]</div>
                             <div class="staff-button">
-                                <button @click="numericPicker(i, j, 'sub')">-</button>
-                                <button @click="numericPicker(i, j, 'add')">+</button>
+                                <button @click="numericPicker(i, key, 'sub')">-</button>
+                                <button @click="numericPicker(i, key, 'add')">+</button>
                             </div>
 
                         </li>
