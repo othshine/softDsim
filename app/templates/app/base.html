@@ -21,10 +21,9 @@
         <div class="logo">
             SoftDSim
         </div>
-        <div class="row">
+        <div id="nav-menu" class="row">
             {% block nav-content %}
             {% endblock %}
-            <div class="menu">
                 <a href="#" class="link">
                     <div class="nav-opt">Hi {{ user }}!</div>
                 </a>
@@ -37,7 +36,6 @@
                 <a href="/logout" class="link">
                     <div class="nav-opt">Logout</div>
                 </a>
-            </div>
         </div>
     </nav>
 
