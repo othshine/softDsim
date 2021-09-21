@@ -55,6 +55,9 @@ def get_points(param, data):
 def apply_changes(s: Scenario, data: dict):
     if staff := data_get(data['numeric_rows'], 'staff'):
         adjust_staff(s, staff.get('values'))
+    for action in data['button_rows']:
+        s.actions.adjust(action)
+
 
 
 @login_required

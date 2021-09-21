@@ -111,7 +111,7 @@ class Action:
 
     @property
     def json(self):
-        return {'title': self.title, 'answers': self.format_answers()}
+        return {'title': self.title, 'answers': self.format_answers(), 'id': self.id}
 
 
     @property
@@ -149,6 +149,11 @@ class ActionList:
                 a.answers.append(Answer(label, False))
             self.actions.append(a)
 
+    def adjust(self, data):
+        for answer in self.get(data.get('id')).answers:
+            for actual in data.get('answers', []):
+                if actual.get('label') == answer.label:
+                    answer.active = actual.get('active')
 
 class Scenario:
     def __init__(self, **kwargs):
