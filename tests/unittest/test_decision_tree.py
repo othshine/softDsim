@@ -1,7 +1,8 @@
 import pytest
 
 from app.src.domain.dataObjects import SimulationGoal
-from app.src.domain.decision_tree import Scenario, Decision, AnsweredDecision, SimulationDecision, TextBlock, Answer
+from app.src.domain.decision_tree import Scenario, Decision, AnsweredDecision, SimulationDecision, TextBlock, Answer, \
+    ActionList
 from utils import YAMLReader
 
 
@@ -65,10 +66,13 @@ def test_scenario_get_next_decision():
 
 
 def test_scenario_loads_yaml_actions():
+    ActionList()
+
+
+
+
+
+def test_scenario_actions():
     s = Scenario()
-    s.actions.add('model-pick')
 
-    s.actions.load()
 
-    j = s.actions.json
-    assert j['button_rows'][0]['title'] == "Model"

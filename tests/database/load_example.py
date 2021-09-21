@@ -5,20 +5,19 @@ from mongo_models import ScenarioMongoModel
 
 def load():
     mongo = ScenarioMongoModel()
-    s = Scenario()
+    s = Scenario(name="Lets See")
+    s.actions.scrap_actions()
 
     d = AnsweredDecision()
     d.add_text_block("Welcome", "Text data.")
-    d.add(Answer(text="A1", points=30))
-    d.add(Answer(text="A2", points=100))
-    d.add(Answer(text="A3", points=0))
+    d.active_actions.append('model-pick')
     s.add(d)
 
     d = AnsweredDecision()
     d.add_text_block("Header 2", "Text data 2.")
     d.add_text_block("Header 3", "Text data 3.")
-    d.add(Answer(text="A11", points=100))
-    d.add(Answer(text="A12", points=0))
+    d.active_actions.append('salary-pick')
+    d.active_actions.append('life-cycle-pick')
     s.add(d)
 
     d = SimulationDecision(goal=SimulationGoal(tasks=400), max_points=250)

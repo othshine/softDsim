@@ -1,6 +1,7 @@
 from abc import ABC
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
+from deprecated import deprecated
 
 from bson import ObjectId
 
@@ -11,15 +12,12 @@ from utils import month_to_day, YAMLReader
 
 @dataclass
 class Answer:
-    text: str
-    points: int
-    result_text: str = None
+    label: str
+    active: bool = False
 
     @property
     def json(self):
-        return {'text': self.text,
-                'points': self.points,
-                'result_text': self.result_text}
+        return {'label': self.label, 'active': self.active}
 
 
 @dataclass
@@ -38,13 +36,13 @@ class Decision(ABC):
         self.text: List[TextBlock] = kwargs.get('text', None)
         self.continue_text: str = kwargs.get('continue_text', "Continue")
         self.points = kwargs.get('points', 0)
-        self.buttons = kwargs.get('button_rows', [])
+        self.active_actions: List[str] = kwargs.get('active_actions', [])
 
     @property
     def json(self):
         data = {'continue_text': self.continue_text,
                 'points': self.points,
-                'buttons': self.buttons}
+                'active_actions': self.active_actions}
         if self.text:
             data = {**data, 'text': [t.json for t in self.text]}
         return data
@@ -59,12 +57,6 @@ class Decision(ABC):
         else:
             self.text = [t]
 
-    def evaluate(self):
-        for row in self.buttons:
-            for answer in row.get('answers') or []:
-                if answer['active']:
-                    self.points += answer['points']
-
 
 class AnsweredDecision(Decision):
     def __init__(self, **kwargs):
@@ -77,12 +69,6 @@ class AnsweredDecision(Decision):
     @property
     def json(self):
         return {**super().json, 'answers': [a.json for a in self.answers]}
-
-    def add(self, answer: Answer):
-        self.answers.append(answer)
-
-    def add_answer(self, text: str, points: int, *args):
-        self.answers.append(Answer(text, points))
 
     def get_max_points(self):
         return max([a.points for a in self.answers])
@@ -102,7 +88,6 @@ class SimulationDecision(Decision):
 
     @property
     def json(self):
-        print({**super().json, 'goal': self.goal.json})
         return {**super().json, 'goal': self.goal.json}
 
     def set_goal(self, goal: SimulationGoal):
@@ -112,31 +97,61 @@ class SimulationDecision(Decision):
         return self.max_points
 
 
-class Actions:
-    ids = []
-    json = {'button_rows': [], 'numeric_rows': []}
+class Action:
+    def __init__(self, id, title: str, typ: str, active: bool = False, answers=[]):
+        self.id = id
+        self.title = title
+        self.typ = typ
+        self.active = active
+        self.answers: List[Answer] = []
+        if answers:
+            for answer in answers:
+                self.answers.append(Answer(**answer))
 
-    def add(self, id_: str):
-        self.ids.append(id_)
 
-    def load(self):
-        for id_ in self.ids:
-            if id_ not in self.json:
-                print(1)
-                entry = YAMLReader.read('actions', 'button-rows', id_)
-                print(2)
-                print(entry)
-                self.json['button_rows'].append(
-                    {
-                        'title': entry['title'],
-                        'answers': [{'label': v, 'active': False} for v in entry['values']]
-                    }
-                )
+    @property
+    def json(self):
+        return {'title': self.title, 'answers': self.format_answers()}
+
+
+    @property
+    def full_json(self):
+        return {**self.json, 'id': self.id, 'typ': self.typ, 'answers': [a.json for a in self.answers]}
+
+    def format_answers(self):
+        ans = []
+        for a in self.answers:
+            ans.append({'label': a.label, 'active': a.active})
+        return ans
+
+
+class ActionList:
+    def __init__(self, json=None):
+        self.actions: List[Action] = []
+        if json:
+            for action in json:
+                self.actions.append(Action(**action))
+
+    @property
+    def json(self):
+        return [a.full_json for a in self.actions]
+
+    def get(self, id) -> Optional[Action]:
+        for action in self.actions:
+            if action.id == id:
+                return action
+        return None
+
+    def scrap_actions(self):
+        for id in YAMLReader.read('actions', 'button-rows'):
+            a = Action(id, YAMLReader.read('actions', 'button-rows', id, 'title'), 'button')
+            for label in YAMLReader.read('actions', 'button-rows', id, 'values'):
+                a.answers.append(Answer(label, False))
+            self.actions.append(a)
 
 
 class Scenario:
     def __init__(self, **kwargs):
-        self.actions = None
         if json := kwargs.get('json'):
             self.build(json)
         else:
@@ -150,7 +165,7 @@ class Scenario:
             self._decisions = kwargs.get('decisions', []) or []
             self.id = ObjectId(kwargs.get('id')) or ObjectId()
             self.desc = kwargs.get('desc', 0) or ""
-            self.actions = kwargs.get('actions', Actions())
+            self.actions = kwargs.get('actions', ActionList())
             self.team = Team()
             self.name = kwargs.get("name", "DefaultName")
 
@@ -185,7 +200,8 @@ class Scenario:
              'team': self.team.json,
              '_id': str(self.id),
              'id': str(self.id),
-             'name': self.name
+             'name': self.name,
+             'actions': self.actions.json
              }
         return d
 
@@ -194,6 +210,14 @@ class Scenario:
 
     def remove(self, index: int):
         del self._decisions[index]
+
+    @property
+    def button_rows(self):
+        json = []
+        for a in self._decisions[self.counter].active_actions:
+            if (action := self.actions.get(a)) is not None:
+                json.append(action.json)
+        return json
 
     def get_max_points(self) -> int:
         return sum([d.get_max_points() for d in self._decisions])
@@ -207,7 +231,7 @@ class Scenario:
     def _apply_work_result(self, wr: WorkResult):
         self.tasks_done += wr.tasks_completed
 
-    def build(self, json):  # ToDo: Refactor.
+    def build(self, json):  # ToDo: Refactor. Use **
         self.__init__(tasks_done=json.get('tasks_done'),
                       tasks_total=json.get('tasks_total'),
                       scheduled_days=json.get('scheduled_days'),
@@ -216,8 +240,10 @@ class Scenario:
                       budget=json.get('budget'),
                       id=json.get('_id'),
                       desc=json.get('desc'),
-                      name=json.get('name')
+                      name=json.get('name'),
+                      actions=ActionList(json=json.get('actions'))
                       )
+
         for d in json.get('decisions') or []:
             self.add(build_decision(d))
         if t := json.get('team'):
@@ -251,12 +277,9 @@ class Scenario:
 
 def build_decision(d):
     if d.get('goal'):
-        dec = SimulationDecision(goal=SimulationGoal(**d.get('goal')))
+        dec = SimulationDecision(goal=SimulationGoal(**d.get('goal')), active_actions=d.get('active_actions'))
     else:
-        dec = AnsweredDecision()
-        for a in d.get('answers') or []:
-            dec.add(Answer(text=a.get('text'), points=a.get('points'), result_text=a.get('result_text')))
-    dec.buttons = d.get('buttons')
+        dec = AnsweredDecision(active_actions=d.get('active_actions'))
     for t in d.get('text') or []:
         dec.add_text_block(t.get('header'), t.get('content'))
     dec.points = d.get('points', 0)

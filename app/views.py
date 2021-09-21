@@ -67,7 +67,6 @@ def click_continue(request, sid):
         data = json.loads(request.body.decode('utf-8'))
         apply_changes(s, data)
         s.work(5, int(data['meetings']))
-        p = get_points(s.get_decision(), data)
         d = next(s)
     context = {
         "continue_text": d.continue_text,
@@ -76,7 +75,7 @@ def click_continue(request, sid):
         "blocks": [],
         "cost": s.team.salary,
         "actual_cost": s.actual_cost,
-        'button_rows': d.buttons,
+        'button_rows': s.button_rows,
         'numeric_rows': [
             {
                 'title': "staff",
