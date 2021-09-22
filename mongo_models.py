@@ -59,6 +59,7 @@ class ScenarioMongoModel(MongoConnection):
             json['id'] = i
             json['_id'] = i
             json['user'] = user
+            json['template'] = False
             return self.save(json)
         raise NoObjectWithIdException()
 

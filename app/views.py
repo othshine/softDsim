@@ -71,6 +71,8 @@ def apply_changes(s: Scenario, data: dict):
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
+    if s.user != request.user.username:
+        return HttpResponse(status=403)
 
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))

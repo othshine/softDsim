@@ -82,10 +82,11 @@ class AnsweredDecision(Decision):
         """
         user_actions = data['button_rows']
         for action in self.actions:
-            user_answer_data = next(item for item in user_actions if item["id"] == action.id)
-            user_answer = next(item['label'] for item in user_answer_data['answers'] if item["active"] == True)
-            p = action.get_points(user_answer)
-            self.points += p
+            if user_answer_data := next((item for item in user_actions if item["id"] == action.id), None):
+                user_answer = next((item['label'] for item in user_answer_data['answers'] if item["active"] is True),
+                                   None)
+                p = action.get_points(user_answer)
+                self.points += p
 
 
 class SimulationDecision(Decision):
@@ -136,6 +137,7 @@ class Action:
         :param value: str: the answers text.
         :return: int: points for that answer.
         """
+        if not value: value = ""
         for answer in self.answers:
             if answer.label.lower() == value.lower():
                 return answer.points
@@ -311,23 +313,6 @@ class Scenario:
         if not nr:
             nr = self.counter
         return self.decisions[nr]
-
-    def copy(self, user: str = None):
-        s = Scenario(tasks_done=self.tasks_done,
-                     tasks_total=self.tasks_total,
-                     actual_cost=self.actual_cost,
-                     budget=self.budget,
-                     current_day=self.current_day,
-                     scheduled_days=self.scheduled_days,
-                     counter=self.counter,
-                     _decisions=self.decisions,
-                     id=ObjectId(),
-                     desc=self.desc,
-                     actions=self.actions,
-                     team=self.team,
-                     name=self.name,
-                     user=user)
-        return s
 
 
 def build_decision(d):
