@@ -43,7 +43,7 @@ def build():
         s.add(build_decision())
 
     model = ScenarioMongoModel()
-    print("Scenario saved as " + str(model.save(obj=s)))
+    print("Scenario saved as " + str(model.save(obj=s.json)))
 
 
 funcs = {

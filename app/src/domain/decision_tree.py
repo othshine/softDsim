@@ -14,10 +14,11 @@ from utils import month_to_day, YAMLReader
 class Answer:
     label: str
     active: bool = False
+    points: int = 0
 
     @property
     def json(self):
-        return {'label': self.label, 'active': self.active}
+        return {'label': self.label, 'active': self.active, 'points': self.points}
 
 
 @dataclass
@@ -50,6 +51,9 @@ class Decision(ABC):
     def get_max_points(self):
         pass
 
+    def eval(self, args):
+        pass
+
     def add_text_block(self, header: str, content: str):
         t = TextBlock(header, content)
         if self.text:
@@ -61,23 +65,27 @@ class Decision(ABC):
 class AnsweredDecision(Decision):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.answers = kwargs.get('answers', [])
+        self.actions: List[Action] = [Action(**a) for a in kwargs.get('actions', []) or []]
 
-    def __len__(self):
-        return len(self.answers)
+    def add_button_action(self, title, answers):
+        self.actions.append(Action(id=str(ObjectId()), title=title, typ='button', active=True, answers=answers))
 
     @property
     def json(self):
-        return {**super().json, 'answers': [a.json for a in self.answers]}
+        return {**super().json, 'actions': [a.full_json for a in self.actions]}
 
-    def get_max_points(self):
-        return max([a.points for a in self.answers])
-
-    def get_points_for(self, answer_text: str) -> int:
-        for a in self.answers:
-            if answer_text == a.text:
-                return a.points
-        return 0
+    def eval(self, data):
+        """
+        Evaluates a decision.
+        :param data: Vue object that contains user choices.
+        :return: None
+        """
+        user_actions = data['button_rows']
+        for action in self.actions:
+            user_answer_data = next(item for item in user_actions if item["id"] == action.id)
+            user_answer = next(item['label'] for item in user_answer_data['answers'] if item["active"] == True)
+            p = action.get_points(user_answer)
+            self.points += p
 
 
 class SimulationDecision(Decision):
@@ -98,7 +106,7 @@ class SimulationDecision(Decision):
 
 
 class Action:
-    def __init__(self, id, title: str, typ: str, active: bool = False, answers=[]):
+    def __init__(self, id, title: str, typ: str, active: bool = False, answers=None):
         self.id = id
         self.title = title
         self.typ = typ
@@ -108,11 +116,9 @@ class Action:
             for answer in answers:
                 self.answers.append(Answer(**answer))
 
-
     @property
     def json(self):
         return {'title': self.title, 'answers': self.format_answers(), 'id': self.id}
-
 
     @property
     def full_json(self):
@@ -123,6 +129,17 @@ class Action:
         for a in self.answers:
             ans.append({'label': a.label, 'active': a.active})
         return ans
+
+    def get_points(self, value: str) -> int:
+        """
+        Returns the points for a answer. Value must be the string that is also the answers label.
+        :param value: str: the answers text.
+        :return: int: points for that answer.
+        """
+        for answer in self.answers:
+            if answer.label.lower() == value.lower():
+                return answer.points
+        return 0
 
 
 class ActionList:
@@ -150,10 +167,12 @@ class ActionList:
             self.actions.append(a)
 
     def adjust(self, data):
-        for answer in self.get(data.get('id')).answers:
-            for actual in data.get('answers', []):
-                if actual.get('label') == answer.label:
-                    answer.active = actual.get('active')
+        if self.get(data.get('id')):
+            for answer in self.get(data.get('id')).answers:
+                for actual in data.get('answers', []):
+                    if actual.get('label') == answer.label:
+                        answer.active = actual.get('active')
+
 
 class Scenario:
     def __init__(self, **kwargs):
@@ -166,13 +185,14 @@ class Scenario:
             self.budget = int(kwargs.get('budget', 0) or 0)
             self.current_day = int(kwargs.get('current_day', 0) or 0)
             self.scheduled_days = int()
-            self.counter = int(kwargs.get('counter', -1) or -1)
+            self.counter = int(kwargs.get('counter', -1))
             self._decisions = kwargs.get('decisions', []) or []
             self.id = ObjectId(kwargs.get('id')) or ObjectId()
             self.desc = kwargs.get('desc', 0) or ""
             self.actions = kwargs.get('actions', ActionList())
             self.team = Team()
             self.name = kwargs.get("name", "DefaultName")
+            self.user = kwargs.get('user')
 
     def __iter__(self):
         return self
@@ -206,7 +226,8 @@ class Scenario:
              '_id': str(self.id),
              'id': str(self.id),
              'name': self.name,
-             'actions': self.actions.json
+             'actions': self.actions.json,
+             'user': self.user
              }
         return d
 
@@ -222,6 +243,8 @@ class Scenario:
         for a in self._decisions[self.counter].active_actions:
             if (action := self.actions.get(a)) is not None:
                 json.append(action.json)
+        for action in self._decisions[self.counter].actions:
+            json.append(action.json)
         return json
 
     def get_max_points(self) -> int:
@@ -246,7 +269,9 @@ class Scenario:
                       id=json.get('_id'),
                       desc=json.get('desc'),
                       name=json.get('name'),
-                      actions=ActionList(json=json.get('actions'))
+                      counter=json.get('counter'),
+                      actions=ActionList(json=json.get('actions')),
+                      user=json.get('user')
                       )
 
         for d in json.get('decisions') or []:
@@ -268,23 +293,45 @@ class Scenario:
         """
         if self.counter == -1:
             self.counter = 0
+            print("set")
         else:
             d = self._decisions[self.counter]
-            if not isinstance(d, SimulationDecision) or (
+            if (not isinstance(d, SimulationDecision)) or (
                     isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.tasks_done)):
                 self.counter += 1
+                print("yes")
+            else:
+                print("no")
+        print("C", self.counter)
 
     def get_decision(self, nr: int = None) -> Decision:
         if not nr:
             nr = self.counter
         return self._decisions[nr]
 
+    def copy(self, user: str = None):
+        s = Scenario(tasks_done=self.tasks_done,
+                     tasks_total=self.tasks_total,
+                     actual_cost=self.actual_cost,
+                     budget=self.budget,
+                     current_day=self.current_day,
+                     scheduled_days=self.scheduled_days,
+                     counter=self.counter,
+                     _decisions=self._decisions,
+                     id=ObjectId(),
+                     desc=self.desc,
+                     actions=self.actions,
+                     team=self.team,
+                     name=self.name,
+                     user=user)
+        return s
+
 
 def build_decision(d):
     if d.get('goal'):
         dec = SimulationDecision(goal=SimulationGoal(**d.get('goal')), active_actions=d.get('active_actions'))
     else:
-        dec = AnsweredDecision(active_actions=d.get('active_actions'))
+        dec = AnsweredDecision(active_actions=d.get('active_actions'), actions=d.get('actions'))
     for t in d.get('text') or []:
         dec.add_text_block(t.get('header'), t.get('content'))
     dec.points = d.get('points', 0)

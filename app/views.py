@@ -20,7 +20,7 @@ from utils import data_get
 @login_required
 def index(request):
     mongo = ScenarioMongoModel()
-    sc = mongo.find_all()
+    sc = mongo.find_all_templates()
     context = {'scenarios': [s.json for s in sc]}
     return render(request, "app/index.html", context)
 
@@ -42,6 +42,13 @@ def app(request, sid):
     return render(request, "app/app.html")
 
 
+@login_required
+def create_new(request, sid):
+    model = ScenarioMongoModel()
+    mid = model.copy(sid, user=request.user.username)
+    return redirect('/s/' + mid)
+
+
 def get_points(param, data):
     points = 0
     for row in data['button_rows']:
@@ -59,17 +66,18 @@ def apply_changes(s: Scenario, data: dict):
         s.actions.adjust(action)
 
 
-
 @login_required
 @csrf_exempt
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
+    print("cc", s.counter)
 
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         apply_changes(s, data)
         s.work(5, int(data['meetings']))
+        s.get_decision().eval(data)
         d = next(s)
     context = {
         "continue_text": d.continue_text,
@@ -112,10 +120,10 @@ def scenarios(request):
     if request.method == 'POST':
         x = json.loads(request.body.decode('utf-8'))
         s = Scenario(json=x)
-        model.save(s)
+        model.save(s.json)
         return HttpResponse(status=201)
     else:
-        x = model.find_all()
+        x = model.find_all_templates()
         context = {'scenarios': [s.json for s in x]}
         return HttpResponse(json.dumps(context), content_type="application/json")
 
@@ -143,7 +151,7 @@ def add_scenario(request):
             print(form.cleaned_data)
             s = Scenario(name=form.cleaned_data['name'])
             mongo = ScenarioMongoModel()
-            mid = mongo.save(s)
+            mid = mongo.save(s.json)
             print("XXX")
             return HttpResponseRedirect("/instructor/edit/" + s.get_id(), )  # ToDo: use reverse.
     context = {

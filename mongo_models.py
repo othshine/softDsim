@@ -28,7 +28,12 @@ class ScenarioMongoModel(MongoConnection):
         raise NoObjectWithIdException()
 
     def save(self, obj) -> ObjectId:
-        return self.collection.insert_one(obj.json).inserted_id
+        if isinstance(obj, Scenario):
+            obj = obj.json
+        return self.collection.insert_one(obj).inserted_id
+
+    def save_template(self, obj) -> ObjectId:
+        return self.collection.insert_one({**obj.json, 'template': True}).inserted_id
 
     def update(self, obj):  # ToDo: Tests for updating Scenarios.
         if self.collection.find({'_id': obj.get_id()}).count():
@@ -42,9 +47,18 @@ class ScenarioMongoModel(MongoConnection):
             return self.collection.delete_many({"_id": mid})
         raise NoObjectWithIdException()
 
-    def find_all(self):
+    def find_all_templates(self):
         col = []
-        for s in self.collection.find():
+        for s in self.collection.find({'template': True}):
             col.append(Scenario(json=s))
         return col
+
+    def copy(self, sid, user: str):
+        if json := self.collection.find_one({'_id': sid}):
+            i = str(ObjectId())
+            json['id'] = i
+            json['_id'] = i
+            json['user'] = user
+            return self.save(json)
+        raise NoObjectWithIdException()
 

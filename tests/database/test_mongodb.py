@@ -63,31 +63,12 @@ def test_mongo_scenario_can_be_saved_loaded_and_deleted():
         mongo.get(mid2)
 
 
-def test_mongo_scenario_saves_decision_tree():
-    mongo = ScenarioMongoModel()
-    s = Scenario()
-    d = AnsweredDecision()
-    d.add_text_block("Title", "This is some sweet content!")
-    d.add(Answer(text="Kanban", points=30))
-    d.add(Answer(text="Scrum", points=100))
-    s.add(d)
-    mid = mongo.save(s)
-
-    result = mongo.get(mid)
-
-    answers = [a.text for a in next(result).answers]
-    assert "Kanban" in answers
-    assert "Scrum" in answers
-
-
 def test_mongo_scenario_saves_text_blocks():
     mongo = ScenarioMongoModel()
     s = Scenario()
     d = AnsweredDecision()
     d.add_text_block("Title", "This is some sweet content!")
     d.add_text_block("Title 2", "C2")
-    d.add(Answer(text="Kanban", points=30))
-    d.add(Answer(text="Scrum", points=100))
     s.add(d)
     mid = mongo.save(s)
 
@@ -104,8 +85,6 @@ def test_decision_saves_dtype_and_points():
     d = AnsweredDecision(points=200)
     d.add_text_block("Title", "This is some sweet content!")
     d.add_text_block("Title 2", "C2")
-    a = Answer(text="Scrum", points=100)
-    d.add(a)
     s.add(d)
     mid = mongo.save(s)
 
@@ -116,9 +95,6 @@ def test_decision_saves_dtype_and_points():
     assert isinstance(dec, Decision)
     assert not isinstance(dec, SimulationDecision)
     assert dec.points == 200
-    assert dec.answers[0] == Answer(text='Scrum', points=100)
-    assert dec.answers[0] != Answer(text='Kanban', points=0)
-    assert dec.answers[0].json == a.json
 
 
 def test_team_members_are_saved():
@@ -292,19 +268,59 @@ def test_custom_name_for_scenario():
 def test_change_decision():
     s = Scenario()
     mongo = ScenarioMongoModel()
-
     s.add(Decision())
+    mid = mongo.save(s)
+    res = mongo.get(mid)
+    d = res.get_decision(0)
+    d.add_text_block(header="hi", content="None")
+    mongo.update(res)
+    res2 = mongo.get(mid)
+    assert res2.get_decision(0).text[0].header == "hi"
+
+
+def test_mongo_scenario_saves_decision_tree():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    s.actions.scrap_actions()
+    d = AnsweredDecision()
+    s.add(d)
+    d2 = AnsweredDecision()
+    d2.active_actions.append('model-pick')
+    s.add(d2)
 
     mid = mongo.save(s)
 
-    res = mongo.get(mid)
+    s = mongo.get(mid)
+    next(s)
+    assert len(s.button_rows) == 0
+    next(s)
+    assert len(s.button_rows) == 1
+    assert s.button_rows[0]['title'] == 'Model'
 
-    d = res.get_decision(0)
 
-    d.add_text_block(header="hi", content="None")
+def test_mongo_stores_points_for_answer():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    s.actions.scrap_actions()
+    d = AnsweredDecision()
+    d.add_button_action(title='Model', answers=[{'label': 'Waterfall', 'points': 100}, {'label': 'Scrum', 'points': 0},
+                                                {'label': 'Spiral', 'points': 0}])
+    s.add(d)
+    next(s)
+    assert len(s.button_rows) == 1
+    assert s.button_rows[0]['title'] == 'Model'
+    assert 'Waterfall' in [a['label'] for a in s.button_rows[0]['answers']]
+    assert 'Scrum' in [a['label'] for a in s.button_rows[0]['answers']]
+    assert 'Spiral' in [a['label'] for a in s.button_rows[0]['answers']]
+    assert 'Kanban' not in [a['label'] for a in s.button_rows[0]['answers']]
 
-    mongo.update(res)
+    mid = mongo.save(s)
 
-    res2 = mongo.get(mid)
+    s = mongo.get(mid)
 
-    assert res2.get_decision(0).text[0].header == "hi"
+    assert len(s.button_rows) == 1
+    assert s.button_rows[0]['title'] == 'Model'
+    assert 'Waterfall' in [a['label'] for a in s.button_rows[0]['answers']]
+    assert 'Scrum' in [a['label'] for a in s.button_rows[0]['answers']]
+    assert 'Spiral' in [a['label'] for a in s.button_rows[0]['answers']]
+    assert 'Kanban' not in [a['label'] for a in s.button_rows[0]['answers']]

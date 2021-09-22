@@ -9,7 +9,7 @@ def add():
     scenario.add(Decision(text=[TextBlock("Welcome", "To the game.")], dtype='simulate'))
     scenario.team += Member('junior')
 
-    return mongo.save(scenario)
+    return mongo.save(scenario.json)
 
 
 if __name__ == "__main__":
