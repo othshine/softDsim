@@ -54,17 +54,17 @@ class TestDecisionTree(unittest.TestCase):
 
     def test_scenario_remove(self):
         s = Scenario()
-        self.assertEqual([], s._decisions)
+        self.assertEqual([], s.decisions)
         d1 = Decision("1")
         d1.add_answer("Answer", 100)
         s.add(d1)
-        self.assertEqual([d1], s._decisions)
+        self.assertEqual([d1], s.decisions)
         d2 = Decision("2")
         d2.add_answer("Answer2", 50)
         s.add(d2)
-        self.assertEqual([d1, d2], s._decisions)
+        self.assertEqual([d1, d2], s.decisions)
         s.remove(0)
-        self.assertEqual([d2], s._decisions)
+        self.assertEqual([d2], s.decisions)
 
     def test_scenario_num_of_desicions(self):
         s = Scenario()

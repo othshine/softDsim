@@ -90,7 +90,7 @@ def test_decision_saves_dtype_and_points():
 
     result = mongo.get(mid)
 
-    dec = result._decisions[0]
+    dec = result.decisions[0]
     assert isinstance(dec, AnsweredDecision)
     assert isinstance(dec, Decision)
     assert not isinstance(dec, SimulationDecision)

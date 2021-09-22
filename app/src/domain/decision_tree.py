@@ -186,7 +186,7 @@ class Scenario:
             self.current_day = int(kwargs.get('current_day', 0) or 0)
             self.scheduled_days = int()
             self.counter = int(kwargs.get('counter', -1))
-            self._decisions = kwargs.get('decisions', []) or []
+            self.decisions = kwargs.get('decisions', []) or []
             self.id = ObjectId(kwargs.get('id')) or ObjectId()
             self.desc = kwargs.get('desc', 0) or ""
             self.actions = kwargs.get('actions', ActionList())
@@ -198,13 +198,13 @@ class Scenario:
         return self
 
     def __next__(self) -> Decision:
-        if self.counter >= len(self._decisions) - 1:
+        if self.counter >= len(self.decisions) - 1:
             raise StopIteration
         self._eval_counter()
-        return self._decisions[self.counter]
+        return self.decisions[self.counter]
 
     def __len__(self) -> int:
-        return len(self._decisions)
+        return len(self.decisions)
 
     def __eq__(self, other):
         if isinstance(other, Scenario):
@@ -215,7 +215,7 @@ class Scenario:
     def json(self):
         d = {'tasks_done': self.tasks_done,
              'tasks_total': self.tasks_total,
-             'decisions': [dec.json for dec in self._decisions],
+             'decisions': [dec.json for dec in self.decisions],
              'actual_cost': self.actual_cost,
              'budget': self.budget,
              'counter': self.counter,
@@ -232,23 +232,26 @@ class Scenario:
         return d
 
     def add(self, decision: Decision):
-        self._decisions.append(decision)
+        self.decisions.append(decision)
 
     def remove(self, index: int):
-        del self._decisions[index]
+        del self.decisions[index]
 
     @property
     def button_rows(self):
         json = []
-        for a in self._decisions[self.counter].active_actions:
-            if (action := self.actions.get(a)) is not None:
+        d = self.decisions[self.counter]
+        if isinstance(d, SimulationDecision):
+            for a in d.active_actions or []:
+                if (action := self.actions.get(a)) is not None:
+                    json.append(action.json)
+        else:
+            for action in d.actions or []:
                 json.append(action.json)
-        for action in self._decisions[self.counter].actions:
-            json.append(action.json)
         return json
 
     def get_max_points(self) -> int:
-        return sum([d.get_max_points() for d in self._decisions])
+        return sum([d.get_max_points() for d in self.decisions])
 
     def work(self, days, meeting):
         wp = WorkPackage(days=days, daily_meeting_hours=meeting)
@@ -295,7 +298,7 @@ class Scenario:
             self.counter = 0
             print("set")
         else:
-            d = self._decisions[self.counter]
+            d = self.decisions[self.counter]
             if (not isinstance(d, SimulationDecision)) or (
                     isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.tasks_done)):
                 self.counter += 1
@@ -307,7 +310,7 @@ class Scenario:
     def get_decision(self, nr: int = None) -> Decision:
         if not nr:
             nr = self.counter
-        return self._decisions[nr]
+        return self.decisions[nr]
 
     def copy(self, user: str = None):
         s = Scenario(tasks_done=self.tasks_done,
@@ -317,7 +320,7 @@ class Scenario:
                      current_day=self.current_day,
                      scheduled_days=self.scheduled_days,
                      counter=self.counter,
-                     _decisions=self._decisions,
+                     _decisions=self.decisions,
                      id=ObjectId(),
                      desc=self.desc,
                      actions=self.actions,

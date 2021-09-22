@@ -53,11 +53,11 @@ let x = new Vue({
         },
         numericPicker(i, j, op) {
             let v = -1
-            if (op === "add"){
+            if (op === "add") {
                 v = 1
             }
             let count = this.numeric_rows[i]['values'][j];
-            if (!(count < 1 && v === -1)){
+            if (!(count < 1 && v === -1)) {
                 this.numeric_rows[i]['values'][j] += v;
             }
 
@@ -99,10 +99,16 @@ async function cont() {
         }
     );
     const data = await response.json();
+
     console.log(data)
-    for (const dataKey in data) {
-        x._data[dataKey] = data[dataKey]
+    if (data['done'] === true) {
+        window.location.href = '/result/' + s
+    } else {
+        for (const dataKey in data) {
+            x._data[dataKey] = data[dataKey]
+        }
+        addWeek(costChart, data.actual_cost, COUNTER)
+        COUNTER += 1;
     }
-    addWeek(costChart, data.actual_cost, COUNTER)
-    COUNTER += 1;
+
 }

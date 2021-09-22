@@ -71,37 +71,40 @@ def apply_changes(s: Scenario, data: dict):
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
-    print("cc", s.counter)
 
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         apply_changes(s, data)
         s.work(5, int(data['meetings']))
         s.get_decision().eval(data)
-        d = next(s)
-    context = {
-        "continue_text": d.continue_text,
-        "tasks_done": s.tasks_done,
-        "tasks_total": s.tasks_total,
-        "blocks": [],
-        "cost": s.team.salary,
-        "actual_cost": s.actual_cost,
-        'button_rows': s.button_rows,
-        'numeric_rows': [
-            {
-                'title': "staff",
-                'values':
+        try:
+            d = next(s)
+            context = {
+                "continue_text": d.continue_text,
+                "tasks_done": s.tasks_done,
+                "tasks_total": s.tasks_total,
+                "blocks": [],
+                "cost": s.team.salary,
+                "actual_cost": s.actual_cost,
+                'button_rows': s.button_rows,
+                'numeric_rows': [
                     {
-                        'junior': s.team.count('junior'),
-                        'senior': s.team.count('senior'),
-                        'expert': s.team.count('expert')
+                        'title': "staff",
+                        'values':
+                            {
+                                'junior': s.team.count('junior'),
+                                'senior': s.team.count('senior'),
+                                'expert': s.team.count('expert')
+                            }
                     }
+                ],
+                'done': False
             }
-        ]
+            for t in d.text:
+                context.get('blocks').append({'header': t.header, 'text': t.content})
+        except StopIteration:
+            context = {'done': True}
 
-    }
-    for t in d.text:
-        context.get('blocks').append({'header': t.header, 'text': t.content})
     model.update(s)
     return HttpResponse(json.dumps(context), content_type="application/json")
 
@@ -256,3 +259,11 @@ def login_request(request):
 def logout_request(request):
     logout(request)
     return redirect('/')
+
+
+def result_stats(request, sid):
+    mongo = ScenarioMongoModel()
+    s = mongo.get(sid)
+    print("Wanna do")
+
+    return render(request=request, template_name="app/result.html", context={'scenario': s})
