@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
 from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm
-from app.src.domain.decision_tree import Scenario, Decision
+from app.src.domain.decision_tree import Scenario, Decision, SimulationDecision
 from app.src.domain.team import Member
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 from utils import data_get
@@ -74,11 +74,17 @@ def click_continue(request, sid):
     if s.user != request.user.username:
         return HttpResponse(status=403)
 
+    if request.method == 'GET':
+        context = {"hi": True}
+        return HttpResponse(json.dumps(context), content_type="application/json")
+
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         apply_changes(s, data)
-        s.work(5, int(data['meetings']))
-        s.get_decision().eval(data)
+        if isinstance(s.get_decision(), SimulationDecision):
+            s.work(5, int(data['meetings']))
+        if s.counter >= 0:
+            s.get_decision().eval(data)
         try:
             d = next(s)
             context = {
@@ -87,6 +93,9 @@ def click_continue(request, sid):
                 "tasks_total": s.tasks_total,
                 "blocks": [],
                 "cost": s.team.salary,
+                "budget": s.budget,
+                "scheduled_days": s.scheduled_days,
+                "current_day": s.current_day,
                 "actual_cost": s.actual_cost,
                 'button_rows': s.button_rows,
                 'numeric_rows': [

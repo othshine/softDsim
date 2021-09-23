@@ -31,7 +31,7 @@
                 Statistics
             </div>
             <h3 class="element-header">Project Plan</h3>
-            <div id="gantt-chart" style="width:100%; height: 10rem;">
+            <div id="gantt-chart" style="width:100%; height: 1rem;">
 
             </div>
 
@@ -116,9 +116,12 @@
 
     </section>
     </div>
-
 {% endblock %}
 
+{% block endScripts %}
+    <script src="{% static 'app/libs/gantt/gantt.js' %}"></script>
+    <script src="{% static 'app/charts.js' %}"></script>
+{% endblock %}
 
 
 

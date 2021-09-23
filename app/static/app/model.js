@@ -100,15 +100,24 @@ async function cont() {
     );
     const data = await response.json();
 
-    console.log(data)
     if (data['done'] === true) {
         window.location.href = '/result/' + s
     } else {
         for (const dataKey in data) {
             x._data[dataKey] = data[dataKey]
         }
-        addWeek(costChart, data.actual_cost, COUNTER)
-        COUNTER += 1;
+        if (costChart.data.datasets.length === 1) {
+            initializeCharts(data['budget'], data['tasks_total'], data['scheduled_days']/5)
+        }
+
+        console.log(data['current_day'])
+        console.log(costChart.data.datasets[0].data.length * 5)
+        if ((costChart.data.datasets[0].data.length-1) * 5 < data['current_day']){
+            console.log(data['current_day'])
+            addWeek(costChart, data['actual_cost'])
+            addWeek(taskChart, data['tasks_done'])
+        }
+
     }
 
 }

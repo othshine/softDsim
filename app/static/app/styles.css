@@ -178,6 +178,13 @@ button.active-button{
   width: 100%;
 }
 
+#tasks-chart {
+  min-height: 200px;
+}
+
+#cost-chart{
+  min-height: 200px;
+}
 
 
 /* numeric fields */

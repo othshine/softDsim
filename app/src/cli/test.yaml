@@ -1,4 +1,4 @@
-name: Woche 3
+name: Woche 11
 tasks_total: 855
 budget: 200000
 scheduled_days: 100
@@ -50,8 +50,8 @@ decisions:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.
       - header: Goal
-        content: 400 Tasks
+        content: 855 Tasks
       - header: Story
-        content: Your all ready to go. Start of the project by managing the team. Its all on you now.
+        content: You're ready to go. Start off the project by managing the team. Its all on you now.
     goal:
-      tasks: 400
+      tasks: 855
