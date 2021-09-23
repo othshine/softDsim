@@ -107,10 +107,7 @@ def click_continue(request, sid):
         except StopIteration:
             context = {'done': True}
 
-        print("before: ", s.counter)
         model.update(s)
-        s = model.get(sid)
-        print("after: ", s.counter)
         return HttpResponse(json.dumps(context), content_type="application/json")
 
 
@@ -156,11 +153,9 @@ def add_scenario(request):
     if request.method == 'POST':
         form = ScenarioNameForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
             s = Scenario(name=form.cleaned_data['name'])
             mongo = ScenarioMongoModel()
             mid = mongo.save(s.json)
-            print("XXX")
             return HttpResponseRedirect("/instructor/edit/" + s.get_id(), )  # ToDo: use reverse.
     context = {
         'form': ScenarioNameForm(),
@@ -183,7 +178,6 @@ def edit(request, sid):
         form = ScenarioEditForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            print(data)
             s.budget = float(data.get('budget'))
             s.tasks_total = int(data.get('tasks'))
             mongo.update(s)
@@ -269,6 +263,4 @@ def logout_request(request):
 def result_stats(request, sid):
     mongo = ScenarioMongoModel()
     s = mongo.get(sid)
-    print("Wanna do")
-
     return render(request=request, template_name="app/result.html", context={'scenario': s})

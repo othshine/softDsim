@@ -200,9 +200,9 @@ class Scenario:
         return self
 
     def __next__(self) -> Decision:
-        if self.counter >= len(self.decisions) - 1:
-            raise StopIteration
         self._eval_counter()
+        if self.counter >= len(self.decisions):
+            raise StopIteration
         return self.decisions[self.counter]
 
     def __len__(self) -> int:
@@ -257,7 +257,8 @@ class Scenario:
 
     def work(self, days, meeting):
         wp = WorkPackage(days=days, daily_meeting_hours=meeting)
-        self._apply_work_result(self.team.work(wp))
+        wr = self.team.work(wp)
+        self._apply_work_result(wr)
         self.actual_cost += month_to_day(self.team.salary, days)
         self.current_day += days
 
@@ -298,16 +299,11 @@ class Scenario:
         """
         if self.counter == -1:
             self.counter = 0
-            print("set")
         else:
             d = self.decisions[self.counter]
             if (not isinstance(d, SimulationDecision)) or (
                     isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.tasks_done)):
                 self.counter += 1
-                print("yes")
-            else:
-                print("no")
-        print("C", self.counter)
 
     def get_decision(self, nr: int = None) -> Decision:
         if not nr:
