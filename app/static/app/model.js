@@ -70,22 +70,12 @@ let x = new Vue({
 
 
 /* Load Continue */
-let COUNTER = 0 // ToDo: Count on server side by having a flag at the current decision.
 
-function readButton(elementId) {
-    for (const button of document.getElementById(elementId).children) {
-        if (button.classList.contains('active-button')) {
-            return button.innerText;
-        }
-    }
-    return null;
-}
-
-
-function countStaff(staffType) {
-    return document.getElementById("staff-number-" + staffType).innerText.length;
-}
-
+/**
+ * Function is called when user clicks on the continue button while playing a scenario. Everything that has to do with
+ * fetching updating the data happens here.
+ * @returns {Promise<void>}
+ */
 async function cont() {
     const s = window.location.pathname.split('/').slice(-1)[0]
     const response = await fetch('/continue/' + s,
@@ -99,7 +89,6 @@ async function cont() {
         }
     );
     const data = await response.json();
-
     if (data['done'] === true) {
         window.location.href = '/result/' + s
     } else {
@@ -107,17 +96,11 @@ async function cont() {
             x._data[dataKey] = data[dataKey]
         }
         if (costChart.data.datasets.length === 1) {
-            initializeCharts(data['budget'], data['tasks_total'], data['scheduled_days']/5)
+            initializeCharts(data['budget'], data['tasks_total'], data['scheduled_days'] / 5)
         }
-
-        console.log(data['current_day'])
-        console.log(costChart.data.datasets[0].data.length * 5)
-        if ((costChart.data.datasets[0].data.length-1) * 5 < data['current_day']){
-            console.log(data['current_day'])
+        if ((costChart.data.datasets[0].data.length - 1) * 5 < data['current_day']) {
             addWeek(costChart, data['actual_cost'])
             addWeek(taskChart, data['tasks_done'])
         }
-
     }
-
 }
