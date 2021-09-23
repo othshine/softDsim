@@ -60,7 +60,6 @@ class _YAMLReader:
         self.path = path
 
     def read(self, *args):
-        print(self.path)
         with open(self.path) as y:
             data = load(y, Loader=FullLoader)
             for arg in args:

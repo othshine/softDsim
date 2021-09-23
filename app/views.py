@@ -102,13 +102,16 @@ def click_continue(request, sid):
                 ],
                 'done': False
             }
-            for t in d.text:
+            for t in d.text or []:
                 context.get('blocks').append({'header': t.header, 'text': t.content})
         except StopIteration:
             context = {'done': True}
 
-    model.update(s)
-    return HttpResponse(json.dumps(context), content_type="application/json")
+        print("before: ", s.counter)
+        model.update(s)
+        s = model.get(sid)
+        print("after: ", s.counter)
+        return HttpResponse(json.dumps(context), content_type="application/json")
 
 
 def instructor(request):

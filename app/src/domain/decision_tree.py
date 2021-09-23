@@ -186,7 +186,7 @@ class Scenario:
             self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
             self.budget = int(kwargs.get('budget', 0) or 0)
             self.current_day = int(kwargs.get('current_day', 0) or 0)
-            self.scheduled_days = int()
+            self.scheduled_days = int(kwargs.get('scheduled_days', 0) or 0)
             self.counter = int(kwargs.get('counter', -1))
             self.decisions = kwargs.get('decisions', []) or []
             self.id = ObjectId(kwargs.get('id')) or ObjectId()

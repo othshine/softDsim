@@ -1,0 +1,57 @@
+name: Woche 3
+tasks_total: 855
+budget: 200000
+scheduled_days: 100
+desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
+
+decisions:
+  - text:
+    - header: Welcome
+      content: Here is something explained to the user.
+    - header: Choose the fitting strategy
+      content: The project requirements were perfectly outlined by the customer. Nothing difficult. What Model to choose?
+    - header: The Product Life Cycle
+      content: While choosing the PM model it is a good idea to also think about the produt life cycle.
+    actions:
+      - title: Model
+        answers:
+          Waterfall: 100
+          Scrum: 0
+          Kanban: 0
+        typ: button
+      - title: Product Life Cycle
+        answers:
+          Agile: 0
+          Incremental: 50
+          Iterative: 50
+          Predictive: 100
+        typ: button
+  - text:
+    - header: Decision Number 2
+      content: Here is something explained to the user.
+    - header: These are merely Examples
+      content: This is an example decision to show what is possible.
+    actions:
+      - title: Your Title
+        answers:
+          Wrong: 0
+          Also Wrong: 0
+          Correct: 100
+        typ: button
+      - title: Choose
+        answers:
+          A: 0
+          B: 100
+        typ: button
+  - continue_text: Advance 1 Week
+    active_actions:
+      - salary-pick
+    text:
+      - header: This is a Simulation Decision
+        content: You will need to make your own decision to reach the goal.
+      - header: Goal
+        content: 400 Tasks
+      - header: Story
+        content: Your all ready to go. Start of the project by managing the team. Its all on you now.
+    goal:
+      tasks: 400
