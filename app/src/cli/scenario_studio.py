@@ -21,6 +21,8 @@ def make():
             kwargs['continue_text'] = ct
         if aa := decision.get('active_actions'):
             kwargs['active_actions'] = aa
+        if n := decision.get('name'):
+            kwargs['name'] = n
         if g := decision.get('goal'):
             d = SimulationDecision(**kwargs, goal=SimulationGoal(tasks=g.get('tasks')))
         else:

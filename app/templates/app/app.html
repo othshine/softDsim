@@ -72,12 +72,12 @@
             <ul>
                 <li v-for="row, i in numeric_rows">
                     <h3 class="element-header">
-                        [[ row.title ]]
+                        [[ row.title | uppercase]]
                     </h3>
                     <ul :id="row.id" class="row">
                         <li v-for="(val, key) in row.values" class="numeric-field">
                             <div class="staff-number">[[ dots(val) ]]</div>
-                            <div class="staff-name">[[ key ]]</div>
+                            <div class="staff-name">[[ key | uppercase ]]</div>
                             <div class="staff-button">
                                 <button @click="numericPicker(i, key, 'sub')">-</button>
                                 <button @click="numericPicker(i, key, 'add')">+</button>
@@ -88,25 +88,11 @@
                 </li>
             </ul>
 
-            <h3 class="element-header">
-                Meetings
-            </h3>
-            <div class="button-row row-3">
-                <button onclick="subMeeting()">-</button>
-                <button onclick="" disabled><strong>[[ meetings ]]</strong></button>
-                <button onclick="addMeeting()">+</button>
-            </div>
-            <h3 class="element-header">
-                Trainings
-            </h3>
-            <h3 class="element-header">
-                Activity Distribution
-            </h3>
-            <div id="activity-distribution-container">
-                <div class="activity-bar"></div>
-                <div class="activity-bar"></div>
-                <div class="activity-bar"></div>
-            </div>
+            <template v-if="$data.meeting_planner">
+                {% include 'app/snippets/meeting_planner.html' %}
+            </template>
+
+
 
             <div id="continue-container">
                 <button onclick="cont()">[[ continue_text ]]</button>

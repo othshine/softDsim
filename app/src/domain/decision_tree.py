@@ -1,7 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import List, Optional
-from deprecated import deprecated
 
 from bson import ObjectId
 
@@ -38,12 +37,14 @@ class Decision(ABC):
         self.continue_text: str = kwargs.get('continue_text', "Continue")
         self.points = kwargs.get('points', 0)
         self.active_actions: List[str] = kwargs.get('active_actions', [])
+        self.name = kwargs.get('name', "Decision")
 
     @property
     def json(self):
         data = {'continue_text': self.continue_text,
                 'points': self.points,
-                'active_actions': self.active_actions}
+                'active_actions': self.active_actions,
+                'name': self.name}
         if self.text:
             data = {**data, 'text': [t.json for t in self.text]}
         return data
@@ -163,10 +164,11 @@ class ActionList:
 
     def scrap_actions(self):
         for id in YAMLReader.read('actions', 'button-rows'):
-            a = Action(id, YAMLReader.read('actions', 'button-rows', id, 'title'), 'button')
-            for label in YAMLReader.read('actions', 'button-rows', id, 'values'):
-                a.answers.append(Answer(label, False))
-            self.actions.append(a)
+            if id not in [x.id for x in self.actions]:
+                a = Action(id, YAMLReader.read('actions', 'button-rows', id, 'title'), 'button')
+                for label in YAMLReader.read('actions', 'button-rows', id, 'values'):
+                    a.answers.append(Answer(label, False))
+                self.actions.append(a)
 
     def adjust(self, data):
         if self.get(data.get('id')):
@@ -252,6 +254,23 @@ class Scenario:
                 json.append(action.json)
         return json
 
+    @property
+    def numeric_rows(self):
+        json = []
+        d = self.decisions[self.counter]
+        for aa in d.active_actions:
+            if aa == 'staff-pick':  # ToDo: Make this quick and dirty solution dynamic.
+                json.append({
+                    'title': "staff",
+                    'values':
+                        {
+                            'junior': self.team.count('junior'),
+                            'senior': self.team.count('senior'),
+                            'expert': self.team.count('expert')
+                        }
+                })
+        return json
+
     def get_max_points(self) -> int:
         return sum([d.get_max_points() for d in self.decisions])
 
@@ -312,12 +331,19 @@ class Scenario:
             return None
         return self.decisions[nr]
 
+    def total_score(self) -> int:
+        p = 0
+        for d in self.decisions:
+            p += d.points
+        return p
+
 
 def build_decision(d):
+    kwargs = {"active_actions": d.get('active_actions'), "name": d.get('name')}
     if d.get('goal'):
-        dec = SimulationDecision(goal=SimulationGoal(**d.get('goal')), active_actions=d.get('active_actions'))
+        dec = SimulationDecision(**kwargs, goal=SimulationGoal(**d.get('goal')))
     else:
-        dec = AnsweredDecision(active_actions=d.get('active_actions'), actions=d.get('actions'))
+        dec = AnsweredDecision(**kwargs, actions=d.get('actions'))
     for t in d.get('text') or []:
         dec.add_text_block(t.get('header'), t.get('content'))
     dec.points = d.get('points', 0)

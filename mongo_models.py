@@ -36,9 +36,12 @@ class ScenarioMongoModel(MongoConnection):
         return self.collection.insert_one({**obj.json, 'template': True}).inserted_id
 
     def update(self, obj):  # ToDo: Tests for updating Scenarios.
-        if self.collection.find({'_id': obj.get_id()}).count():
+        self.collection.find_one_and_update({'_id': obj.get_id()}, { "$set" : obj.json})
+        """
+        if self.collection.find().count():
             self.remove(mid=obj.get_id())
         return self.save(obj)
+        """
 
     def remove(self, obj=None, mid=None):
         if obj:
@@ -62,4 +65,13 @@ class ScenarioMongoModel(MongoConnection):
             json['template'] = False
             return self.save(json)
         raise NoObjectWithIdException()
+
+    def find_user_scores(self, name, username):
+        f = {"name": name, "user": username}
+        result = list(self.collection.find(f))
+        tries = len(result)
+        best_score = 0
+        for s in result:
+            best_score = max(best_score, Scenario(json=s).total_score())
+        return tries, best_score
 

@@ -8,8 +8,10 @@
             <h1>Results</h1>
         </div>
     {% for decision in scenario.decisions %}
+        <h3>{{ decision.name }}</h3>
         <p>Points: {{ decision.points }}</p>
     {% endfor %}
+    <h2>Total Score: {{ scenario.total_score }} </h2>
     
 
     </div>

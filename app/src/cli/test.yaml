@@ -1,11 +1,12 @@
-name: Woche 11
+name: Week Uno
 tasks_total: 855
 budget: 200000
 scheduled_days: 100
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
 
 decisions:
-  - text:
+  - name: Model and Life Cycle
+    text:
     - header: Welcome
       content: Here is something explained to the user.
     - header: Choose the fitting strategy
@@ -26,7 +27,8 @@ decisions:
           Iterative: 50
           Predictive: 100
         typ: button
-  - text:
+  - name: Demo Decision
+    text:
     - header: Decision Number 2
       content: Here is something explained to the user.
     - header: These are merely Examples
@@ -43,9 +45,11 @@ decisions:
           A: 0
           B: 100
         typ: button
-  - continue_text: Advance 1 Week
+  - name: Simulation
+    continue_text: Advance 1 Week
     active_actions:
-      - salary-pick
+      - staff-pick
+      - meeting-planner
     text:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.

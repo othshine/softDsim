@@ -21,6 +21,13 @@ let x = new Vue({
     filters: {
         toCurrency(value) {
             return `${value.toLocaleString('de-DE', {style: 'currency', currency: 'EUR'})}`
+        },
+        uppercase(value) {
+            if (!value) {
+                return '';
+            }
+
+            return value.toString().charAt(0).toUpperCase() + value.toString().slice(1);
         }
 
     },

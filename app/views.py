@@ -21,7 +21,18 @@ from utils import data_get
 def index(request):
     mongo = ScenarioMongoModel()
     sc = mongo.find_all_templates()
-    context = {'scenarios': [s.json for s in sc]}
+    s_list = []
+    for scenario in sc:
+        tries, best_score = mongo.find_user_scores(scenario.name, request.user.username)
+        print(tries)
+        s_list.append({
+            'name': scenario.name,
+            'id': scenario.id,
+            'tries': tries,
+            'best_score': best_score
+        })
+    context = {'scenarios': s_list}
+
     return render(request, "app/index.html", context)
 
 
@@ -98,17 +109,8 @@ def click_continue(request, sid):
                 "current_day": s.current_day,
                 "actual_cost": s.actual_cost,
                 'button_rows': s.button_rows,
-                'numeric_rows': [
-                    {
-                        'title': "staff",
-                        'values':
-                            {
-                                'junior': s.team.count('junior'),
-                                'senior': s.team.count('senior'),
-                                'expert': s.team.count('expert')
-                            }
-                    }
-                ],
+                'numeric_rows': s.numeric_rows,
+                'meeting_planner': 'meeting-planner' in d.active_actions,
                 'done': False
             }
             for t in d.text or []:
