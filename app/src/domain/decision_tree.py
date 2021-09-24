@@ -325,9 +325,10 @@ class Scenario:
                 self.counter += 1
 
     def get_decision(self, nr: int = None) -> Optional[Decision]:
-        if not nr:
+        if nr is None:
             nr = self.counter
         if nr < 0:
+            print(2)
             return None
         return self.decisions[nr]
 
