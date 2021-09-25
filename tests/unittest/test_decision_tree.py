@@ -1,8 +1,9 @@
 import pytest
 
 from app.src.domain.dataObjects import SimulationGoal
-from app.src.domain.decision_tree import Scenario, Decision, AnsweredDecision, SimulationDecision, TextBlock, Answer, \
+from app.src.domain.decision_tree import Decision, AnsweredDecision, SimulationDecision, TextBlock, Answer, \
     ActionList
+from app.src.domain.scenario import Scenario
 from utils import YAMLReader
 
 

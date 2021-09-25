@@ -1,7 +1,9 @@
 from bson import ObjectId
+from deprecated.classic import deprecated
 from pymongo import MongoClient
 
-from app.src.domain.decision_tree import Scenario
+from app.src.domain.factories import Factory
+from app.src.domain.scenario import Scenario, UserScenario
 
 
 class NoObjectWithIdException(Exception):
@@ -11,7 +13,7 @@ class NoObjectWithIdException(Exception):
 class MongoConnection(object):
     def __init__(self):
         client = MongoClient('localhost', 27017)
-        self.db = client['softdsim']
+        self.db = client['v2']
 
     def get_collection(self, name):
         self.collection = self.db[name]
@@ -23,8 +25,12 @@ class ScenarioMongoModel(MongoConnection):
         self.get_collection('scenarios')
 
     def get(self, _id):
+        typ = 'scenario'
         if json := self.collection.find_one({'_id': _id}):
-            return Scenario(json=json)
+            if json.get('template') is None:
+                typ = 'userscenario'
+                json['template'] = self.get(json.get('template_id'))
+            return Factory.deserialize(json, typ)
         raise NoObjectWithIdException()
 
     def save(self, obj) -> ObjectId:
@@ -36,12 +42,9 @@ class ScenarioMongoModel(MongoConnection):
         return self.collection.insert_one({**obj.json, 'template': True}).inserted_id
 
     def update(self, obj):  # ToDo: Tests for updating Scenarios.
-        return self.collection.find_one_and_update({'_id': obj.get_id()}, { "$set" : obj.json})['_id']
-        """
-        if self.collection.find().count():
-            self.remove(mid=obj.get_id())
-        return self.save(obj)
-        """
+        # ToDo: Do not allow to update templates.
+        print(obj.json)
+        return self.collection.find_one_and_update({'_id': obj.get_id()}, {"$set": obj.json})['_id']
 
     def remove(self, obj=None, mid=None):
         if obj:
@@ -53,9 +56,10 @@ class ScenarioMongoModel(MongoConnection):
     def find_all_templates(self):
         col = []
         for s in self.collection.find({'template': True}):
-            col.append(Scenario(json=s))
+            col.append(Factory.deserialize(json=s, typ="scenario"))
         return col
 
+    @deprecated
     def copy(self, sid, user: str):
         if json := self.collection.find_one({'_id': sid}):
             i = str(ObjectId())
@@ -75,3 +79,7 @@ class ScenarioMongoModel(MongoConnection):
             best_score = max(best_score, Scenario(json=s).total_score())
         return tries, best_score
 
+    def create(self, sid, user):
+        if template := self.collection.find_one({'_id': sid}):
+            return self.save(Factory.create_user_scenario(user, template).json)
+        raise NoObjectWithIdException("No template scenario with id: " + str(sid))

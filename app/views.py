@@ -11,7 +11,8 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
 from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm
-from app.src.domain.decision_tree import Scenario, Decision, SimulationDecision
+from app.src.domain.decision_tree import Decision, SimulationDecision
+from app.src.domain.scenario import Scenario, UserScenario
 from app.src.domain.team import Member
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 from utils import data_get
@@ -23,13 +24,13 @@ def index(request):
     sc = mongo.find_all_templates()
     s_list = []
     for scenario in sc:
-        tries, best_score = mongo.find_user_scores(scenario.name, request.user.username)
-        print(tries)
+        #tries, best_score = mongo.find_user_scores(scenario.name, request.user.username)
+        #print(tries)
         s_list.append({
             'name': scenario.name,
             'id': scenario.id,
-            'tries': tries,
-            'best_score': best_score
+            #'tries': tries,
+            #'best_score': best_score
         })
     context = {'scenarios': s_list}
 
@@ -56,7 +57,7 @@ def app(request, sid):
 @login_required
 def create_new(request, sid):
     model = ScenarioMongoModel()
-    mid = model.copy(sid, user=request.user.username)
+    mid = model.create(sid, user=request.user.username)
     return redirect('/s/' + mid)
 
 
@@ -70,7 +71,7 @@ def get_points(param, data):
     return points
 
 
-def apply_changes(s: Scenario, data: dict):
+def apply_changes(s: UserScenario, data: dict):
     if staff := data_get(data['numeric_rows'], 'staff'):
         adjust_staff(s, staff.get('values'))
     for action in data['button_rows']:
@@ -97,15 +98,16 @@ def click_continue(request, sid):
         if s.counter >= 0:
             s.get_decision().eval(data)
         try:
+
             d = next(s)
             context = {
                 "continue_text": d.continue_text,
                 "tasks_done": s.tasks_done,
-                "tasks_total": s.tasks_total,
+                "tasks_total": s.template.tasks_total,
                 "blocks": [],
                 "cost": s.team.salary,
-                "budget": s.budget,
-                "scheduled_days": s.scheduled_days,
+                "budget": s.template.budget,
+                "scheduled_days": s.template.scheduled_days,
                 "current_day": s.current_day,
                 "actual_cost": s.actual_cost,
                 'button_rows': s.button_rows,

@@ -1,4 +1,5 @@
-from app.src.domain.decision_tree import Scenario, Decision, TextBlock
+from app.src.domain.decision_tree import Decision, TextBlock
+from app.src.domain.scenario import Scenario
 from app.src.domain.team import Member
 from mongo_models import ScenarioMongoModel
 

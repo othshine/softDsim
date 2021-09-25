@@ -1,5 +1,7 @@
 import unittest
-from app.src.domain.decision_tree import Answer, Decision, Scenario
+from app.src.domain.decision_tree import Answer, Decision
+from app.src.domain.scenario import Scenario
+
 
 class TestDecisionTree(unittest.TestCase):
 

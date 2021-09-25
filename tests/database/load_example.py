@@ -1,5 +1,6 @@
 from app.src.domain.dataObjects import SimulationGoal
-from app.src.domain.decision_tree import Scenario, AnsweredDecision, Answer, SimulationDecision
+from app.src.domain.decision_tree import AnsweredDecision, Answer, SimulationDecision
+from app.src.domain.scenario import Scenario
 from mongo_models import ScenarioMongoModel
 
 
