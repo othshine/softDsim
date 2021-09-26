@@ -152,8 +152,21 @@ class UserScenario:
             return None
         return self.decisions[nr]
 
+    def get_answered_decisions(self):
+        return [d for d in self.decisions if not isinstance(d, SimulationDecision)]
+
     def total_score(self) -> int:
         p = 0
         for d in self.decisions:
             p += d.points
+        p += self.time_score()
+        p += self.budget_score()
         return p
+
+    def time_score(self) -> int:
+        # ToDo: use a defined factor instead of 100.
+        # ToDo: the factor should have a weight that can be defined when create the scenario.
+        return round((self.template.scheduled_days / self.current_day) * 100)
+
+    def budget_score(self) -> int:
+        return round((self.template.budget / self.actual_cost) * 100)

@@ -14,23 +14,24 @@ from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm
 from app.src.domain.decision_tree import Decision, SimulationDecision
 from app.src.domain.scenario import Scenario, UserScenario
 from app.src.domain.team import Member
-from mongo_models import ScenarioMongoModel, NoObjectWithIdException
+from mongo_models import ScenarioMongoModel, NoObjectWithIdException, UserMongoModel
 from utils import data_get
 
 
 @login_required
 def index(request):
-    mongo = ScenarioMongoModel()
-    sc = mongo.find_all_templates()
+    scenario_model = ScenarioMongoModel()
+    user_model = UserMongoModel()
+    sc = scenario_model.find_all_templates()
     s_list = []
     for scenario in sc:
-        #tries, best_score = mongo.find_user_scores(scenario.name, request.user.username)
-        #print(tries)
+        best_score = user_model.get_best_score(user=request.user.username, template_id=scenario.id)
+        tries = user_model.get_num_tries(user=request.user.username, template_id=scenario.id)
         s_list.append({
             'name': scenario.name,
             'id': scenario.id,
-            #'tries': tries,
-            #'best_score': best_score
+            'tries': tries,
+            'best_score': best_score
         })
     context = {'scenarios': s_list}
 
@@ -119,6 +120,8 @@ def click_continue(request, sid):
                 context.get('blocks').append({'header': t.header, 'text': t.content})
         except StopIteration:
             context = {'done': True}
+            user_model = UserMongoModel()
+            user_model.save_score(user=request.user.username, scenario=s, score=s.total_score())
 
         model.update(s)
         return HttpResponse(json.dumps(context), content_type="application/json")

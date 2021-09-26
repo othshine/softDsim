@@ -43,7 +43,6 @@ class ScenarioMongoModel(MongoConnection):
 
     def update(self, obj):  # ToDo: Tests for updating Scenarios.
         # ToDo: Do not allow to update templates.
-        print(obj.json)
         return self.collection.find_one_and_update({'_id': obj.get_id()}, {"$set": obj.json})['_id']
 
     def remove(self, obj=None, mid=None):
@@ -70,16 +69,37 @@ class ScenarioMongoModel(MongoConnection):
             return self.save(json)
         raise NoObjectWithIdException()
 
-    def find_user_scores(self, name, username):
-        f = {"name": name, "user": username}
-        result = list(self.collection.find(f))
-        tries = len(result)
-        best_score = 0
-        for s in result:
-            best_score = max(best_score, Scenario(json=s).total_score())
-        return tries, best_score
-
     def create(self, sid, user):
         if template := self.collection.find_one({'_id': sid}):
             return self.save(Factory.create_user_scenario(user, template).json)
         raise NoObjectWithIdException("No template scenario with id: " + str(sid))
+
+
+class UserMongoModel(MongoConnection):
+    def __init__(self):
+        super(UserMongoModel, self).__init__()
+        self.get_collection('users')
+
+    def save_score(self, user: str, scenario: UserScenario, score: int):
+        if self.collection.count({'username': user}) == 0:
+            self.save_user(user)
+        json = self.collection.find_one({'username': user})
+        scores = json.get(scenario.template.id, [])
+        print("sc", scores)
+        scores.append(score)
+        self.collection.find_one_and_update({'username': user}, {"$set": {scenario.template.id: scores}})
+
+    def save_user(self, user: str):
+        if self.collection.find({'username': user}).count():
+            raise ValueError("User "+user+" already exists!")
+        self.collection.save({'username': user})
+        return
+
+    def get_best_score(self, user: str, template_id) -> int:
+        json = self.collection.find_one({'username': user}) or {}
+        return max(json.get(template_id, [0]))
+
+    def get_num_tries(self, user, template_id) -> int:
+        user = self.collection.find_one({'username': user}) or {}
+        return len(user.get(template_id, []))
+
