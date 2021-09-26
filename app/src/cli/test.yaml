@@ -1,4 +1,4 @@
-name: Week Uno
+name: Week Duo
 tasks_total: 855
 budget: 200000
 scheduled_days: 100
@@ -58,4 +58,16 @@ decisions:
       - header: Story
         content: You're ready to go. Start off the project by managing the team. Its all on you now.
     goal:
-      tasks: 855
+      tasks: 500
+  - name: Simulation
+    continue_text: Advance 1 Week
+    active_actions:
+      - staff-pick
+      - meeting-planner
+    text:
+      - header: Hold on!
+        content: One of your competitors has announced a similar product and will launch it in 6 weeks.
+      - header: Management
+        content: The Senior Management wants the product on the market before your competitors.
+    goal:
+      tasks: 900

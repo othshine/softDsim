@@ -7,12 +7,16 @@
         <div class="row title-row">
             <h1>Results</h1>
         </div>
-    {% for decision in scenario.decisions %}
-        <h3>{{ decision.name }}</h3>
-        <p>Points: {{ decision.points }}</p>
-    {% endfor %}
-    <h2>Total Score: {{ scenario.total_score }} </h2>
-    
+        {% for decision in scenario.get_answered_decisions %}
+            <h3>{{ decision.name }}</h3>
+            <p>Points: {{ decision.points }}</p>
+        {% endfor %}
+        <h3>Time</h3>
+        <p>Points: {{ scenario.time_score }}</p>
+        <h3>Budget</h3>
+        <p>Points: {{ scenario.budget_score }}</p>
+        <h2>Total Score: {{ scenario.total_score }} </h2>
+
 
     </div>
 

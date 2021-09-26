@@ -1,7 +1,10 @@
 import os
 
+from bson import ObjectId
+
 from app.src.domain.dataObjects import SimulationGoal
-from app.src.domain.decision_tree import Scenario, AnsweredDecision, SimulationDecision
+from app.src.domain.decision_tree import AnsweredDecision, SimulationDecision
+from app.src.domain.scenario import Scenario
 from mongo_models import ScenarioMongoModel
 from utils import _YAMLReader
 
@@ -14,6 +17,7 @@ def make():
                  budget=data.get('budget', 10000),
                  desc=data.get('desc', ''),
                  scheduled_days=data.get('scheduled_days', 100),
+                 id=ObjectId()
                  )
     for decision in data.get('decisions', []):
         kwargs = {}
@@ -35,7 +39,6 @@ def make():
             d.add_text_block(tb.get('header', ''), tb.get('content', ''))
         s.add(d)
     mongo = ScenarioMongoModel()
-    s.actions.scrap_actions()
     print(mongo.save_template(s))
 
 

@@ -1,7 +1,8 @@
 import pytest
 
 from app.src.domain.dataObjects import SimulationGoal
-from app.src.domain.decision_tree import Scenario, Decision, Answer, AnsweredDecision, SimulationDecision
+from app.src.domain.decision_tree import Decision, Answer, AnsweredDecision, SimulationDecision
+from app.src.domain.scenario import UserScenario, Scenario
 from app.src.domain.team import Member, SkillType
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException
 
