@@ -124,6 +124,14 @@ class Team:
         return mean([m.motivation for m in self.staff] or [0])
 
     @property
+    def familiarity(self):
+        """
+        The teams familiarity. Is considered to be the average (mean) of each team members familiarity. 0 if team has
+        no staff. :return: float
+        """
+        return mean([m.familiarity for m in self.staff] or [0])
+
+    @property
     def salary(self):
         """
         The teams total monthly salary expenditures. The sum of all members' salary.

@@ -119,6 +119,8 @@ def click_continue(request, sid):
                 'button_rows': s.button_rows,
                 'numeric_rows': s.numeric_rows,
                 'meeting_planner': 'meeting-planner' in d.active_actions,
+                'motivation': s.team.motivation,
+                'familiarity': s.team.familiarity,
                 'done': False
             }
             for t in d.text or []:
