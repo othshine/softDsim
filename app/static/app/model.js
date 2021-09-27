@@ -95,6 +95,10 @@ async function cont() {
             body: JSON.stringify(x._data)
         }
     );
+
+    if (response.status == 403){
+        alert("This is not a valid scenario id")
+    }
     const data = await response.json();
     if (data['done'] === true) {
         window.location.href = '/result/' + s

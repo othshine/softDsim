@@ -75,6 +75,10 @@ def get_points(param, data):
 def apply_changes(s: UserScenario, data: dict):
     if staff := data_get(data['numeric_rows'], 'staff'):
         adjust_staff(s, staff.get('values'))
+    if q := data_get(data['button_rows'], 'Quality Check'):
+        if data_get(q['answers'], 'Perform', attr='label').get('active'):
+            # ToDo: implement scenario quality checks here.
+            print("Do QA here!!!")
     for action in data['button_rows']:
         s.actions.adjust(action)
 
@@ -84,7 +88,7 @@ def apply_changes(s: UserScenario, data: dict):
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
-    if s.user != request.user.username:
+    if not isinstance(s, UserScenario) or s.user != request.user.username:
         return HttpResponse(status=403)
 
     if request.method == 'GET':
@@ -98,6 +102,7 @@ def click_continue(request, sid):
             s.work(5, int(data['meetings']))
         if s.counter >= 0:
             s.get_decision().eval(data)
+            print("Q:", s.quality_score())
         try:
 
             d = next(s)

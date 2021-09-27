@@ -1,3 +1,5 @@
+from random import random
+
 from pymongo import MongoClient
 from yaml import load, FullLoader
 import os
@@ -25,6 +27,27 @@ def value_or_error(val, lower: float = 0.0, upper: float = 1.0):
     raise ValueError
 
 
+def quality(tasks, errors) -> int:
+    """
+    Calculates a quality score between 0 and 100. The score is calculated using an exponential function.
+    :param tasks: Number of total tasks.
+    :param errors: Number of tasks with errors.
+    :return: quality score.
+    """
+    if tasks == 0:
+        return 100
+    return round((((tasks - errors) * (1 / tasks)) ** 8) * 100)
+
+
+def probability(p: float) -> int:
+    """
+    Returns 1 with a probability of p and 0 with probability of 1-p.
+    :param p: probability of getting 1.
+    :return: 1 or 0
+    """
+    return 1 if random() < p else 0
+
+
 def dots(n: int):
     """
     Returns a string with n dots: •
@@ -42,15 +65,16 @@ def month_to_day(value: float, num_days: int = 1) -> float:
     return value * (num_days / 20)
 
 
-def data_get(data, title) -> dict:
+def data_get(data, value, attr='title') -> dict:
     """
     Searches in list data for a dict that has a attr 'title' that equals <title>.
+    :param attr: The attributes name, default is title.
     :param data: A list of dicts.
-    :param title: A string that is the title of the dict that is searched.
+    :param value: A string that is the title of the dict that is searched.
     :return: dict
     """
     for obj in data:
-        if obj.get('title') == title:
+        if obj.get(attr) == value:
             return obj
     return {}
 

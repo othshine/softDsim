@@ -37,6 +37,11 @@ actions:
         - Predictive
         - Iterative
         - Agile
+    quality-check:
+      title: Quality Check
+      values:
+        - Perform
+        - Don't Perform
   numeric-rows:
     staff-pick:
       title: Staff

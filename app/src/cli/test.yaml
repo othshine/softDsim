@@ -1,4 +1,4 @@
-name: Week Duo
+name: Demo Scenario
 tasks_total: 855
 budget: 200000
 scheduled_days: 100
@@ -45,11 +45,23 @@ decisions:
           A: 0
           B: 100
         typ: button
+  - name: Organizational Structure
+    text:
+      - header: Organizational Structure
+        content: Your company has a functional organizational structure. What does this mean for you as a project manager? How strong is your authority?
+    actions:
+      - title: Authority
+        answers:
+          Little: 100
+          Moderate: 0
+          High: 0
+        typ: button
   - name: Simulation
     continue_text: Advance 1 Week
     active_actions:
       - staff-pick
       - meeting-planner
+      - quality-check
     text:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.
@@ -59,11 +71,28 @@ decisions:
         content: You're ready to go. Start off the project by managing the team. Its all on you now.
     goal:
       tasks: 500
+  - name: Budegt Increase
+    text:
+      - header: Hold on!
+        content: One of your competitors has announced a similar product and will launch it in 6 weeks.
+      - header: Management
+        content: The Senior Management wants the product on the market before your competitors.
+      - header: Strategy
+        content: You will need more budget to meet the new requirements. But the more money the project costs, the less management will be satisfied with it. For how much more budget will you ask?
+    actions:
+      - title: Budegt Increase
+        answers:
+          + 6.000: 0
+          + 10.000: 0
+          + 15.000: 100
+        typ: button
+
   - name: Simulation
     continue_text: Advance 1 Week
     active_actions:
       - staff-pick
       - meeting-planner
+      - quality-check
     text:
       - header: Hold on!
         content: One of your competitors has announced a similar product and will launch it in 6 weeks.

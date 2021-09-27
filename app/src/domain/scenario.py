@@ -6,7 +6,7 @@ from bson import ObjectId
 from app.src.domain.dataObjects import WorkPackage, WorkResult, SimulationGoal
 from app.src.domain.decision_tree import ActionList, Decision, SimulationDecision, AnsweredDecision
 from app.src.domain.team import Team, Member
-from utils import month_to_day
+from utils import month_to_day, quality
 
 
 @dataclass
@@ -38,6 +38,7 @@ class Scenario:
 class UserScenario:
     def __init__(self, **kwargs):
         self.tasks_done = int(kwargs.get('tasks_done', 0) or 0)
+        self.errors = int(kwargs.get('errors', 0) or 0)
         self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
         self.current_day = int(kwargs.get('current_day', 0) or 0)
         self.counter = int(kwargs.get('counter', -1))
@@ -68,6 +69,7 @@ class UserScenario:
     @property
     def json(self):
         d = {'tasks_done': self.tasks_done,
+             'errors': self.errors,
              'decisions': [dec.json for dec in self.decisions],
              'actual_cost': self.actual_cost,
              'counter': self.counter,
@@ -129,6 +131,8 @@ class UserScenario:
 
     def _apply_work_result(self, wr: WorkResult):
         self.tasks_done += wr.tasks_completed
+        self.errors += wr.unidentified_errors
+        print(self.errors)
 
     def get_id(self) -> str:
         return str(self.id)
@@ -161,6 +165,7 @@ class UserScenario:
             p += d.points
         p += self.time_score()
         p += self.budget_score()
+        p += self.quality_score()
         return p
 
     def time_score(self) -> int:
@@ -170,3 +175,6 @@ class UserScenario:
 
     def budget_score(self) -> int:
         return round((self.template.budget / self.actual_cost) * 100)
+
+    def quality_score(self) -> int:
+        return quality(self.tasks_done, self.errors)

@@ -5,7 +5,7 @@ from typing import List
 from bson import ObjectId
 
 from app.src.domain.dataObjects import WorkPackage, WorkResult
-from utils import YAMLReader, value_or_error
+from utils import YAMLReader, value_or_error, probability
 
 
 # ToDo: Finish logic in team. Then save team in DB.
@@ -60,8 +60,12 @@ class Member:
         """
         if self.halted:
             raise MemberIsHalted
-        number_tasks = floor(self.efficiency * time * YAMLReader.read('task-completion-coefficient'))
-        number_tasks_with_unidentified_errors = round(number_tasks * self.skill_type.error_rate)  # Introduce fatigue?
+        number_tasks = 0
+        number_tasks_with_unidentified_errors = 0
+        for _ in range(round(time)):
+            number_tasks += probability(self.efficiency * YAMLReader.read('task-completion-coefficient'))
+        for _ in range(number_tasks):
+            number_tasks_with_unidentified_errors += probability(self.skill_type.error_rate)
         return number_tasks, number_tasks_with_unidentified_errors
 
     def train(self):
@@ -144,7 +148,6 @@ class Team:
             nt, ne = self.solve_tasks(work_package.daily_work_hours)
             wr.tasks_completed += nt
             wr.unidentified_errors += ne
-
         return wr
 
     def meeting(self, time):
