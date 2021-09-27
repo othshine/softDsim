@@ -25,6 +25,15 @@ function subMeeting() {
 }
 
 
+function toggleVisibility(elId){
+    const element = document.getElementById(elId);
+    if (element.style.display == 'none'){
+        element.style.display = 'block'
+    } else {
+        element.style.display = 'none'
+    }
+}
+
 /* Activity Distribution Chart */
 
 function calculateActivityLength(meetings, trainings) {

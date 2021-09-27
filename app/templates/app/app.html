@@ -14,7 +14,7 @@
 {% block content %}
     <section id="main">
         <section class="main-division-third">
-            <div class="division-title">
+            <div class="division-title none-select">
                 Scenario
             </div>
 
@@ -27,27 +27,27 @@
 
         </section>
         <section class="main-division-third">
-            <div class="division-title">
+            <div class="division-title none-select">
                 Statistics
             </div>
-            <h3 class="element-header">Project Plan</h3>
+            <h3 class="element-header pointer none-select" onclick="toggleVisibility('gantt-chart')">Project Plan <span class="smaller">&#x25bc;</span></h3>
             <div id="gantt-chart" style="width:100%; height: 1rem;">
 
             </div>
 
-            <h3 class="element-header">Cost</h3>
-            <div>
+            <h3 class="element-header pointer none-select" onclick="toggleVisibility('cost-chart-container')">Cost <span class="smaller">&#x25bc;</span></h3>
+            <div id="cost-chart-container">
                 <canvas id="cost-chart"></canvas>
             </div>
 
-            <h3 class="element-header">Tasks / Timeline</h3>
-            <div>
+            <h3 class="element-header pointer none-select" onclick="toggleVisibility('tasks-chart-container')">Tasks / Timeline <span class="smaller">&#x25bc;</span></h3>
+            <div id="tasks-chart-container">
                 <canvas id="tasks-chart"></canvas>
             </div>
 
         </section>
         <section class="main-division-third">
-            <div class="division-title">
+            <div class="division-title none-select">
                 Actions
             </div>
 
@@ -64,8 +64,6 @@
                             </button>
                         </li>
                     </ul>
-
-
                 </li>
             </ul>
 
