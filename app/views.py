@@ -1,4 +1,5 @@
 import json
+import time
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -75,10 +76,12 @@ def get_points(param, data):
 def apply_changes(s: UserScenario, data: dict):
     if staff := data_get(data['numeric_rows'], 'staff'):
         adjust_staff(s, staff.get('values'))
-    if q := data_get(data['button_rows'], 'Quality Check'):
+    if q := data_get(data['button_rows'], 'Quality Review'):
         if data_get(q['answers'], 'Perform', attr='label').get('active'):
-            # ToDo: implement scenario quality checks here.
-            print("Do QA here!!!")
+            s.perform_quality_check = True
+    if q := data_get(data['button_rows'], 'Fix Errors'):
+        if data_get(q['answers'], 'Perform', attr='label').get('active'):
+            s.error_fixing = True
     for action in data['button_rows']:
         s.actions.adjust(action)
 
@@ -102,9 +105,7 @@ def click_continue(request, sid):
             s.work(5, int(data['meetings']))
         if s.counter >= 0:
             s.get_decision().eval(data)
-            print("Q:", s.quality_score())
         try:
-
             d = next(s)
             context = {
                 "continue_text": d.continue_text,

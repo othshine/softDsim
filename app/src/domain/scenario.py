@@ -37,6 +37,7 @@ class Scenario:
 
 class UserScenario:
     def __init__(self, **kwargs):
+        self.identified_errors = int(kwargs.get('identified_errors', 0) or 0)
         self.tasks_done = int(kwargs.get('tasks_done', 0) or 0)
         self.errors = int(kwargs.get('errors', 0) or 0)
         self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
@@ -48,6 +49,8 @@ class UserScenario:
         self.team = Team()
         self.user = kwargs.get('user')
         self.template: Scenario = kwargs.get('scenario')
+        self.perform_quality_check = False
+        self.error_fixing = False
 
     def __iter__(self):
         return self
@@ -70,6 +73,7 @@ class UserScenario:
     def json(self):
         d = {'tasks_done': self.tasks_done,
              'errors': self.errors,
+             'identified_errors': self.identified_errors,
              'decisions': [dec.json for dec in self.decisions],
              'actual_cost': self.actual_cost,
              'counter': self.counter,
@@ -123,7 +127,9 @@ class UserScenario:
         return sum([d.get_max_points() for d in self.decisions])
 
     def work(self, days, meeting):
-        wp = WorkPackage(days=days, daily_meeting_hours=meeting)
+        wp = WorkPackage(days=days, daily_meeting_hours=meeting, quality_check=self.perform_quality_check,
+                         error_fixing=self.error_fixing, tasks=self.template.tasks_total - self.tasks_done,
+                         unidentified_errors=self.errors, identified_errors=self.identified_errors)
         wr = self.team.work(wp)
         self._apply_work_result(wr)
         self.actual_cost += month_to_day(self.team.salary, days)
@@ -131,7 +137,11 @@ class UserScenario:
 
     def _apply_work_result(self, wr: WorkResult):
         self.tasks_done += wr.tasks_completed
+        self.identified_errors += wr.identified_errors
+        self.identified_errors -= wr.fixed_errors
         self.errors += wr.unidentified_errors
+        self.errors -= wr.identified_errors
+
         print(self.errors)
 
     def get_id(self) -> str:

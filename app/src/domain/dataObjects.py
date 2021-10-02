@@ -5,16 +5,22 @@ from dataclasses import dataclass
 class WorkPackage:
     days: int
     daily_meeting_hours: int
+    tasks: int
+    unidentified_errors: int
+    identified_errors: int
+    quality_check: bool
+    error_fixing: bool
 
     @property
     def daily_work_hours(self):
-        return 8 - self.daily_meeting_hours
+        return 8 - self.daily_meeting_hours  # ToDo: support for overtime.
 
 
 @dataclass(frozen=False)
 class WorkResult:
     tasks_completed: int = 0
     unidentified_errors: int = 0
+    identified_errors: int = 0
     fixed_errors: int = 0
 
 

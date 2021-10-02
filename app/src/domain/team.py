@@ -1,3 +1,4 @@
+import time
 from math import floor
 from statistics import mean
 from typing import List
@@ -7,8 +8,9 @@ from bson import ObjectId
 from app.src.domain.dataObjects import WorkPackage, WorkResult
 from utils import YAMLReader, value_or_error, probability
 
+TASK_COMPLETION_COEF = YAMLReader.read('task-completion-coefficient')
+ERR_COMPLETION_COEF = YAMLReader.read('error-completion-coefficient')
 
-# ToDo: Finish logic in team. Then save team in DB.
 
 def inc(x: float):
     """
@@ -52,7 +54,7 @@ class Member:
         """
         return self.skill_type.throughput * mean([self.xp_factor, self.motivation, self.familiarity])
 
-    def solve_tasks(self, time: float) -> (int, int):
+    def solve_tasks(self, time: float, coeff=TASK_COMPLETION_COEF) -> (int, int):
         """
         Simulates a member solving tasks for <time> hours.
         :param time: Number of hours.
@@ -63,7 +65,7 @@ class Member:
         number_tasks = 0
         number_tasks_with_unidentified_errors = 0
         for _ in range(round(time)):
-            number_tasks += probability(self.efficiency * YAMLReader.read('task-completion-coefficient'))
+            number_tasks += probability(self.efficiency * coeff)
         for _ in range(number_tasks):
             number_tasks_with_unidentified_errors += probability(self.skill_type.error_rate)
         return number_tasks, number_tasks_with_unidentified_errors
@@ -139,24 +141,48 @@ class Team:
         """
         return sum([m.skill_type.salary for m in self.staff] or [0])
 
-    def solve_tasks(self, time):
+    def solve_tasks(self, time, err = False):
         num_tasks = 0
         num_errs = 0
         for member in self.staff:
             if not member.halted:
-                t, e = member.solve_tasks(time)
+                if err:
+                    t, e = member.solve_tasks(time, coeff=ERR_COMPLETION_COEF)
+                else:
+                    t, e = member.solve_tasks(time)
                 num_tasks += t
                 num_errs += e
         return num_tasks, num_errs
 
     def work(self, work_package: WorkPackage) -> WorkResult:
         wr = WorkResult()
+        print(work_package)
+        t = 0
+        e = 0
         for day in range(work_package.days):
             self.meeting(work_package.daily_meeting_hours)
             nt, ne = self.solve_tasks(work_package.daily_work_hours)
-            wr.tasks_completed += nt
-            wr.unidentified_errors += ne
+            t += nt
+            e += ne
+        wr.unidentified_errors += e
+        if work_package.error_fixing:
+            while t > 0 and wr.fixed_errors < work_package.identified_errors:
+                t -= 1
+                wr.fixed_errors += 1
+        if work_package.quality_check:
+            while t > 0 and wr.identified_errors < work_package.unidentified_errors:
+                t -= 1
+                wr.identified_errors += 1
+        t_comp = min(t, work_package.tasks)
+        wr.tasks_completed += t_comp
+        while t - work_package.tasks >= 2:
+            if wr.unidentified_errors > 0:
+                wr.unidentified_errors -= 1
+            t -= 2
+
+        print(wr)
         return wr
+
 
     def meeting(self, time):
         """

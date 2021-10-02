@@ -40,7 +40,8 @@ class _Factory:
                           actions=ActionList(json=json.get('actions')),
                           user=json.get('user'),
                           scenario=json.get('template'),
-                          errors=json.get('errors'))
+                          errors=json.get('errors'),
+                          identified_errors=json.get('identified_errors'))
 
         if t := json.get('team'):
             for m in t.get('staff'):

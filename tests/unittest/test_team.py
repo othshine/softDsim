@@ -3,6 +3,7 @@ from typing import Tuple
 
 import pytest
 
+from app.src.domain.dataObjects import WorkPackage
 from app.src.domain.team import SkillType, Member, NotAValidSkillTypeException, Team, MemberIsHalted
 from utils import YAMLReader
 
@@ -254,3 +255,19 @@ def test_remove_weakest_member():
     assert m2 in t
     assert m3 not in t
     assert m4 in t
+
+
+def test_quality_check():
+    t = Team()
+    t += Member('expert', xp_factor=1, motivation=1, familiarity=1)
+    wr = t.work(WorkPackage(days=5, daily_meeting_hours=0, tasks=100, unidentified_errors=5, identified_errors=3, quality_check=True, error_fixing=False))
+    assert wr.identified_errors == 5
+    assert wr.unidentified_errors > 0
+    assert wr.tasks_completed > 0
+    assert wr.fixed_errors == 0
+
+    wr = t.work(WorkPackage(days=5, daily_meeting_hours=0, tasks=5, unidentified_errors=0, identified_errors=4,
+                            quality_check=True, error_fixing=True))
+    assert wr.identified_errors == 0
+    assert wr.tasks_completed == 5
+    assert wr.fixed_errors == 4

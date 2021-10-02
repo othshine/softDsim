@@ -13,7 +13,9 @@ skill-levels:
     error-rate: 0.05
     throughput: 7
 
+# Coefficients
 task-completion-coefficient: 0.2
+error-completion-coefficient: 0.1
 
 
 
@@ -39,7 +41,12 @@ actions:
         - Iterative
         - Agile
     quality-check:
-      title: Quality Check
+      title: Quality Review
+      values:
+        - Perform
+        - Don't Perform
+    error-fixing:
+      title: Fix Errors
       values:
         - Perform
         - Don't Perform
