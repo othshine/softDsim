@@ -77,7 +77,7 @@ class _Factory:
                 for action in decision.get('actions'):
                     d.add_button_action(title=action.get('title', ''), id=action.get('id', ObjectId()),
                                         answers=[{'label': a['label'], 'points': a['points']} for a in
-                                                 action['answers']])
+                                                 action['answers']], required=action.get('required'))
             for tb in decision.get('text', []):
                 d.add_text_block(tb.get('header', ''), tb.get('content', ''))
             s.add(d)

@@ -151,7 +151,7 @@ button:hover {
 
 button:disabled:hover {
     background-color: var(--light);
-    cursor: auto;
+    cursor: not-allowed;
 }
 
 button:active {

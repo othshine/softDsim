@@ -1,5 +1,5 @@
-name: Demo Scenario
-tasks_total: 855
+name: Demo Scenario IV
+tasks_total: 900
 budget: 200000
 scheduled_days: 100
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
@@ -20,6 +20,7 @@ decisions:
           Scrum: 0
           Kanban: 0
         typ: button
+        required: True
       - title: Product Life Cycle
         answers:
           Agile: 0
@@ -27,6 +28,7 @@ decisions:
           Iterative: 50
           Predictive: 100
         typ: button
+        required: True
   - name: Demo Decision
     text:
     - header: Decision Number 2
@@ -62,11 +64,12 @@ decisions:
       - staff-pick
       - meeting-planner
       - quality-check
+      - error-fixing
     text:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.
-      - header: Goal
-        content: 855 Tasks
+      - header: Scope
+        content: 900 Tasks
       - header: Story
         content: You're ready to go. Start off the project by managing the team. Its all on you now.
     goal:
@@ -93,10 +96,22 @@ decisions:
       - staff-pick
       - meeting-planner
       - quality-check
+      - error-fixing
     text:
       - header: Hold on!
         content: One of your competitors has announced a similar product and will launch it in 6 weeks.
       - header: Management
         content: The Senior Management wants the product on the market before your competitors.
+    goal:
+      tasks: 900
+  - name: Bug Fixing
+    continue_text: End
+    active_actions:
+      - meeting-planner
+      - quality-check
+      - error-fixing
+    text:
+      - header: All Tasks Done
+        content: Your team has completed all tasks. You can now decide to either end the project or perform a week of quality checks to fix errors.
     goal:
       tasks: 900

@@ -54,4 +54,27 @@ function makeActivityChart(length) {
 }
 
 
+function all_required_actions_done(){
+    let t = true;
+    for (const c of document.getElementsByClassName('req')) {
+        let active = false;
+        for (const li of c.nextElementSibling.childNodes){
+            if (li.childNodes[0].classList.contains('active-button')){
+                active = true;
+            }
+        }
+        if (active === false){
+            t = false
+        }
+    }
+    return t;
+}
 
+function set_continue_button(){
+    document.getElementById('continue-button').disabled = !all_required_actions_done();
+}
+
+
+document.addEventListener("click", () =>{
+    set_continue_button()
+})

@@ -85,6 +85,7 @@
                     <h3 class="element-header">
                         [[ row.title ]]
                     </h3>
+                    <div v-if="row.required" class="req" hidden></div>
                     <ul :id="row.id" class="button-row">
                         <li v-for="a, j in row.answers">
                             <button @click="vuePickButton(i, j)" v-bind:class="{ 'active-button': a.active }">[[ a.label
@@ -102,7 +103,7 @@
 
 
             <div id="continue-container">
-                <button onclick="cont()">[[ continue_text ]]</button>
+                <button id="continue-button" onclick="cont()">[[ continue_text ]]</button>
             </div>
 
         </section>

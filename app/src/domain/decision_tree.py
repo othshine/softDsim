@@ -67,10 +67,10 @@ class AnsweredDecision(Decision):
         super().__init__(**kwargs)
         self.actions: List[Action] = [Action(**a) for a in kwargs.get('actions', []) or []]
 
-    def add_button_action(self, title, answers, id=None):
+    def add_button_action(self, title, answers, id=None, required=False):
         if id is None:
             id = str(ObjectId())
-        self.actions.append(Action(id=id, title=title, typ='button', active=True, answers=answers))
+        self.actions.append(Action(id=id, title=title, typ='button', active=True, answers=answers, required=required))
 
     @property
     def json(self):
@@ -109,23 +109,25 @@ class SimulationDecision(Decision):
 
 
 class Action:
-    def __init__(self, id, title: str, typ: str, active: bool = False, answers=None):
+    def __init__(self, id, title: str, typ: str, active: bool = False, answers=None, required=False):
         self.id = id
         self.title = title
         self.typ = typ
         self.active = active
         self.answers: List[Answer] = []
+        self.required: bool = required
         if answers:
             for answer in answers:
                 self.answers.append(Answer(**answer))
 
     @property
     def json(self):
-        return {'title': self.title, 'answers': self.format_answers(), 'id': self.id}
+        return {'title': self.title, 'answers': self.format_answers(), 'id': self.id, 'required': self.required}
 
     @property
     def full_json(self):
-        return {**self.json, 'id': self.id, 'typ': self.typ, 'answers': [a.json for a in self.answers]}
+        return {**self.json, 'id': self.id, 'typ': self.typ, 'answers': [a.json for a in self.answers],
+                'required': self.required}
 
     def format_answers(self):
         ans = []
@@ -177,5 +179,3 @@ class ActionList:
                 for actual in data.get('answers', []):
                     if actual.get('label') == answer.label:
                         answer.active = actual.get('active')
-
-
