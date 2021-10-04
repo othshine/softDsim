@@ -51,6 +51,7 @@ class UserScenario:
         self.template: Scenario = kwargs.get('scenario')
         self.perform_quality_check = False
         self.error_fixing = False
+        self.model = kwargs.get('model', 'waterfall') or ""
 
     def __iter__(self):
         return self
@@ -83,7 +84,8 @@ class UserScenario:
              'id': str(self.id),
              'user': self.user,
              'actions': self.actions.json,
-             'template_id': str(self.template.id)
+             'template_id': str(self.template.id),
+             'model': self.model
              }
         return d
 

@@ -16,7 +16,7 @@ from app.src.domain.decision_tree import Decision, SimulationDecision
 from app.src.domain.scenario import Scenario, UserScenario
 from app.src.domain.team import Member
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException, UserMongoModel
-from utils import data_get
+from utils import data_get, get_active_label
 
 
 @login_required
@@ -84,6 +84,13 @@ def apply_changes(s: UserScenario, data: dict):
             s.error_fixing = True
     for action in data['button_rows']:
         s.actions.adjust(action)
+        funcs = {'model': set_model}
+        if func := funcs.get(action.get('title').lower()):
+            func(s, get_active_label(action.get('answers')))
+
+
+def set_model(s: UserScenario, model):
+    s.model = model.lower()
 
 
 @login_required

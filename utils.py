@@ -79,6 +79,15 @@ def data_get(data, value, attr='title') -> dict:
     return {}
 
 
+def get_active_label(data):
+    """
+    Searches in a list of answers for the answers that is active == True and returns that answers label.
+    :param data: list [{'label': 'A', 'active': False}, {'label': 'B', 'active': True}, {'label': 'C', 'active': False}]
+    :return: str 'B'
+    """
+    return data_get(data, True, attr='active').get('label') or None
+
+
 class _YAMLReader:
     def __init__(self, path):
         self.path = path

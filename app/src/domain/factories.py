@@ -41,7 +41,8 @@ class _Factory:
                           user=json.get('user'),
                           scenario=json.get('template'),
                           errors=json.get('errors'),
-                          identified_errors=json.get('identified_errors'))
+                          identified_errors=json.get('identified_errors'),
+                          model=json.get('model'))
 
         if t := json.get('team'):
             for m in t.get('staff'):
