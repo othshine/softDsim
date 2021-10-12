@@ -145,7 +145,8 @@ def click_continue(request, sid):
                 'meeting_planner': 'meeting-planner' in d.active_actions,
                 'motivation': s.team.motivation,
                 'familiarity': s.team.familiarity,
-                'done': False
+                'done': False,
+                'scrum': s.model == 'scrum' and isinstance(s.get_decision(), SimulationDecision)
             }
             for t in d.text or []:
                 context.get('blocks').append({'header': t.header, 'text': t.content})

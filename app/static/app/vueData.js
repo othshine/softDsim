@@ -19,6 +19,7 @@ let x = new Vue({
         motivation: 0,
         familiarity: 0,
         stress: 0,
+        scrum: false
 
     },
     filters: {
