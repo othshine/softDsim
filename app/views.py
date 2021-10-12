@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm
 from app.src.domain.decision_tree import Decision, SimulationDecision
 from app.src.domain.scenario import Scenario, UserScenario
-from app.src.domain.team import Member
+from app.src.domain.team import Member, ScrumTeam
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException, UserMongoModel
 from utils import data_get, get_active_label
 
@@ -43,12 +43,15 @@ def evaluate_decision(data, decision):
     decision.evaluate(data.get(decision.dtype))
 
 
-def adjust_staff(s, staff):
-    for t in ['junior', 'senior', 'expert']:
-        while s.team.count(t) > staff.get(t):
-            s.team.remove_weakest(t)
-        while s.team.count(t) < staff.get(t):
-            s.team += Member(t)
+def adjust_scrum_management(s, param):
+    if isinstance(s.team, ScrumTeam):
+        s.team.junior_master = param.get('Junior Scrum Master')
+        s.team.senior_master = param.get('Senior Scrum Master')
+        s.team.po = param.get('Product Owner')
+
+
+
+
 
 
 @login_required
@@ -73,9 +76,16 @@ def get_points(param, data):
     return points
 
 
+
 def apply_changes(s: UserScenario, data: dict):
     if staff := data_get(data['numeric_rows'], 'staff'):
-        adjust_staff(s, staff.get('values'))
+        print(staff)
+        s.team.adjust(staff.get('values'))
+    if staff := data_get(data['numeric_rows'], 'Scrum Management'):
+        adjust_scrum_management(s, staff.get('values'))
+    if isinstance(s.team, ScrumTeam):
+        print(data['numeric_rows'])
+        s.team.adjust([t for t in data['numeric_rows'] if "scrum team" in t.get('title').lower()])
     if q := data_get(data['button_rows'], 'Quality Review'):
         if data_get(q['answers'], 'Perform', attr='label').get('active'):
             s.perform_quality_check = True
@@ -91,6 +101,8 @@ def apply_changes(s: UserScenario, data: dict):
 
 def set_model(s: UserScenario, model):
     s.model = model.lower()
+    if not isinstance(s.team, ScrumTeam) and s.model == 'scrum':
+        s.team = ScrumTeam()
 
 
 @login_required
@@ -98,6 +110,7 @@ def set_model(s: UserScenario, model):
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
+    print(s.model, s.team)
     if not isinstance(s, UserScenario) or s.user != request.user.username:
         return HttpResponse(status=403)
 
@@ -108,8 +121,11 @@ def click_continue(request, sid):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         apply_changes(s, data)
+        print(s.model, s.team)
+        print(s.numeric_rows)
         if isinstance(s.get_decision(), SimulationDecision):
             s.work(5, int(data['meetings']))
+            print(s.model)
         if s.counter >= 0:
             s.get_decision().eval(data)
         try:
@@ -137,7 +153,6 @@ def click_continue(request, sid):
             context = {'done': True}
             user_model = UserMongoModel()
             user_model.save_score(user=request.user.username, scenario=s, score=s.total_score())
-
         model.update(s)
         return HttpResponse(json.dumps(context), content_type="application/json")
 

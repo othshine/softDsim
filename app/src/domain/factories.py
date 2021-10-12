@@ -3,7 +3,19 @@ from bson import ObjectId
 from app.src.domain.dataObjects import SimulationGoal
 from app.src.domain.decision_tree import SimulationDecision, AnsweredDecision, ActionList
 from app.src.domain.scenario import Scenario, UserScenario
-from app.src.domain.team import Member
+from app.src.domain.team import Member, Team
+
+
+def parse_team(t):
+    i = t.get('id') or str(ObjectId())
+    team = Team(i)
+    for m in t.get('staff'):
+        member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
+                        familiarity=m.get('familiarity'), id=m.get('_id'))
+        if m.get('halted'):
+            member.halt()
+        team += member
+    return team
 
 
 class _Factory:
@@ -43,14 +55,17 @@ class _Factory:
                           errors=json.get('errors'),
                           identified_errors=json.get('identified_errors'),
                           model=json.get('model'))
-
-        if t := json.get('team'):
-            for m in t.get('staff'):
-                member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
-                                familiarity=m.get('familiarity'), id=m.get('_id'))
-                if m.get('halted'):
-                    member.halt()
-                us.team += member
+        if us.model.lower() == "scrum":
+            if t := json.get('team'):
+                if t := t.get('teams'):
+                    for team in t:
+                        print(team)
+                        print(parse_team(team))
+                        print(us.team.teams)
+                        us.team.teams.append(parse_team(team))
+        else:
+            if t := json.get('team'):
+                us.team = parse_team(t)
         self._add_decisions(json.get('decisions', []), us)
 
         return us

@@ -2,6 +2,7 @@ from math import floor
 from typing import Tuple
 
 import pytest
+from bson import ObjectId
 
 from app.src.domain.dataObjects import WorkPackage
 from app.src.domain.team import SkillType, Member, NotAValidSkillTypeException, Team, MemberIsHalted
@@ -41,7 +42,7 @@ def test_member_has_all_params():
 
 
 def test_team_add_operator():
-    team = Team()
+    team = Team(str(ObjectId()))
     assert len(team.staff) == 0
     team += Member()
     assert len(team.staff) == 1
@@ -50,7 +51,7 @@ def test_team_add_operator():
 
 
 def test_team_remove_member():
-    team = Team()
+    team = Team(str(ObjectId()))
     m1 = Member()
     m2 = Member()
     assert m1 not in team
@@ -65,7 +66,7 @@ def test_team_remove_member():
 
 
 def test_team_remove_member_that_is_not_in_team():
-    team = Team()
+    team = Team(str(ObjectId()))
     assert len(team) == 0
     team += Member()
     assert len(team) == 1
@@ -74,14 +75,14 @@ def test_team_remove_member_that_is_not_in_team():
 
 
 def test_team_size():
-    team = Team()
+    team = Team(str(ObjectId()))
     assert len(team) == 0
     team += Member()
     assert len(team) == 1
 
 
 def test_teams_motivation():
-    team = Team()
+    team = Team(str(ObjectId()))
     assert team.motivation == 0
     team += Member(motivation=0.10)
     team += Member(motivation=0)
@@ -89,7 +90,7 @@ def test_teams_motivation():
 
 
 def test_teams_salary():
-    team = Team()
+    team = Team(str(ObjectId()))
     salary = 0
     assert team.salary == salary
     team += Member(skill_type='expert')
@@ -148,7 +149,7 @@ def test_member_factors_are_between_zero_and_one():
 
 
 def test_team_solves_tasks():
-    t = Team()
+    t = Team(str(ObjectId()))
     m1 = Member(xp_factor=1, motivation=1, familiarity=1)
     m2 = Member(xp_factor=0.5, motivation=0.5, familiarity=0.5)
     t += m1
@@ -172,7 +173,7 @@ def test_member_training():
 
 
 def test_team_solve_tasks_halted_member():
-    t = Team()
+    t = Team(str(ObjectId()))
     m = Member(xp_factor=1, motivation=1, familiarity=1)
     mh = Member(xp_factor=1, motivation=1, familiarity=1)
     mh.halt()
@@ -195,7 +196,7 @@ def test_halted_member_raises_exception_when_solve_tasks():
 
 
 def test_team_meeting():
-    t = Team()
+    t = Team(str(ObjectId()))
     m = Member()
     t += m
     f1 = m.familiarity
@@ -205,7 +206,7 @@ def test_team_meeting():
 
 
 def test_team_get_member_by_id():
-    t = Team()
+    t = Team(str(ObjectId()))
     t += Member(xp_factor=1)
     t += Member(skill_type='expert')
     m = Member(skill_type='senior', xp_factor=0.1, motivation=1, familiarity=0)
@@ -220,7 +221,7 @@ def test_team_get_member_by_id():
     assert m2.familiarity == m.familiarity
 
 def test_team_count_types():
-    t = Team()
+    t = Team(str(ObjectId()))
     t += Member("junior")
     t += Member("senior")
     t += Member("senior")
@@ -232,7 +233,7 @@ def test_team_count_types():
 
 
 def test_remove_weakest_member():
-    t = Team()
+    t = Team(str(ObjectId()))
     m1 = Member(skill_type='junior', xp_factor=0.1, motivation=1, familiarity=0)
     m2 = Member(skill_type='senior', xp_factor=1, motivation=1, familiarity=1)
     m3 = Member(skill_type='senior', xp_factor=0.1, motivation=1, familiarity=0)
@@ -258,7 +259,7 @@ def test_remove_weakest_member():
 
 
 def test_quality_check():
-    t = Team()
+    t = Team(str(ObjectId()))
     t += Member('expert', xp_factor=1, motivation=1, familiarity=1)
     wr = t.work(WorkPackage(days=5, daily_meeting_hours=0, tasks=100, unidentified_errors=5, identified_errors=3, quality_check=True, error_fixing=False))
     assert wr.identified_errors == 5
@@ -271,3 +272,16 @@ def test_quality_check():
     assert wr.identified_errors == 0
     assert wr.tasks_completed == 5
     assert wr.fixed_errors == 4
+
+def test_team_number_communication_channels():
+    t = Team(str(ObjectId()))
+    assert t.num_communication_channels == 0
+    t += Member()
+    assert t.num_communication_channels == 0
+    t += Member()
+    assert t.num_communication_channels == 1
+    t += Member()
+    assert t.num_communication_channels == 3
+    for _ in range(10):
+        t += Member()
+    assert t.num_communication_channels == 78

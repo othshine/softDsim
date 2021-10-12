@@ -1,3 +1,4 @@
+import statistics
 from random import random
 
 from pymongo import MongoClient
@@ -47,6 +48,12 @@ def probability(p: float) -> int:
     """
     return 1 if random() < p else 0
 
+def weighted(*args):
+    data = []
+    for arg in args:
+        for _ in range(arg[1]):
+            data.append(arg[0])
+    return statistics.mean(data)
 
 def dots(n: int):
     """

@@ -13,9 +13,17 @@ skill-levels:
     error-rate: 0.05
     throughput: 7
 
+manager:
+  junior:
+    salary: 3000
+  senior:
+    salary: 5000
+  po:
+    salary: 7000
+
 # Coefficients
-task-completion-coefficient: 0.2
-error-completion-coefficient: 0.1
+task-completion-coefficient: 0.5
+error-completion-coefficient: 0.3
 
 
 
@@ -57,3 +65,9 @@ actions:
         - junior
         - senior
         - expert
+    scrum-management:
+      title: Management
+      values:
+        - junior scrum Master
+        - senior scrum Master
+        - product owner

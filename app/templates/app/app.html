@@ -96,15 +96,22 @@
                 </li>
             </ul>
 
+            <h3 class="element-header">Add Scrum Team</h3>
+            <div class="button-row">
+                <button onclick="addScrumTeam()">Add</button>
+            </div>
 
             <template v-if="$data.meeting_planner">
                 {% include 'app/snippets/meeting_planner.html' %}
             </template>
 
+            <div class="spacer" style="height: 5rem;"></div>
+
 
             <div id="continue-container">
                 <button id="continue-button" onclick="cont()">[[ continue_text ]]</button>
             </div>
+
 
         </section>
 

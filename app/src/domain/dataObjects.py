@@ -23,6 +23,13 @@ class WorkResult:
     identified_errors: int = 0
     fixed_errors: int = 0
 
+    def __add__(self, other):
+        self.tasks_completed += other.tasks_completed
+        self.unidentified_errors += other.unidentified_errors
+        self.identified_errors += other.identified_errors
+        self.fixed_errors += other.fixed_errors
+        return self
+
 
 @dataclass(frozen=True)
 class SimulationGoal:

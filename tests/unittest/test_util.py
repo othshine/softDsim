@@ -1,4 +1,4 @@
-from utils import get_active_label
+from utils import get_active_label, weighted
 
 
 def test_get_active_label():
@@ -16,3 +16,6 @@ def test_get_active_label():
     a = get_active_label(
         [{'label': 'A', 'active': False}, {'label': 'B', 'active': False}, {'label': 'C', 'active': False}])
     assert a is None
+
+def test_weighted():
+    assert 0.36 < weighted((0.5, 2), (0.1, 1)) < 0.37

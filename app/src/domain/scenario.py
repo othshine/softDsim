@@ -5,7 +5,7 @@ from bson import ObjectId
 
 from app.src.domain.dataObjects import WorkPackage, WorkResult, SimulationGoal
 from app.src.domain.decision_tree import ActionList, Decision, SimulationDecision, AnsweredDecision
-from app.src.domain.team import Team, Member
+from app.src.domain.team import Team, Member, ScrumTeam
 from utils import month_to_day, quality
 
 
@@ -35,6 +35,19 @@ class Scenario:
                 }
 
 
+def create_staff_row(team: Team, title: str = 'staff'):
+    return {
+        'id': team.id,
+        'title': f"{title}",
+        'values':
+            {
+                'junior': team.count('junior'),
+                'senior': team.count('senior'),
+                'expert': team.count('expert')
+            }
+    }
+
+
 class UserScenario:
     def __init__(self, **kwargs):
         self.identified_errors = int(kwargs.get('identified_errors', 0) or 0)
@@ -46,12 +59,15 @@ class UserScenario:
         self.decisions = kwargs.get('decisions', []) or []
         self.id = ObjectId(kwargs.get('id')) or ObjectId()
         self.actions = kwargs.get('actions') or ActionList()
-        self.team = Team()
         self.user = kwargs.get('user')
         self.template: Scenario = kwargs.get('scenario')
         self.perform_quality_check = False
         self.error_fixing = False
         self.model = kwargs.get('model', 'waterfall') or ""
+        if self.model.lower() == 'scrum':
+            self.team = ScrumTeam()
+        else:
+            self.team = Team(str(ObjectId()))
 
     def __iter__(self):
         return self
@@ -114,15 +130,21 @@ class UserScenario:
         d = self.decisions[self.counter]
         for aa in d.active_actions:
             if aa == 'staff-pick':  # ToDo: Make this quick and dirty solution dynamic.
-                json.append({
-                    'title': "staff",
-                    'values':
-                        {
-                            'junior': self.team.count('junior'),
-                            'senior': self.team.count('senior'),
-                            'expert': self.team.count('expert')
-                        }
-                })
+                if isinstance(self.team, Team):
+                    json.append(create_staff_row(team=self.team))
+                elif isinstance(self.team, ScrumTeam):
+                    json.append({
+                        'title': "Scrum Management",
+                        'values':
+                            {
+                                'Junior Scrum Master': self.team.junior_master,
+                                'Senior Scrum Master': self.team.senior_master,
+                                'Product Owner': self.team.po
+                            }
+                    })
+                    for i, team in enumerate(self.team.teams):
+                        json.append(create_staff_row(team=team, title='Scrum Team'))
+
         return json
 
     def get_max_points(self) -> int:

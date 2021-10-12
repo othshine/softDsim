@@ -6,7 +6,7 @@ from typing import List
 from bson import ObjectId
 
 from app.src.domain.dataObjects import WorkPackage, WorkResult
-from utils import YAMLReader, value_or_error, probability
+from utils import YAMLReader, value_or_error, probability, weighted
 
 TASK_COMPLETION_COEF = YAMLReader.read('task-completion-coefficient')
 ERR_COMPLETION_COEF = YAMLReader.read('error-completion-coefficient')
@@ -54,7 +54,7 @@ class Member:
         """
         return self.skill_type.throughput * mean([self.xp_factor, self.motivation, self.familiarity])
 
-    def solve_tasks(self, time: float, coeff=TASK_COMPLETION_COEF) -> (int, int):
+    def solve_tasks(self, time: float, coeff=TASK_COMPLETION_COEF, team_efficiency:float=1.0) -> (int, int):
         """
         Simulates a member solving tasks for <time> hours.
         :param time: Number of hours.
@@ -65,7 +65,7 @@ class Member:
         number_tasks = 0
         number_tasks_with_unidentified_errors = 0
         for _ in range(round(time)):
-            number_tasks += probability(self.efficiency * coeff)
+            number_tasks += probability(weighted((self.efficiency, 1), (team_efficiency, 1)) * coeff)
         for _ in range(number_tasks):
             number_tasks_with_unidentified_errors += probability(self.skill_type.error_rate)
         return number_tasks, number_tasks_with_unidentified_errors
@@ -91,8 +91,9 @@ class Member:
 
 
 class Team:
-    def __init__(self):
+    def __init__(self, id: str):
         self.staff: List[Member] = []
+        self.id = id
 
     def __iadd__(self, member: Member):
         self.staff.append(member)
@@ -114,7 +115,8 @@ class Team:
     @property
     def json(self):
         return {
-            'staff': [m.json for m in self.staff]
+            'staff': [m.json for m in self.staff],
+            'id': self.id
         }
 
     @property
@@ -141,22 +143,22 @@ class Team:
         """
         return sum([m.skill_type.salary for m in self.staff] or [0])
 
-    def solve_tasks(self, time, err = False):
+    def solve_tasks(self, time, err=False):
         num_tasks = 0
         num_errs = 0
         for member in self.staff:
             if not member.halted:
                 if err:
-                    t, e = member.solve_tasks(time, coeff=ERR_COMPLETION_COEF)
+                    t, e = member.solve_tasks(time, coeff=ERR_COMPLETION_COEF, team_efficiency=self.efficiency())
                 else:
-                    t, e = member.solve_tasks(time)
+                    t, e = member.solve_tasks(time, team_efficiency=self.efficiency())
                 num_tasks += t
                 num_errs += e
         return num_tasks, num_errs
 
     def work(self, work_package: WorkPackage) -> WorkResult:
         wr = WorkResult()
-        print(work_package)
+        # print(work_package)
         t = 0
         e = 0
         for day in range(work_package.days):
@@ -180,9 +182,13 @@ class Team:
                 wr.unidentified_errors -= 1
             t -= 2
 
-        print(wr)
-        return wr
+        print("WEEK RESULT")
+        print("Completed Tasks:", wr.tasks_completed)
+        print("Fixed Errors:", wr.fixed_errors)
+        print("Identified Errors:", wr.identified_errors)
+        print("Unidentified Errors:", wr.unidentified_errors)
 
+        return wr
 
     def meeting(self, time):
         """
@@ -218,6 +224,79 @@ class Team:
             if m.skill_type.name == skill_type_name and (w is None or w.efficiency > m.efficiency):
                 w = m
         self.__isub__(w)
+
+    def adjust(self, staff_data):
+        for t in ['junior', 'senior', 'expert']:
+            while self.count(t) > staff_data.get(t):
+                self.remove_weakest(t)
+            while self.count(t) < staff_data.get(t):
+                self.staff.append(Member(t))
+
+    @property
+    def num_communication_channels(self):
+        """Returns number of communication channels."""
+        n = len(self.staff)
+        return (n*(n-1))/2
+
+    def efficiency(self):
+        """Returns the team's efficiency. Which increases as the number of communication channels grows."""
+        c = self.num_communication_channels
+        return 1/(1+(c/20-0.05))
+
+
+class ScrumTeam:
+    def __init__(self, junior: int = 0, senior: int = 0, po: int = 0):
+        self.teams: List[Team] = []
+        self.junior_master = junior
+        self.senior_master = senior
+        self.po = po
+
+    @property
+    def json(self):
+        return {
+            'teams': [t.json for t in self.teams], 'junior_master': self.junior_master,
+            'senior_master': self.senior_master, 'po': self.po
+        }
+
+    @property
+    def salary(self):
+        sal = sum([t.salary for t in self.teams])
+        y = YAMLReader.read('manager')
+        sal += y.get('junior').get('salary') * self.junior_master
+        sal += y.get('senior').get('salary') * self.senior_master
+        sal += y.get('po').get('salary') * self.po
+        return sal
+
+    @property
+    def motivation(self):
+        return sum([t.motivation for t in self.teams])
+
+    @property
+    def familiarity(self):
+        return sum([t.familiarity for t in self.teams])
+
+    def work(self, wp: WorkPackage) -> WorkResult:
+        wr = WorkResult()
+        for team in self.teams:
+            wr += team.work(wp)
+        return wr
+
+    def get_team(self, id):
+        for t in self.teams:
+            if t.id == id:
+                return t
+        return None
+
+    def adjust(self, data):
+        for team_data in data:
+            team = self.get_team(team_data.get('id'))
+            if team:
+                print("Team Adjusted:", team.id)
+                team.adjust(team_data.get('values'))
+            else:
+                new_team = Team(str(ObjectId()))
+                new_team.adjust(team_data.get('values'))
+                self.teams.append(new_team)
 
 
 class SkillType:
