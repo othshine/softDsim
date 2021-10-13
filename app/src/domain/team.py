@@ -273,7 +273,7 @@ class ScrumTeam:
 
     @property
     def familiarity(self):
-        return sum([t.familiarity for t in self.teams])
+        return mean([t.familiarity for t in self.teams] or [0])
 
     def work(self, wp: WorkPackage) -> WorkResult:
         wr = WorkResult()

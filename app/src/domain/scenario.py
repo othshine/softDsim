@@ -143,7 +143,9 @@ class UserScenario:
                             }
                     })
                     for i, team in enumerate(self.team.teams):
-                        json.append(create_staff_row(team=team, title='Scrum Team'))
+                        t = create_staff_row(team=team, title='Scrum Team')
+                        print(t)
+                        json.append(t)
 
         return json
 

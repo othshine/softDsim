@@ -78,7 +78,9 @@
 
                         </li>
                     </ul>
+                    <button v-on:click="aremove(row.id)" v-if="row.id">Remove Team</button>
                 </li>
+
             </ul>
             <template v-if="$data.scrum">
                 {% include 'app/snippets/add_scrum_team_btn.html' %}

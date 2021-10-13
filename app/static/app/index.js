@@ -83,3 +83,8 @@ function addScrumTeam(){
     const j = {'title': 'Scrum Team', 'values': {'junior': 2, 'senior': 1, 'expert': 1}}
     x.$data.numeric_rows.push(j)
 }
+
+
+function removeScrumTeam(x){
+    console.log(x)
+}

@@ -76,6 +76,9 @@ let x = new Vue({
             }
 
 
+        },
+        aremove(x){
+            console.log(x)
         }
 
 
