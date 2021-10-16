@@ -27,7 +27,7 @@
 
         </section>
         <section class="main-division-third">
-            <div class="division-title none-select">
+            <div class="division-title none-select" title="Here you can find statistics">
                 Statistics
             </div>
             <h3 class="element-header pointer none-select" onclick="toggleVisibility('gantt-chart')">Project Plan <span
@@ -64,7 +64,7 @@
 
             <ul>
                 <li v-for="row, i in numeric_rows">
-                    <h3 class="element-header">
+                    <h3  :title="row.hover" class="element-header">
                         [[ row.title | uppercase]]
                     </h3>
                     <ul :id="row.id" class="row">
@@ -87,7 +87,7 @@
             </template>
             <ul>
                 <li v-for="row, i in button_rows">
-                    <h3 class="element-header">
+                    <h3 :title="row.hover" class="element-header" >
                         [[ row.title ]]
                     </h3>
                     <div v-if="row.required" class="req" hidden></div>

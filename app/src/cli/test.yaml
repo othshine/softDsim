@@ -1,4 +1,4 @@
-name: Long Simulation
+name: Hover Text
 tasks_total: 9000
 budget: 900000
 scheduled_days: 300
@@ -21,6 +21,7 @@ decisions:
           Kanban: 0
         typ: button
         required: True
+        hover: Depending on the model you can adjust different settings later on in the simulation.
       - title: Product Life Cycle
         answers:
           Agile: 0

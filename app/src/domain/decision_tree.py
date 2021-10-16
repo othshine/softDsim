@@ -43,7 +43,7 @@ class Decision(ABC):
         data = {'continue_text': self.continue_text,
                 'points': self.points,
                 'active_actions': self.active_actions,
-                'name': self.name}
+                'name': self.name,}
         if self.text:
             data = {**data, 'text': [t.json for t in self.text]}
         return data
@@ -67,10 +67,10 @@ class AnsweredDecision(Decision):
         super().__init__(**kwargs)
         self.actions: List[Action] = [Action(**a) for a in kwargs.get('actions', []) or []]
 
-    def add_button_action(self, title, answers, id=None, required=False):
+    def add_button_action(self, title, answers, id=None, required=False, hover=""):
         if id is None:
             id = str(ObjectId())
-        self.actions.append(Action(id=id, title=title, typ='button', active=True, answers=answers, required=required))
+        self.actions.append(Action(id=id, title=title, typ='button', active=True, answers=answers, required=required, hover=hover))
 
     @property
     def json(self):
@@ -109,25 +109,27 @@ class SimulationDecision(Decision):
 
 
 class Action:
-    def __init__(self, id, title: str, typ: str, active: bool = False, answers=None, required=False):
+    def __init__(self, id, title: str, typ: str, active: bool = False, answers=None, required=False, hover=""):
         self.id = id
         self.title = title
         self.typ = typ
         self.active = active
+        self.hover = hover
         self.answers: List[Answer] = []
         self.required: bool = required
         if answers:
             for answer in answers:
                 self.answers.append(Answer(**answer))
+        print("Action created: ", self.hover)
 
     @property
     def json(self):
-        return {'title': self.title, 'answers': self.format_answers(), 'id': self.id, 'required': self.required}
+        return {'title': self.title, 'answers': self.format_answers(), 'id': self.id, 'required': self.required, 'hover': self.hover}
 
     @property
     def full_json(self):
         return {**self.json, 'id': self.id, 'typ': self.typ, 'answers': [a.json for a in self.answers],
-                'required': self.required}
+                'required': self.required, 'hover': self.hover}
 
     def format_answers(self):
         ans = []

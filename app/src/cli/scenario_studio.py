@@ -34,7 +34,7 @@ def make():
             for action in decision.get('actions'):
                 d.add_button_action(title=action.get('title', ''),
                                     answers=[{'label': key, 'points': action['answers'][key]} for key in action[
-                                        'answers']], required=action.get('required'))
+                                        'answers']], required=action.get('required'), hover=action.get('hover', ""))
         for tb in decision.get('text', []):
             d.add_text_block(tb.get('header', ''), tb.get('content', ''))
         s.add(d)
