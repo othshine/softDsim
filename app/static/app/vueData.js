@@ -77,8 +77,12 @@ let x = new Vue({
 
 
         },
-        aremove(x){
-            console.log(x)
+        remove_scrum_team(x){
+            for (let i = 0; i < this.numeric_rows.length; i++) {
+                if (this.numeric_rows[i].id === x){
+                    this.numeric_rows.splice(i, 1)
+                }
+            }
         }
 
 

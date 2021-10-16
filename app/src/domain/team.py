@@ -291,12 +291,17 @@ class ScrumTeam:
         for team_data in data:
             team = self.get_team(team_data.get('id'))
             if team:
-                print("Team Adjusted:", team.id)
                 team.adjust(team_data.get('values'))
             else:
-                new_team = Team(str(ObjectId()))
+                id = str(ObjectId())
+                new_team = Team(id)
+                team_data['id'] = id
                 new_team.adjust(team_data.get('values'))
                 self.teams.append(new_team)
+
+        for team in self.teams:
+            if team.id not in [t.get('id') for t in data]:
+                self.teams.remove(team)
 
 
 class SkillType:
