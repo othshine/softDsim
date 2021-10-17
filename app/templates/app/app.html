@@ -78,7 +78,7 @@
 
                         </li>
                     </ul>
-                    <button v-on:click="remove_scrum_team(row.id)" v-if="row.id">Remove Team</button>
+                    <button v-on:click="remove_numeric_row(i)" v-if="isScrumTeam(row)" style="border-radius: 1rem; margin-top: 0.5rem" class="btn-danger">Remove Team</button>
                 </li>
 
             </ul>

@@ -77,12 +77,16 @@ let x = new Vue({
 
 
         },
-        remove_scrum_team(x){
-            for (let i = 0; i < this.numeric_rows.length; i++) {
-                if (this.numeric_rows[i].id === x){
-                    this.numeric_rows.splice(i, 1)
-                }
-            }
+        /**
+         * Removes the ith numeric row i the vue data object numeric rows array.
+         * @param i
+         * @returns {undefined}
+         */
+        remove_numeric_row(i){
+            this.numeric_rows.splice(i, 1)
+        },
+        isScrumTeam(row){
+            return row.title === "Scrum Team";
         }
 
 

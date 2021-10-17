@@ -184,6 +184,12 @@ button.active-button {
 }
 
 
+.btn-danger:hover {
+    background-color: var(--red);
+    color: white;
+    font-weight: bold;
+}
+
 /* Charts */
 
 .chart-container {
