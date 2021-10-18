@@ -4,7 +4,7 @@ from app.src.domain.dataObjects import SimulationGoal
 from app.src.domain.decision_tree import Decision, Answer, AnsweredDecision, SimulationDecision
 from app.src.domain.scenario import UserScenario, Scenario
 from app.src.domain.team import Member, SkillType
-from mongo_models import ScenarioMongoModel, NoObjectWithIdException
+from mongo_models import ScenarioMongoModel, NoObjectWithIdException, ClickHistoryModel
 
 
 def test_mongo_scenario_update():
@@ -325,3 +325,24 @@ def test_mongo_stores_points_for_answer():
     assert 'Scrum' in [a['label'] for a in s.button_rows[0]['answers']]
     assert 'Spiral' in [a['label'] for a in s.button_rows[0]['answers']]
     assert 'Kanban' not in [a['label'] for a in s.button_rows[0]['answers']]
+
+
+def test_save_click_history():
+    model = ClickHistoryModel()
+    id = model.new_hist()
+    json = model.get(id)
+
+    assert json == {"_id": id}
+
+def test_save_click_history_add_event():
+    model = ClickHistoryModel()
+    id = model.new_hist()
+
+    event = {'btn_id': 'model', 'answer': 'scrum'}
+    model.add_event(id, event)
+    assert model.get(id) == {'_id': id, 'events': [event]}
+
+    event2 = {'decision_index': 3, 'btn_id': 'life-cycle', 'answer': 'iterative'}
+    model.add_event(id, event2)
+    assert model.get(id) == {'_id': id, 'events': [event, event2]}
+

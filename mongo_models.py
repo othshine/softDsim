@@ -12,7 +12,7 @@ class NoObjectWithIdException(Exception):
 
 class MongoConnection(object):
     def __init__(self):
-        client = MongoClient('localhost', 27017)
+        client = MongoClient('localhost', 2717)  # ToDo: Use env var.
         self.db = client['v2']
 
     def get_collection(self, name):
@@ -85,13 +85,12 @@ class UserMongoModel(MongoConnection):
             self.save_user(user)
         json = self.collection.find_one({'username': user})
         scores = json.get(scenario.template.id, [])
-        print("sc", scores)
         scores.append(score)
         self.collection.find_one_and_update({'username': user}, {"$set": {scenario.template.id: scores}})
 
     def save_user(self, user: str):
         if self.collection.find({'username': user}).count():
-            raise ValueError("User "+user+" already exists!")
+            raise ValueError("User " + user + " already exists!")
         self.collection.save({'username': user})
         return
 
@@ -102,4 +101,24 @@ class UserMongoModel(MongoConnection):
     def get_num_tries(self, user, template_id) -> int:
         user = self.collection.find_one({'username': user}) or {}
         return len(user.get(template_id, []))
+
+
+class ClickHistoryModel(MongoConnection):
+    def __init__(self):
+        super(ClickHistoryModel, self).__init__()
+        self.get_collection('history')
+
+    def new_hist(self):
+        return self.collection.insert_one({}).inserted_id
+
+    def get(self, id):
+        return self.collection.find_one({'_id': id})
+
+    def add_event(self, id, event):
+        json = self.get(id)
+        events = json.get('events', [])
+        events.append(event)
+        self.collection.find_one_and_update({'_id': id}, {'$set': {'events': events}})
+
+
 
