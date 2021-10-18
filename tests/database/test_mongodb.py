@@ -334,6 +334,7 @@ def test_save_click_history():
 
     assert json == {"_id": id}
 
+
 def test_save_click_history_add_event():
     model = ClickHistoryModel()
     id = model.new_hist()
@@ -345,4 +346,3 @@ def test_save_click_history_add_event():
     event2 = {'decision_index': 3, 'btn_id': 'life-cycle', 'answer': 'iterative'}
     model.add_event(id, event2)
     assert model.get(id) == {'_id': id, 'events': [event, event2]}
-

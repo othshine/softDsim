@@ -64,6 +64,7 @@ class UserScenario:
         self.perform_quality_check = False
         self.error_fixing = False
         self.model = kwargs.get('model', 'waterfall') or ""
+        self.history_id: ObjectId = kwargs.get('history')
         if self.model.lower() == 'scrum':
             self.team = ScrumTeam()
         else:
@@ -101,7 +102,8 @@ class UserScenario:
              'user': self.user,
              'actions': self.actions.json,
              'template_id': str(self.template.id),
-             'model': self.model
+             'model': self.model,
+             'history': self.history_id
              }
         return d
 

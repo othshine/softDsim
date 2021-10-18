@@ -26,9 +26,9 @@ class _Factory:
         if typ.lower() == "userscenario":
             return self._create_user_scenario(json)
 
-    def create_user_scenario(self, user: str, template: dict) -> UserScenario:
+    def create_user_scenario(self, user: str, template: dict, history_id: ObjectId) -> UserScenario:
         template = self.deserialize(template, 'scenario')
-        us = UserScenario(user=user, id=ObjectId(), scenario=template, decisions=template.decisions)
+        us = UserScenario(user=user, id=ObjectId(), scenario=template, decisions=template.decisions, history=history_id)
         us.actions.scrap_actions()
         return us
 
@@ -54,7 +54,8 @@ class _Factory:
                           scenario=json.get('template'),
                           errors=json.get('errors'),
                           identified_errors=json.get('identified_errors'),
-                          model=json.get('model'))
+                          model=json.get('model'),
+                          history=json.get('history'))
         if us.model.lower() == "scrum":
             if t := json.get('team'):
                 if t := t.get('teams'):

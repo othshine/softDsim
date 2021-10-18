@@ -13,9 +13,10 @@ from django.views.decorators.csrf import csrf_exempt
 
 from app.forms import ScenarioNameForm, ScenarioEditForm, DecisionEditForm
 from app.src.domain.decision_tree import Decision, SimulationDecision
+import app.src.domain.history as history
 from app.src.domain.scenario import Scenario, UserScenario
 from app.src.domain.team import Member, ScrumTeam
-from mongo_models import ScenarioMongoModel, NoObjectWithIdException, UserMongoModel
+from mongo_models import ScenarioMongoModel, NoObjectWithIdException, UserMongoModel, ClickHistoryModel
 from utils import data_get, get_active_label
 
 
@@ -50,10 +51,6 @@ def adjust_scrum_management(s, param):
         s.team.po = param.get('Product Owner')
 
 
-
-
-
-
 @login_required
 def app(request, sid):
     return render(request, "app/app.html")
@@ -62,7 +59,8 @@ def app(request, sid):
 @login_required
 def create_new(request, sid):
     model = ScenarioMongoModel()
-    mid = model.create(sid, user=request.user.username)
+    hist_model = ClickHistoryModel()
+    mid = model.create(sid, user=request.user.username, history_id=hist_model.new_hist())
     return redirect('/s/' + mid)
 
 
@@ -74,7 +72,6 @@ def get_points(param, data):
                 points += answer['points']
 
     return points
-
 
 
 def apply_changes(s: UserScenario, data: dict):
@@ -121,11 +118,9 @@ def click_continue(request, sid):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         apply_changes(s, data)
-        print(s.model, s.team)
-        print(s.numeric_rows)
+        history.write(s.history_id, data, s.counter)
         if isinstance(s.get_decision(), SimulationDecision):
             s.work(5, int(data['meetings']))
-            print(s.model)
         if s.counter >= 0:
             s.get_decision().eval(data)
         try:

@@ -69,9 +69,9 @@ class ScenarioMongoModel(MongoConnection):
             return self.save(json)
         raise NoObjectWithIdException()
 
-    def create(self, sid, user):
+    def create(self, sid, user, history_id):
         if template := self.collection.find_one({'_id': sid}):
-            return self.save(Factory.create_user_scenario(user, template).json)
+            return self.save(Factory.create_user_scenario(user, template, history_id).json)
         raise NoObjectWithIdException("No template scenario with id: " + str(sid))
 
 
@@ -119,6 +119,3 @@ class ClickHistoryModel(MongoConnection):
         events = json.get('events', [])
         events.append(event)
         self.collection.find_one_and_update({'_id': id}, {'$set': {'events': events}})
-
-
-
