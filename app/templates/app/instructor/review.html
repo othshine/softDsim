@@ -1,10 +1,14 @@
 {% load static %}
+{% load filters %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Playback</title>
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'app/instructor/instructor.css' %}">
+
 </head>
 <body>
 <script>var events = {{ events|safe }}</script>
@@ -15,29 +19,102 @@
     </div>
     <div class="row">
 
-        <div class="xsm"></div>
-        {% for event in events %}
-            <p>{{ event.decision_index }}</p>
-            <p>Day: {{ event.current_day }}</p>
-            <p>Cost:  {{ event.actual_cost }}</p>
-            <p>Day: {{ event.current_day }}</p>
-            <p>familiarity:  {{ event.familiarity }}</p>
-            <p>meetings: {{ event.meetings }}</p>
-            <p>motivation:  {{ event.motivation }}</p>
-            <p>stress: {{ event.stress }}</p>
-            <p>tasks_done:  {{ event.tasks_done }}</p>
-            <p>tasks_total: {{ event.tasks_total }}</p>
-            {% for opt in event.user_opts %}
-                <p>{{ opt.title }}</p>
-                <p>{{ opt.answer }}</p>
-            {% endfor %}
+        <div class="sm"></div>
+        <div>
+            <div class="row"></div>
+            {% for event in events %}
+                <table>
+                    <tr>
+                        <td colspan="12"><h2>Event</h2></td>
+                    </tr>
+                    <tr>
+                        <td colspan="9">
+                            Decision: {{ event.decision_index }}
+                        </td>
+                        <td>
+                            Day: {{ event.current_day }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="12"><h3>STATS</h3></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">Cost</td>
+                        <td colspan="4">{{ event.cost }}</td>
+                        <td colspan="4">Stress</td>
+                        <td colspan="4">{{ event.stress }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">Motivation</td>
+                        <td colspan="4">{{ event.motivation }}</td>
+                        <td colspan="4">Tasks Done</td>
+                        <td colspan="4">{{ event.tasks_done }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">Familiarity</td>
+                        <td colspan="4">{{ event.familiarity }}</td>
+                        <td colspan="4">Total Tasks</td>
+                        <td colspan="4">{{ event.tasks_total }}</td>
+                    </tr>
 
-        {% endfor %}
-        <div class="xsm"></div>
+                    {% for opt in event.user_opts %}
+                        {% if opt.answers %}
+                            <tr>
+                                <td colspan="6">
+                                    {{ opt.title }}
+                                </td>
+                                <td colspan="6">
+                                    {% for a in opt.answers %}
+                                        {{ a }}
+                                    {% endfor %}
+                                    {% else %}
+                            <tr>
+                            <td colspan="12">
+                                {{ opt.title }}
+                            </td>
+                            </tr>
+                            {% for key in opt.values %}
+                                <tr>
+                                <td colspan="6">{{ key }}</td>
+                                <td colspan="6">{{ opt.values|dict_key:key }}</td>
+                                </tr>
+                            {% endfor %}
+
+                        {% endif %}
+
+                    {% endfor %}
+
+
+                </table>
+                <div class="row"></div>
+            {% endfor %}
+        </div>
+        <div class="sm"></div>
     </div>
 </section>
 
-
-
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
