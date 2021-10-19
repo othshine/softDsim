@@ -153,7 +153,7 @@ def click_continue(request, sid):
         return HttpResponse(json.dumps(context), content_type="application/json")
 
 
-def instructor(request):
+def instructor_(request):
     return render(request, "app/instructor/instructor.html")
 
 

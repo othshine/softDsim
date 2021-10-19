@@ -1,0 +1,43 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Playback</title>
+</head>
+<body>
+<script>var events = {{ events|safe }}</script>
+
+<section>
+    <div class="row">
+        <h1>SoftDSimulator Playback</h1>
+    </div>
+    <div class="row">
+
+        <div class="xsm"></div>
+        {% for event in events %}
+            <p>{{ event.decision_index }}</p>
+            <p>Day: {{ event.current_day }}</p>
+            <p>Cost:  {{ event.actual_cost }}</p>
+            <p>Day: {{ event.current_day }}</p>
+            <p>familiarity:  {{ event.familiarity }}</p>
+            <p>meetings: {{ event.meetings }}</p>
+            <p>motivation:  {{ event.motivation }}</p>
+            <p>stress: {{ event.stress }}</p>
+            <p>tasks_done:  {{ event.tasks_done }}</p>
+            <p>tasks_total: {{ event.tasks_total }}</p>
+            {% for opt in event.user_opts %}
+                <p>{{ opt.title }}</p>
+                <p>{{ opt.answer }}</p>
+            {% endfor %}
+
+        {% endfor %}
+        <div class="xsm"></div>
+    </div>
+</section>
+
+
+
+</body>
+</html>
