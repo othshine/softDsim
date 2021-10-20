@@ -8,6 +8,7 @@
     <title>Playback</title>
     <link rel="stylesheet" href="{% static 'app/styles.css' %}">
     <link rel="stylesheet" href="{% static 'app/instructor/instructor.css' %}">
+    <link rel="stylesheet" href="{% static 'app/instructor/review.css' %}">
 
 </head>
 <body>
@@ -31,52 +32,55 @@
                         <td colspan="9">
                             Decision: {{ event.decision_index }}
                         </td>
-                        <td>
+                        <td colspan="3">
                             Day: {{ event.current_day }}
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="12"><h3>STATS</h3></td>
+                        <td colspan="12"><h3>Statistics</h3></td>
                     </tr>
                     <tr>
-                        <td colspan="4">Cost</td>
-                        <td colspan="4">{{ event.cost }}</td>
-                        <td colspan="4">Stress</td>
-                        <td colspan="4">{{ event.stress }}</td>
+                        <td colspan="3" class="title">Stress</td>
+                        <td colspan="3" class="value">{{ event.stress | round }}%</td>
+                        <td colspan="3" class="title">Cost</td>
+                        <td colspan="3" class="value">{{ event.cost }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4">Motivation</td>
-                        <td colspan="4">{{ event.motivation }}</td>
-                        <td colspan="4">Tasks Done</td>
-                        <td colspan="4">{{ event.tasks_done }}</td>
+                        <td colspan="3" class="title">Motivation</td>
+                        <td colspan="3" class="value">{{ event.motivation | round }}%</td>
+                        <td colspan="3" class="title">Tasks Done</td>
+                        <td colspan="3" class="value">{{ event.tasks_done }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4">Familiarity</td>
-                        <td colspan="4">{{ event.familiarity }}</td>
-                        <td colspan="4">Total Tasks</td>
-                        <td colspan="4">{{ event.tasks_total }}</td>
+                        <td colspan="3" class="title">Familiarity</td>
+                        <td colspan="3" class="value">{{ event.familiarity | round }}%</td>
+                        <td colspan="3" class="title">Total Tasks</td>
+                        <td colspan="3" class="value">{{ event.tasks_total }}</td>
+                    </tr>
+                <tr>
+                        <td colspan="12"><h3>Options</h3></td>
                     </tr>
 
                     {% for opt in event.user_opts %}
                         {% if opt.answers %}
                             <tr>
-                                <td colspan="6">
+                                <td colspan="6" class="title">
                                     {{ opt.title }}
                                 </td>
-                                <td colspan="6">
+                                <td colspan="6" class="value">
                                     {% for a in opt.answers %}
                                         {{ a }}
                                     {% endfor %}
                                     {% else %}
                             <tr>
                             <td colspan="12">
-                                {{ opt.title }}
+                                <h3>{{ opt.title | title }}</h3>
                             </td>
                             </tr>
                             {% for key in opt.values %}
                                 <tr>
-                                <td colspan="6">{{ key }}</td>
-                                <td colspan="6">{{ opt.values|dict_key:key }}</td>
+                                <td colspan="6" class="title">{{ key | title }}</td>
+                                <td colspan="6" class="value">{{ opt.values|dict_key:key }}</td>
                                 </tr>
                             {% endfor %}
 

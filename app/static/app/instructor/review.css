@@ -1,0 +1,32 @@
+
+table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table tr:first-of-type{
+    background-color: var(--black);
+}
+
+table tr:first-of-type *{
+    color: white;
+    background-color: transparent;
+    border-radius: 1rem  1rem 0 0;
+}
+
+
+tr:nth-child(2n+0) .title {
+    background-color: #F0F0F0;
+}
+tr:nth-child(2n+1) .title {
+    background-color: #CACACA;
+}
+
+
+tr:nth-child(2n+0) .value {
+    background-color: #C0F0F0;
+}
+tr:nth-child(2n+1) .value {
+    background-color: #AACACA;
+}
