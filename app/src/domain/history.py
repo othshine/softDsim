@@ -1,3 +1,5 @@
+from typing import Optional
+
 from mongo_models import ClickHistoryModel
 
 
@@ -20,3 +22,92 @@ def write(history_id, data, index):
 def _write(event, id):
     model = ClickHistoryModel()
     model.add_event(id, event)
+
+
+class UserOption:
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id')
+        self.title = kwargs.get('title')
+        self.answers = kwargs.get('answers')
+        self.values = kwargs.get('values')
+        self.d_values = {}
+
+
+class Event:
+    def __init__(self, **kwargs):
+        self.decision_index = kwargs.get('decision_index')
+        self.meetings = kwargs.get('meetings')
+        self.tasks_done = kwargs.get('tasks_done')
+        self.tasks_total = kwargs.get('tasks_total')
+        self.cost = kwargs.get('cost')
+        self.current_day = kwargs.get('current_day')
+        self.actual_cost = kwargs.get('actual_cost')
+        self.motivation = kwargs.get('motivation')
+        self.familiarity = kwargs.get('familiarity')
+        self.stress = kwargs.get('stress')
+        self.user_opts = [UserOption(**uo) for uo in kwargs.get('user_opts') or []]
+        self.predecessor: Optional[Event] = None
+
+    def set_predecessor(self, pre):
+        self.predecessor = pre
+
+        for i in range(0, len(self.user_opts)):
+            ou = self.user_opts[i]
+            try:
+                prou = pre.user_opts[i]
+
+                for key in ou.values:
+                    ou.d_values[key] = ou.values.get(key) - prou.values.get(key)
+            except:
+                pass
+
+    @property
+    def d_stress(self):
+        if self.predecessor:
+            return self.stress - self.predecessor.stress
+        else:
+            return 0
+
+    @property
+    def d_tasks_done(self):
+        if self.predecessor:
+            return self.tasks_done - self.predecessor.tasks_done
+        else:
+            return 0
+
+    @property
+    def d_actual_cost(self):
+        if self.predecessor:
+            return self.actual_cost - self.predecessor.actual_cost
+        else:
+            return 0
+
+    @property
+    def d_familiarity(self):
+        if self.predecessor:
+            return self.familiarity - self.predecessor.familiarity
+        else:
+            return 0
+
+    @property
+    def d_cost(self):
+        if self.predecessor:
+            return self.cost - self.predecessor.cost
+        else:
+            return 0
+
+    @property
+    def d_motivation(self):
+        if self.predecessor:
+            return self.motivation - self.predecessor.motivation
+        else:
+            return 0
+
+
+class History:
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('_id')
+        self.events = [Event(**e) for e in kwargs.get('events') if e.get('decision_index') >= 0]
+
+        for i in range(1, len(self.events)):
+            self.events[i].set_predecessor(self.events[i - 1])
