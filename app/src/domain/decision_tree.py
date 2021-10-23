@@ -170,7 +170,8 @@ class ActionList:
     def scrap_actions(self):
         for id in YAMLReader.read('actions', 'button-rows'):
             if id not in [x.id for x in self.actions]:
-                a = Action(id, YAMLReader.read('actions', 'button-rows', id, 'title'), 'button')
+                data = YAMLReader.read('actions', 'button-rows', id)
+                a = Action(id, data.get('title'), 'button', hover=data.get('hover'))
                 for label in YAMLReader.read('actions', 'button-rows', id, 'values'):
                     a.answers.append(Answer(label, False))
                 self.actions.append(a)

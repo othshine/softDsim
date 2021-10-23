@@ -42,6 +42,7 @@ actions:
         - Below average
         - Average
         - Above Average
+      hover: Choose between average salary or pay +/- 10%. This effects the motivation of your team's members.
     life-cycle-pick:
       title: Life Cycle
       values:

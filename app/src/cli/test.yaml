@@ -1,4 +1,4 @@
-name: Hover Text
+name: Actions 3
 tasks_total: 9000
 budget: 900000
 scheduled_days: 300
@@ -39,6 +39,7 @@ decisions:
       - meeting-planner
       - quality-check
       - error-fixing
+      - salary-pick
     text:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.
