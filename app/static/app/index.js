@@ -25,9 +25,9 @@ function subMeeting() {
 }
 
 
-function toggleVisibility(elId){
+function toggleVisibility(elId) {
     const element = document.getElementById(elId);
-    if (element.style.display == 'none'){
+    if (element.style.display == 'none') {
         element.style.display = 'block'
     } else {
         element.style.display = 'none'
@@ -54,37 +54,39 @@ function makeActivityChart(length) {
 }
 
 
-function all_required_actions_done(){
+function all_required_actions_done() {
     let t = true;
-    for (const c of document.getElementsByClassName('req')) {
-        let active = false;
-        for (const li of c.nextElementSibling.childNodes){
-            if (li.childNodes[0].classList.contains('active-button')){
-                active = true;
+    for (const c of x._data.button_rows) {
+        if (c.required === true) {
+            let active = false;
+            for (const a of c.answers) {
+                if (a.active === true) {
+                    active = true;
+                }
             }
-        }
-        if (active === false){
-            t = false
+            if (active === false) {
+                t = false
+            }
         }
     }
     return t;
 }
 
-function set_continue_button(){
+function set_continue_button() {
     document.getElementById('continue-button').disabled = !all_required_actions_done();
 }
 
 
-document.addEventListener("click", () =>{
+document.addEventListener("click", () => {
     set_continue_button()
 })
 
-function addScrumTeam(){
+function addScrumTeam() {
     const j = {'title': 'Scrum Team', 'values': {'junior': 2, 'senior': 1, 'expert': 1}}
     x.$data.numeric_rows.push(j)
 }
 
 
-function removeScrumTeam(x){
+function removeScrumTeam(x) {
     console.log(x)
 }

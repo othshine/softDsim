@@ -39,4 +39,5 @@ async function cont() {
             addWeek(taskChart, data['tasks_done'])
         }
     }
+    set_continue_button()
 }
