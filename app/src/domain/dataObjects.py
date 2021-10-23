@@ -10,6 +10,7 @@ class WorkPackage:
     identified_errors: int
     quality_check: bool
     error_fixing: bool
+    total_tasks_done: int
 
     @property
     def daily_work_hours(self):

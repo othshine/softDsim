@@ -10,6 +10,8 @@ from utils import YAMLReader, value_or_error, probability, weighted
 
 TASK_COMPLETION_COEF = YAMLReader.read('task-completion-coefficient')
 ERR_COMPLETION_COEF = YAMLReader.read('error-completion-coefficient')
+TASKS_PER_MEETING = YAMLReader.read('tasks-per-meeting-coefficient')
+DONE_TASKS_FAMILIARITY_IMPACT_FACTOR = YAMLReader.read('done-tasks-familiarity-impact-factor')
 
 
 def inc(x: float):
@@ -17,7 +19,7 @@ def inc(x: float):
     Increase function for increasing member values (xp, motivation, familiarity). Currently just adds 0.1 with a
     limit of 1. :param x: current value  :return: float - x + 0.1
     """
-    return min([x + 0.1, 1.0])  # ToDo: Find a fitting function that approaches 1
+    return min([x + 0.01, 1.0])  # ToDo: Find a fitting function that approaches 1
 
 
 class Member:
@@ -65,7 +67,7 @@ class Member:
         number_tasks = 0
         number_tasks_with_unidentified_errors = 0
         for _ in range(round(time)):
-            number_tasks += probability(weighted((self.efficiency, 1), (team_efficiency, 1)) * coeff)
+            number_tasks += probability(self.efficiency * team_efficiency * coeff)
         for _ in range(number_tasks):
             number_tasks_with_unidentified_errors += probability(self.skill_type.error_rate)
         return number_tasks, number_tasks_with_unidentified_errors
@@ -88,6 +90,12 @@ class Member:
 
     def get_id(self) -> ObjectId:
         return self.id
+
+    def update_familiarity(self, new_familiarity, w):
+        print("!!!!")
+        print(new_familiarity)
+        print(w)
+        self.familiarity = weighted((self.familiarity, w), (new_familiarity, 1))
 
 
 class Team:
@@ -162,10 +170,10 @@ class Team:
         t = 0
         e = 0
         for day in range(work_package.days):
-            self.meeting(work_package.daily_meeting_hours)
             nt, ne = self.solve_tasks(work_package.daily_work_hours)
             t += nt
             e += ne
+            self.meeting(work_package.daily_meeting_hours, nt, work_package.total_tasks_done)
         wr.unidentified_errors += e
         if work_package.error_fixing:
             while t > 0 and wr.fixed_errors < work_package.identified_errors:
@@ -190,15 +198,20 @@ class Team:
 
         return wr
 
-    def meeting(self, time):
+    def meeting(self, time, new_tasks, tasks_done):
         """
         A meeting increases every members familiarity.
         :return: None
         """
+
+        if new_tasks == 0:
+            daily_familiarity = 1
+        else:
+            daily_familiarity = min((TASKS_PER_MEETING * time) / new_tasks, 1)
+
         for member in self.staff:
             if not member.halted:
-                for _ in range(time):  # ToDo: This can be included in the the improved inc function.
-                    member.familiarity = inc(member.familiarity)
+                member.update_familiarity(daily_familiarity, int(tasks_done / DONE_TASKS_FAMILIARITY_IMPACT_FACTOR))
 
     def get_member(self, _id: ObjectId) -> Member:
         for m in self.staff:

@@ -157,7 +157,8 @@ class UserScenario:
     def work(self, days, meeting):
         wp = WorkPackage(days=days, daily_meeting_hours=meeting, quality_check=self.perform_quality_check,
                          error_fixing=self.error_fixing, tasks=self.template.tasks_total - self.tasks_done,
-                         unidentified_errors=self.errors, identified_errors=self.identified_errors)
+                         unidentified_errors=self.errors, identified_errors=self.identified_errors,
+                         total_tasks_done=self.tasks_done)
         wr = self.team.work(wp)
         self._apply_work_result(wr)
         self.actual_cost += month_to_day(self.team.salary, days)
