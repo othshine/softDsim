@@ -52,6 +52,13 @@ def click_continue(request, sid):
                 'done': False,
                 'scrum': s.model == 'scrum' and isinstance(s.get_decision(), SimulationDecision)
             }
+            if s.current_wr:
+                context['current_workday'] = {
+                    'tasks': s.current_wr.tasks_completed,
+                    'ident_errs': s.current_wr.identified_errors,
+                    'ident_total': s.identified_errors,
+                    'fixed_errs': s.current_wr.fixed_errors
+                }
             for t in d.text or []:
                 context.get('blocks').append({'header': t.header, 'text': t.content})
         except StopIteration:

@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Optional, List
+from typing import Optional
 
 from bson import ObjectId
 
-from app.src.domain.dataObjects import WorkPackage, WorkResult, SimulationGoal
-from app.src.domain.decision_tree import ActionList, Decision, SimulationDecision, AnsweredDecision
-from app.src.domain.team import Team, Member, ScrumTeam
+from app.src.domain.dataObjects import WorkPackage, WorkResult
+from app.src.domain.decision_tree import ActionList, Decision, SimulationDecision
+from app.src.domain.team import Team, ScrumTeam
 from utils import month_to_day, quality
 
 
@@ -65,6 +65,7 @@ class UserScenario:
         self.error_fixing = False
         self.model = kwargs.get('model', 'waterfall') or ""
         self.history_id: ObjectId = kwargs.get('history')
+        self.current_wr = None
         if self.model.lower() == 'scrum':
             self.team = ScrumTeam()
         else:
@@ -160,6 +161,7 @@ class UserScenario:
                          unidentified_errors=self.errors, identified_errors=self.identified_errors,
                          total_tasks_done=self.tasks_done)
         wr = self.team.work(wp)
+        self.current_wr = wr
         self._apply_work_result(wr)
         self.actual_cost += month_to_day(self.team.salary, days)
         self.current_day += days

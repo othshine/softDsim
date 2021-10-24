@@ -1,4 +1,4 @@
-name: Actions 3
+name: Actions 4
 tasks_total: 9000
 budget: 900000
 scheduled_days: 300
@@ -14,6 +14,15 @@ decisions:
     - header: The Product Life Cycle
       content: While choosing the PM model it is a good idea to also think about the produt life cycle.
     actions:
+      - title: Phase
+        answers:
+          Planning: 50
+          Initiation: 100
+          Execution: 0
+          Closing: 0
+        typ: button
+        required: True
+        hover: You can add some text here that shows up when the user hovers over the title.
       - title: Model
         answers:
           Waterfall: 100
@@ -30,6 +39,9 @@ decisions:
           Predictive: 100
         typ: button
         required: True
+    active_actions:
+      - scrum-management
+      - staff-pick
 
   - name: Simulation
     continue_text: Advance 1 Week

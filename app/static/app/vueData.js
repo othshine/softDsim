@@ -19,7 +19,8 @@ let x = new Vue({
         motivation: 0,
         familiarity: 0,
         stress: 0,
-        scrum: false
+        scrum: false,
+        current_workday: false
 
     },
     filters: {

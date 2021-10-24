@@ -4,7 +4,10 @@
 {% block nav-content %}
     <div class="row">
     <div id="task-container" class="row-container">
-        <button>Tasks: [[ tasks_done ]] / [[ tasks_total ]]</button>
+        <button>Tasks: [[ tasks_done ]] / [[ tasks_total ]]
+            <template v-if="current_workday"></template>
+            (+[[ current_workday.tasks ]])
+        </button>
     </div>
     <div class="row-container">
         <button>Monthly Expenditure: [[ cost | toCurrency ]]</button>
@@ -56,6 +59,15 @@
                 <p style="text-align: left"><strong>Motivation:</strong> [[ motivation | percentage ]]</p>
             </div>
 
+            <template v-if="current_workday">
+                <h3 class="element-header pointer none-select" onclick="toggleVisibility('work-container')">Quality<span
+                        class="smaller">&#x25bc;</span></h3>
+                <div id="work-container" style="text-align: left">
+                    <p style="text-align: left"><strong>Identified Errors:</strong> [[ current_workday.ident_errs ]] (Total: [[ current_workday.ident_total ]])</p>
+                    <p style="text-align: left"><strong>Fixed Errors:</strong> [[ current_workday.fixed_errs ]]</p>
+                </div>
+            </template>
+
         </section>
         <section class="main-division-third">
             <div class="division-title none-select">
@@ -64,7 +76,7 @@
 
             <ul>
                 <li v-for="row, i in numeric_rows">
-                    <h3  :title="row.hover" class="element-header">
+                    <h3 :title="row.hover" class="element-header">
                         [[ row.title | uppercase]]
                     </h3>
                     <ul :id="row.id" class="row">
@@ -78,7 +90,9 @@
 
                         </li>
                     </ul>
-                    <button v-on:click="remove_numeric_row(i)" v-if="isScrumTeam(row)" style="border-radius: 1rem; margin-top: 0.5rem" class="btn-danger">Remove Team</button>
+                    <button v-on:click="remove_numeric_row(i)" v-if="isScrumTeam(row)"
+                            style="border-radius: 1rem; margin-top: 0.5rem" class="btn-danger">Remove Team
+                    </button>
                 </li>
 
             </ul>
@@ -87,7 +101,7 @@
             </template>
             <ul>
                 <li v-for="row, i in button_rows">
-                    <h3 :title="row.hover" class="element-header" >
+                    <h3 :title="row.hover" class="element-header">
                         [[ row.title ]]
                     </h3>
                     <div v-if="row.required" class="req" hidden></div>
