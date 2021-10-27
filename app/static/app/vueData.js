@@ -20,7 +20,8 @@ let x = new Vue({
         familiarity: 0,
         stress: 0,
         scrum: false,
-        current_workday: false
+        current_workday: false,
+        advance: false
 
     },
     filters: {

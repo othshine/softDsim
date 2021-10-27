@@ -28,7 +28,7 @@ def click_continue(request, sid):
         data = json.loads(request.body.decode('utf-8'))
         apply_changes(s, data)
         history.write(s.history_id, data, s.counter)
-        if isinstance(s.get_decision(), SimulationDecision):
+        if isinstance(s.get_decision(), SimulationDecision) and data.get('advance'):
             s.work(5, int(data['meetings']))
         if s.counter >= 0:
             s.get_decision().eval(data)

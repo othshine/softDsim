@@ -10,6 +10,7 @@
  */
 async function cont() {
     const s = window.location.pathname.split('/').slice(-1)[0]
+    x.$data.advance = document.getElementById('continue-button').innerText.toLowerCase() !== "start"
     const response = await fetch('/continue/' + s,
         {
             headers: {

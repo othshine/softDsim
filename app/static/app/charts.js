@@ -99,6 +99,14 @@ function initializeCharts(budget, tasks,  weeks){
         task_data.push(i*weekly_tasks)
     }
 
+    /*Add null values for weeks that have passed (if a scenario is loaded that already is half way through)*/
+    if (x.$data.current_day > 0){
+        for (let i = 0; i < x.$data.current_day/5; i++) {
+            addWeek(costChart, null)
+            addWeek(taskChart, null)
+        }
+    }
+
     adjustWeekLabel(costChart, weeks)
     adjustWeekLabel(taskChart, weeks)
     addChartDataRow(costChart, cost_data, "Management Goal")
