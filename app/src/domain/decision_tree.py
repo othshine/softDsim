@@ -43,7 +43,7 @@ class Decision(ABC):
         data = {'continue_text': self.continue_text,
                 'points': self.points,
                 'active_actions': self.active_actions,
-                'name': self.name,}
+                'name': self.name, }
         if self.text:
             data = {**data, 'text': [t.json for t in self.text]}
         return data
@@ -70,7 +70,8 @@ class AnsweredDecision(Decision):
     def add_button_action(self, title, answers, id=None, required=False, hover=""):
         if id is None:
             id = str(ObjectId())
-        self.actions.append(Action(id=id, title=title, typ='button', active=True, answers=answers, required=required, hover=hover))
+        self.actions.append(
+            Action(id=id, title=title, typ='button', active=True, answers=answers, required=required, hover=hover))
 
     @property
     def json(self):
@@ -120,11 +121,11 @@ class Action:
         if answers:
             for answer in answers:
                 self.answers.append(Answer(**answer))
-        print("Action created: ", self.hover)
 
     @property
     def json(self):
-        return {'title': self.title, 'answers': self.format_answers(), 'id': self.id, 'required': self.required, 'hover': self.hover}
+        return {'title': self.title, 'answers': self.format_answers(), 'id': self.id, 'required': self.required,
+                'hover': self.hover}
 
     @property
     def full_json(self):
@@ -172,8 +173,8 @@ class ActionList:
             if id not in [x.id for x in self.actions]:
                 data = YAMLReader.read('actions', 'button-rows', id)
                 a = Action(id, data.get('title'), 'button', hover=data.get('hover'))
-                for label in YAMLReader.read('actions', 'button-rows', id, 'values'):
-                    a.answers.append(Answer(label, False))
+                for i, label in enumerate(data.get('values')):
+                    a.answers.append(Answer(label, i+1 == (data.get('active'))))
                 self.actions.append(a)
 
     def adjust(self, data):

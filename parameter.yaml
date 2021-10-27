@@ -42,7 +42,8 @@ actions:
         - Below average
         - Average
         - Above Average
-      hover: Choose between average salary or pay +/- 10%. This effects the motivation of your team's members.
+      hover: Choose between average salary or pay +/- 10%. This affects the motivation of your team's members.
+      active: 2
     life-cycle-pick:
       title: Life Cycle
       values:
@@ -55,11 +56,15 @@ actions:
       values:
         - Perform
         - Don't Perform
+      active: 2
+      hover: Perform a quality check to find unidentified errors. If you decide to perform a quality check, the team first tries to find errors before continuing with solving new tasks.
     error-fixing:
       title: Fix Errors
       values:
         - Perform
         - Don't Perform
+      active: 2
+      hover: The team will prioritize fixing errors before continuing solving new tasks, to fix errors they first have to be identified (Quality Review).
   numeric-rows:
     staff-pick:
       title: Staff
@@ -67,6 +72,7 @@ actions:
         - junior
         - senior
         - expert
+      hover: Juniors cost 3000/mo, have an error rate of 33% and have a throughput of 3 tasks. Seniors cost 4500/mo, have an error rate of 20% and have a throughput of 7 tasks. Experts cost 7000/mo, have an error rate of 5% and have a throughput of 7 tasks.
     scrum-management:
       title: Management
       values:

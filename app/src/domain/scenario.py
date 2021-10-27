@@ -44,7 +44,8 @@ def create_staff_row(team: Team, title: str = 'staff'):
                 'junior': team.count('junior'),
                 'senior': team.count('senior'),
                 'expert': team.count('expert')
-            }
+            },
+        'hover': "Juniors cost 3000/mo, have an error rate of 33% and have a throughput of 3 tasks. Seniors cost 4500/mo, have an error rate of 20% and have a throughput of 7 tasks. Experts cost 7000/mo, have an error rate of 5% and have a throughput of 7 tasks."
     }
 
 
