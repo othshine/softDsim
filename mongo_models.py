@@ -1,3 +1,5 @@
+from typing import List
+
 from bson import ObjectId
 from deprecated.classic import deprecated
 from pymongo import MongoClient
@@ -80,25 +82,52 @@ class UserMongoModel(MongoConnection):
         super(UserMongoModel, self).__init__()
         self.get_collection('users')
 
-    def save_score(self, user: str, scenario: UserScenario, score: int):
+    def initiate_scenario(self, user: str, scenario_id: str):
+        """Adds a -1 to a user's scenario with the given id. The purpose is that the score is only saved when the user
+        finishes a scenario, to get an accurate count of tries, this method is called as soon as the user starts a
+        scenario and the -1 is overwritten when the user actually finishes. """
+        self._save_score(user=user, scenario_id=scenario_id, score=-1)
+
+    def save_score(self, user: str, scenario_id: str, score: int):
+        """Saves the final score of a user for scenario with the given template id. It also removes a -1 value from
+        the scoreboard for that scenario. """
+        self._remove_score(user=user, scenario_id=scenario_id, score=-1)
+        self._save_score(user=user, scenario_id=scenario_id, score=score)
+
+    def _save_score(self, user: str, scenario_id: str, score: int):
+        """Saves a score for a given user and a given template id to the database."""
+        scores = self._get_scores(scenario_id, user)
+        scores.append(score)
+        self.collection.find_one_and_update({'username': user}, {"$set": {scenario_id: scores}})
+
+    def _get_scores(self, scenario_id, user) -> List[int]:
+        """Returns a list of scores of a user for a given scenario template id that are stored in the database."""
         if self.collection.count({'username': user}) == 0:
             self.save_user(user)
         json = self.collection.find_one({'username': user})
-        scores = json.get(scenario.template.id, [])
-        scores.append(score)
-        self.collection.find_one_and_update({'username': user}, {"$set": {scenario.template.id: scores}})
+        scores = json.get(scenario_id, [])
+        return scores
+
+    def _remove_score(self, user: str, scenario_id: str, score: int):
+        """Removes the first appearance of <score> in a given user's scenario template id array from the database."""
+        scores = self._get_scores(scenario_id, user)
+        scores.remove(score)
+        self.collection.find_one_and_update({'username': user}, {"$set": {scenario_id: scores}})
 
     def save_user(self, user: str):
+        """Creates a document in the database that represents a user."""
         if self.collection.find({'username': user}).count():
             raise ValueError("User " + user + " already exists!")
         self.collection.save({'username': user})
         return
 
     def get_best_score(self, user: str, template_id) -> int:
+        """Returns the highest value in the given scenario template id array for a given user."""
         json = self.collection.find_one({'username': user}) or {}
         return max(json.get(template_id, [0]))
 
     def get_num_tries(self, user, template_id) -> int:
+        """Returns the number of entries in the given scenario template id array for a given user."""
         user = self.collection.find_one({'username': user}) or {}
         return len(user.get(template_id, []))
 
