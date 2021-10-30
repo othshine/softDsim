@@ -83,15 +83,15 @@ class UserMongoModel(MongoConnection):
         self.get_collection('users')
 
     def initiate_scenario(self, user: str, scenario_id: str):
-        """Adds a -1 to a user's scenario with the given id. The purpose is that the score is only saved when the user
+        """Adds a 0 to a user's scenario with the given id. The purpose is that the score is only saved when the user
         finishes a scenario, to get an accurate count of tries, this method is called as soon as the user starts a
-        scenario and the -1 is overwritten when the user actually finishes. """
-        self._save_score(user=user, scenario_id=scenario_id, score=-1)
+        scenario and the 0 is overwritten when the user actually finishes. """
+        self._save_score(user=user, scenario_id=scenario_id, score=0)
 
     def save_score(self, user: str, scenario_id: str, score: int):
-        """Saves the final score of a user for scenario with the given template id. It also removes a -1 value from
+        """Saves the final score of a user for scenario with the given template id. It also removes one 0 value from
         the scoreboard for that scenario. """
-        self._remove_score(user=user, scenario_id=scenario_id, score=-1)
+        self._remove_score(user=user, scenario_id=scenario_id, score=0)
         self._save_score(user=user, scenario_id=scenario_id, score=score)
 
     def _save_score(self, user: str, scenario_id: str, score: int):
@@ -130,6 +130,17 @@ class UserMongoModel(MongoConnection):
         """Returns the number of entries in the given scenario template id array for a given user."""
         user = self.collection.find_one({'username': user}) or {}
         return len(user.get(template_id, []))
+
+    def get_user_ranking(self, template_id):
+        """Returns a list with each user and their high score, and total rank, for a given scenario template."""
+        users = self.collection.find({}) or {}
+        users = [{'username': user.get('username'), 'score': max(user.get(template_id, [0]))} for user in users if
+                 user.get(template_id, False)]
+        users = sorted(users, key=lambda d: d['score'], reverse=True)
+        for i in range(len(users)):
+            users[i]['rank'] = i+1
+        users = {e.get('username'): {'score': e.get('score'), 'rank': e.get('rank')} for e in users}
+        return users
 
 
 class ClickHistoryModel(MongoConnection):

@@ -16,13 +16,16 @@ def index(request):
     sc = scenario_model.find_all_templates()
     s_list = []
     for scenario in sc:
-        best_score = user_model.get_best_score(user=request.user.username, template_id=scenario.id)
+        user_score_rank = user_model.get_user_ranking(scenario.id).get(request.user.username, {})
+        best_score = user_score_rank.get('score', "-")
+        rank = user_score_rank.get('rank', "-")
         tries = user_model.get_num_tries(user=request.user.username, template_id=scenario.id)
         s_list.append({
             'name': scenario.name,
             'id': scenario.id,
             'tries': tries,
-            'best_score': best_score
+            'best_score': best_score,
+            'rank': rank
         })
     context = {'scenarios': s_list}
 
