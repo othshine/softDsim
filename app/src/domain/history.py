@@ -1,10 +1,11 @@
 from typing import Optional
+import time
 
 from mongo_models import ClickHistoryModel
 
 
 def write(history_id, data, index):
-    event = {'decision_index': index, 'user_opts': []}
+    event = {'decision_index': index, 'user_opts': [], 'timestamp': int(time.time())}
     for answer in data.get('button_rows', []):
         event['user_opts'].append({'title': answer.get('title'),
                                    'answers': [a.get('label') for a in answer.get('answers') if a.get('active')],

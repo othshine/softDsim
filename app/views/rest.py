@@ -64,6 +64,6 @@ def click_continue(request, sid):
         except StopIteration:
             context = {'done': True}
             user_model = UserMongoModel()
-            user_model.save_score(user=request.user.username, scenario=s, score=s.total_score())
+            user_model.save_score(user=request.user.username, scenario=s.template.id, score=s.total_score())
         model.update(s)
         return HttpResponse(json.dumps(context), content_type="application/json")
