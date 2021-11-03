@@ -138,7 +138,7 @@ class UserMongoModel(MongoConnection):
                  user.get(template_id, False)]
         users = sorted(users, key=lambda d: d['score'], reverse=True)
         for i in range(len(users)):
-            users[i]['rank'] = i+1
+            users[i]['rank'] = i + 1
         users = {e.get('username'): {'score': e.get('score'), 'rank': e.get('rank')} for e in users}
         return users
 

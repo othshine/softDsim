@@ -9,16 +9,33 @@ from app.forms import DecisionEditForm, ScenarioEditForm, ScenarioNameForm
 from app.src.domain.decision_tree import Decision
 from app.src.domain.history import History
 from app.src.domain.scenario import Scenario
-from mongo_models import ClickHistoryModel, ScenarioMongoModel, NoObjectWithIdException
+from mongo_models import ClickHistoryModel, ScenarioMongoModel, NoObjectWithIdException, UserMongoModel
 
 
-def review(request, hid):
-    print(hid)
-    model = ClickHistoryModel()
-    data = model.get(ObjectId(hid))
-    data = History(**data)
-    print(data)
-    return render(request, "app/instructor/review.html", {'history': data})
+def review(request, sid):
+    # Scenario
+    scenario_model = ScenarioMongoModel()
+    scenario = scenario_model.get(sid)
+
+    # History
+    history_model = ClickHistoryModel()
+    history = history_model.get(ObjectId(scenario.history_id))
+    history = History(**history)
+
+    # User
+    user_model = UserMongoModel()
+    ranking = user_model.get_user_ranking(scenario.template.id)
+    ranking = [ranking.get(u).get('score') for u in ranking]
+    ranking.sort()
+    i = 1
+    for score in ranking:
+        if score > scenario.total_score():
+            i += 1
+        else:
+            break
+
+    return render(request, "app/instructor/review.html",
+                  {'history': history, 'scenario': scenario, 'ranking': i, 'ranks': len(ranking) + 1})
 
 
 def instructor_(request):

@@ -46,6 +46,7 @@ class Event:
         self.motivation = kwargs.get('motivation')
         self.familiarity = kwargs.get('familiarity')
         self.stress = kwargs.get('stress')
+        self.timestamp = kwargs.get('timestamp')
         self.user_opts = [UserOption(**uo) for uo in kwargs.get('user_opts') or []]
         self.predecessor: Optional[Event] = None
 
@@ -104,6 +105,17 @@ class Event:
         else:
             return 0
 
+    @property
+    def time(self):
+        if self.predecessor:
+            return round((self.timestamp - self.predecessor.timestamp), 1)
+        else:
+            return 0
+
+    @property
+    def week(self):
+        return int(self.current_day / 5)
+
 
 class History:
     def __init__(self, **kwargs):
@@ -112,3 +124,6 @@ class History:
 
         for i in range(1, len(self.events)):
             self.events[i].set_predecessor(self.events[i - 1])
+
+    def total_time(self) -> int:
+        return self.events[-1].timestamp - self.events[0].timestamp
