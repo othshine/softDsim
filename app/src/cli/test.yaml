@@ -1,6 +1,6 @@
-name: Demo
+name: Demo IIA
 tasks_total: 1000
-budget: 200000
+budget: 150000
 scheduled_days: 50
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
 
@@ -38,7 +38,7 @@ decisions:
       - meeting-planner
       - quality-check
       - error-fixing
-      - salary-pick
+      - training
     text:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.

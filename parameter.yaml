@@ -58,6 +58,15 @@ actions:
         - Don't Perform
       active: 2
       hover: Perform a quality check to find unidentified errors. If you decide to perform a quality check, the team first tries to find errors before continuing with solving new tasks.
+    training:
+      title: Team Training hours
+      values:
+        - 0 hours
+        - 2 hours
+        - 4 hours
+        - 8 hours
+      active: 1
+      hover: Perform a team trainig to increase the team memebers' skill level ??? XXX
     error-fixing:
       title: Fix Errors
       values:

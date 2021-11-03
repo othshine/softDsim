@@ -146,7 +146,7 @@ button {
 }
 
 button:hover {
-    background-color: var(--blue);
+    background-color: rgba(99, 99, 99, 0.12);
 }
 
 button:disabled:hover {
@@ -155,13 +155,13 @@ button:disabled:hover {
 }
 
 button:active {
-    background-color: var(--neon);
-    color: white;
+    background-color: rgba(99, 99, 99, 0.12);
+    box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
 }
 
 button.active-button {
-    background-color: var(--neon);
-    color: white;
+    color: var(--neon);
+    font-weight: bold;
 }
 
 .button-row {
