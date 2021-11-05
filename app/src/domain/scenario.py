@@ -148,7 +148,6 @@ class UserScenario:
                     })
                     for i, team in enumerate(self.team.teams):
                         t = create_staff_row(team=team, title='Scrum Team')
-                        print(t)
                         json.append(t)
 
         return json
@@ -156,8 +155,8 @@ class UserScenario:
     def get_max_points(self) -> int:
         return sum([d.get_max_points() for d in self.decisions])
 
-    def work(self, days, meeting):
-        wp = WorkPackage(days=days, daily_meeting_hours=meeting, quality_check=self.perform_quality_check,
+    def work(self, days, meeting, training):
+        wp = WorkPackage(days=days, meeting_hours=meeting, training_hours=training, quality_check=self.perform_quality_check,
                          error_fixing=self.error_fixing, tasks=self.template.tasks_total - self.tasks_done,
                          unidentified_errors=self.errors, identified_errors=self.identified_errors,
                          total_tasks_done=self.tasks_done)
@@ -174,7 +173,6 @@ class UserScenario:
         self.errors += wr.unidentified_errors
         self.errors -= wr.identified_errors
 
-        print(self.errors)
 
     def get_id(self) -> str:
         return str(self.id)

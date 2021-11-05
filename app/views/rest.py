@@ -10,13 +10,14 @@ from app.src.domain.scenario import UserScenario
 from app.views.util import apply_changes
 from mongo_models import ScenarioMongoModel, UserMongoModel
 
+from utils import data_get, get_active_label
+
 
 @login_required
 @csrf_exempt
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
-    print(s.model, s.team)
     if not isinstance(s, UserScenario) or s.user != request.user.username:
         return HttpResponse(status=403)
 
@@ -29,7 +30,8 @@ def click_continue(request, sid):
         apply_changes(s, data)
         history.write(s.history_id, data, s.counter)
         if isinstance(s.get_decision(), SimulationDecision) and data.get('advance'):
-            s.work(5, int(data['meetings']))
+            training_hours = int(get_active_label(data_get(data['button_rows'], 'Team Training hours').get('answers', []))[0])
+            s.work(5, int(data['meetings']), training_hours)
         if s.counter >= 0:
             s.get_decision().eval(data)
         try:

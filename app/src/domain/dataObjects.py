@@ -4,7 +4,8 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class WorkPackage:
     days: int
-    daily_meeting_hours: int
+    meeting_hours: int
+    training_hours: int
     tasks: int
     unidentified_errors: int
     identified_errors: int
@@ -14,7 +15,7 @@ class WorkPackage:
 
     @property
     def daily_work_hours(self):
-        return 8 - self.daily_meeting_hours  # ToDo: support for overtime.
+        return 8 - self.meeting_hours  # ToDo: support for overtime.
 
 
 @dataclass(frozen=False)
