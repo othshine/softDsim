@@ -31,7 +31,7 @@
                 <td colspan="6">Date</td>
             </tr>
                 {%  for entry in user %}
-                <tr onclick="location.href='/review/{{ entry |dict_key:'scenario_id' }}'">
+                <tr onclick="location.href='/review/{{ entry |dict_key:'scenario_id' }}'" class="clickable">
                     <td colspan="6">{{ entry | dict_key:'score' }}</td>
                     <td colspan="6">{{ entry | dict_key:'time' | format_time }}</td>
                 </tr>

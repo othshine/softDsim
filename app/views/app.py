@@ -29,6 +29,7 @@ def index(request):
         })
     context = {'scenarios': s_list}
 
+
     return render(request, "app/index.html", context)
 
 

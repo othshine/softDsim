@@ -348,7 +348,13 @@ nav .row > div {
 
 
 
+tr.clickable:hover {
+    background-color: rgba(99, 99, 99, 0.12);
+}
 
+.clickable {
+    cursor: pointer;
+}
 
 
 

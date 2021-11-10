@@ -24,5 +24,6 @@ urlpatterns = [
     path('instructor/edit/<sid>', instructor.edit),
     path('instructor/add/decision/<sid>', instructor.add_decision),
     path('instructor/edit/<sid>/<nr>', instructor.edit_decision),
-    path('play/<sid>', rest.play)
+    path('play/<sid>', rest.play),
+    path('createusers', instructor.create_users),
 ]

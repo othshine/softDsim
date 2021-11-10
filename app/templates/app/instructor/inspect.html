@@ -85,7 +85,7 @@
                 </tr>
 
                     {% for rank in ranking %}
-                        <tr onclick="location.href+='/stud'">
+                        <tr onclick="location.href+='/{{ rank }}'" class="clickable">
                         <td colspan="6">{{ rank }}</td>
                         <td colspan="6">{{ ranking | dict_key:rank | dict_key:"score" }}</td>
                         </tr>

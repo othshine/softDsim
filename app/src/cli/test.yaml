@@ -1,7 +1,7 @@
-name: Demo IIL2
-tasks_total: 10000
-budget: 1500000
-scheduled_days: 300
+name: Mini Software Project
+tasks_total: 850
+budget: 250000
+scheduled_days: 90
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
 
 decisions:
@@ -10,24 +10,26 @@ decisions:
     - header: Welcome
       content: Here is something explained to the user.
     - header: Choose the fitting strategy
-      content: The project requirements were perfectly outlined by the customer. Nothing difficult. What Model to choose?
-    - header: The Product Life Cycle
-      content: While choosing the PM model it is a good idea to also think about the produt life cycle.
+      content: You were just promoted to be a project coordiantor. It is your job to make decisions on how this project will be executed.
+    - header: The Customer
+      content: The customer is a company that is looking for a new interactive website for their business. The customer doesnt have a lot of time to spend on the project, so you need to make sure that the project is executed in a timely manner. There are no tight restrictions on how exatly the website should be designed. It just needs to have a modern appearance and be easy to use. The customer wants to be included in the design process to make final decisons.
+    - header: Model and Product Life Cycle
+      content: While choosing the PM model it is also a good idea to also think about the produt life cycle.
     actions:
       - title: Model
         answers:
-          Waterfall: 100
-          Scrum: 0
-          Kanban: 0
+          Waterfall: 0
+          Scrum: 100
+          Kanban: 50
         typ: button
         required: True
         hover: Depending on the model you can adjust different settings later on in the simulation.
       - title: Product Life Cycle
         answers:
-          Agile: 0
-          Incremental: 50
-          Iterative: 50
-          Predictive: 100
+          Agile: 100
+          Incremental: 0
+          Iterative: 100
+          Predictive: 0
         typ: button
         required: True
   - name: Simulation
@@ -43,8 +45,8 @@ decisions:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.
       - header: Scope
-        content: 900 Tasks
+        content: 850 Tasks
       - header: Story
         content: You're ready to go. Start off the project by managing the team. Its all on you now.
     goal:
-      tasks: 10000
+      tasks: 850

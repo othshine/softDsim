@@ -40,3 +40,9 @@ class DecisionEditForm(forms.Form):
 class AnswerForm(forms.Form):
     text = forms.CharField(max_length=32)
     points = forms.IntegerField(min_value=0, max_value=1000)
+
+class UserAutomationForm(forms.Form):
+    number = forms.IntegerField(min_value=1, max_value=1000, required=True, label="Number of Users")
+    prefix = forms.CharField(max_length=16, required=False, label="Prefix")
+    suffix = forms.CharField(max_length=8, required=False, label="Suffix")
+    csv_separator = forms.CharField(max_length=1,  required=False, label="CSV Separator")

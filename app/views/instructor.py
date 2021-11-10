@@ -1,4 +1,5 @@
 import json
+import random
 
 from bson.objectid import ObjectId
 from django.contrib.admin.views.decorators import staff_member_required
@@ -6,13 +7,20 @@ from django.http.response import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from app.forms import DecisionEditForm, ScenarioEditForm, ScenarioNameForm
+from django.contrib.auth.models import User
+
+from app.forms import DecisionEditForm, ScenarioEditForm, ScenarioNameForm, UserAutomationForm
 from app.src.domain.ScenarioOverview import ScenarioOverview
 from app.src.domain.decision_tree import Decision
 from app.src.domain.history import History
 from app.src.domain.scenario import Scenario
 from mongo_models import ClickHistoryModel, ScenarioMongoModel, NoObjectWithIdException, UserMongoModel
 
+PREFIX = "sose_"
+SUFFIX = None
+CSV_SEPARATOR = ";"
+
+PASSWORD_LEN = 8
 
 @staff_member_required
 def review(request, sid):
@@ -195,3 +203,35 @@ def edit_decision(request, sid, nr):
         ]
     }
     return render(request, "app/instructor/instructor_edit.html", context)
+
+
+@csrf_exempt
+def create_users(request):
+    if request.method == 'POST':
+        form = UserAutomationForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            csv = ""
+            sep = CSV_SEPARATOR if data.get('csv_separator') == "" else data.get('csv_separator')
+            for i in range(int(data.get('number', 0))):
+                username = data.get('prefix', PREFIX) + f"{i+1:03d}"
+                if data.get('suffix'):
+                    username += data.get('suffix')
+                password = create_password()
+                User.objects.create_user(username=username, password=password)
+                csv += username + sep + password + "\n"
+
+            return HttpResponse(csv, content_type='text/csv')
+
+    context = {
+        'form': UserAutomationForm(),
+    }
+    return render(request, "app/instructor/user_creation.html", context)
+
+
+def create_password():
+    chars = 'qwertzuiopasdfghjkyxcvbnmQWERTZUPASDFGHJKLYXCVBNM123456789'
+    password = ''
+    for i in range(PASSWORD_LEN):
+        password += chars[random.randint(0, len(chars) - 1)]
+    return password

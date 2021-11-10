@@ -1,7 +1,20 @@
 {% extends 'app/base.html' %}
 
 
+
 {% block content %}
+
+    {% if request.user.is_staff  %}
+        <div class="row title-row">
+            <h1>Instructor Area</h1>
+        </div>
+
+        <div class="row" style="width: 50%; margin-right: auto; margin-left: auto">
+        <button onclick="location.href='/createusers'">Create Users</button>
+        <button onclick="location.href='/instructor'">Scenario Statistics</button>
+        </div>
+
+    {% endif %}
 
     <div class="half-box">
         <div class="row title-row">

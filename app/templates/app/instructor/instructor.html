@@ -23,7 +23,7 @@
 
 
             {% for overview in overviews %}
-            <table onclick="location.href='/instructor/{{ overview.scenario_id }}'">
+            <table onclick="location.href='/instructor/{{ overview.scenario_id }}'" class="clickable">
                 <tr>
                     <td colspan="12"><h2>{{ overview.scenario_name }}</h2></td>
                 </tr>
