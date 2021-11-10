@@ -37,8 +37,9 @@ def create_new(request, sid):
     model = ScenarioMongoModel()
     hist_model = ClickHistoryModel()
     user_model = UserMongoModel()
-    mid = model.create(sid, user=request.user.username, history_id=hist_model.new_hist())
-    user_model.initiate_scenario(user=request.user.username, scenario_id=sid)
+    hist_id = hist_model.new_hist()
+    mid = model.create(sid, user=request.user.username, history_id=hist_id)
+    user_model.initiate_scenario(user=request.user.username, scenario_template_id=sid, scenario_id=mid, history_id=hist_id)
     return redirect('/s/' + mid)
 
 

@@ -1,17 +1,20 @@
 import json
 
 from bson.objectid import ObjectId
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http.response import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 from app.forms import DecisionEditForm, ScenarioEditForm, ScenarioNameForm
+from app.src.domain.ScenarioOverview import ScenarioOverview
 from app.src.domain.decision_tree import Decision
 from app.src.domain.history import History
 from app.src.domain.scenario import Scenario
 from mongo_models import ClickHistoryModel, ScenarioMongoModel, NoObjectWithIdException, UserMongoModel
 
 
+@staff_member_required
 def review(request, sid):
     # Scenario
     scenario_model = ScenarioMongoModel()
@@ -37,15 +40,59 @@ def review(request, sid):
     return render(request, "app/instructor/review.html",
                   {'history': history, 'scenario': scenario, 'ranking': i, 'ranks': len(ranking) + 1})
 
-
+@staff_member_required
 def instructor_(request):
-    return render(request, "app/instructor/instructor.html")
+    overview = create_scenario_template_inspection_overview_all()
+    return render(request, "app/instructor/instructor.html", {'overviews': overview})
 
 
+def create_scenario_template_inspection_overview_all():
+    overview = []
+    model = ScenarioMongoModel()
+    for scenario in model.find_all_templates():
+        overview.append(create_scenario_template_inspection_overview(scenario))
+    return overview
+
+
+def create_scenario_template_inspection_overview(scenario):
+    user_model = UserMongoModel()
+    ranking = user_model.get_user_ranking(scenario.id)
+    ranking = [ranking.get(u).get('score') for u in ranking]
+    ranking.sort(reverse=True)
+    if len(ranking) == 0:
+        ranking.append(0)
+    return ScenarioOverview(scenario_id=scenario.id, scenario_name=scenario.name, best_score=ranking[0],
+                            score_median=ranking[int(len(ranking) / 2)],
+                            score_75=ranking[int(len(ranking) * 0.75)],
+                            score_90=ranking[int(len(ranking) * 0.9)], users=ranking[0:3], avg_time=10,
+                            total_tries=user_model.get_num_total_tries(scenario.id))
+
+
+def instructor_inspect(request, sid):
+    model = ScenarioMongoModel()
+    try:
+        overview = create_scenario_template_inspection_overview(model.get(sid))
+        user_model = UserMongoModel()
+        ranking = user_model.get_user_ranking(sid)
+        return render(request, "app/instructor/inspect.html", {'overview': overview, "ranking": ranking})
+    except NoObjectWithIdException:
+        return HttpResponseRedirect("/instructor")
+
+def inpect_user(request, sid, username):
+    history_model = UserMongoModel()
+    scenario_model = ScenarioMongoModel()
+    user = history_model.get_user_scorecard(user=username, template_id=sid)
+    name = scenario_model.get(sid).name
+    return render(request, "app/instructor/inspect_user.html", {"user": user, "name": name})
+
+def login(request):
+    return render(request, "app/instructor/login.html")
+
+@staff_member_required
 def instructor_search(request):
     return render(request, "app/instructor/search.html")
 
-
+@staff_member_required
 @csrf_exempt
 def scenarios(request):
     model = ScenarioMongoModel()
@@ -59,7 +106,7 @@ def scenarios(request):
         context = {'scenarios': [s.json for s in x]}
         return HttpResponse(json.dumps(context), content_type="application/json")
 
-
+@staff_member_required
 def scenario_search_result(request):
     return render(request, "app/instructor/search_result.html")
 
@@ -75,7 +122,7 @@ def get_scenario(request, sid):
             return HttpResponse(status=404)
     return HttpResponse(json.dumps(model.get(sid).json), content_type="application/json")
 
-
+@staff_member_required
 def add_scenario(request):
     if request.method == 'POST':
         form = ScenarioNameForm(request.POST)
@@ -96,7 +143,7 @@ def add_scenario(request):
     }
     return render(request, "app/instructor/instructor_edit.html", context)
 
-
+@staff_member_required
 def edit(request, sid):
     mongo = ScenarioMongoModel()
     s = mongo.get(sid)
@@ -121,7 +168,7 @@ def edit(request, sid):
     }
     return render(request, "app/instructor/instructor_edit.html", context)
 
-
+@staff_member_required
 def add_decision(request, sid):
     mongo = ScenarioMongoModel()
     s = mongo.get(sid)
@@ -130,7 +177,7 @@ def add_decision(request, sid):
     mongo.update(s)
     return HttpResponseRedirect("/instructor/edit/" + sid + "/" + str(nr))
 
-
+@staff_member_required
 def edit_decision(request, sid, nr):
     mongo = ScenarioMongoModel()
     d = mongo.get(sid).get_decision(int(nr))

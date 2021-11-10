@@ -5,7 +5,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Scenario Overview</title>
+    <title>Scenario Inspection</title>
     <link rel="stylesheet" href="{% static 'app/styles.css' %}">
     <link rel="stylesheet" href="{% static 'app/instructor/instructor.css' %}">
     <link rel="stylesheet" href="{% static 'app/instructor/review.css' %}">
@@ -14,16 +14,14 @@
 <body>
 <section>
     <div class="row">
-        <h1>SoftDSimulator Scenario Overview</h1>
+        <h1>SoftDSimulator Scenario Inspection</h1>
     </div>
     <div class="row">
         <div class="sm"></div>
         <div>
             <div class="row"></div>
 
-
-            {% for overview in overviews %}
-            <table onclick="location.href='/instructor/{{ overview.scenario_id }}'">
+            <table>
                 <tr>
                     <td colspan="12"><h2>{{ overview.scenario_name }}</h2></td>
                 </tr>
@@ -69,11 +67,36 @@
                 </tr>
             </table>
                 <div class="row"></div>
-            {% endfor %}
         </div>
         <div class="sm"></div>
     </div>
 
+</section>
+
+<section>
+    <div class="row">
+        <div class="sm"></div>
+        <div>
+            <div class="row"></div>
+
+            <table>
+                <tr>
+                    <td colspan="12"><h2>Ranking</h2></td>
+                </tr>
+
+                    {% for rank in ranking %}
+                        <tr onclick="location.href+='/stud'">
+                        <td colspan="6">{{ rank }}</td>
+                        <td colspan="6">{{ ranking | dict_key:rank | dict_key:"score" }}</td>
+                        </tr>
+                    {% endfor %}
+
+
+            </table>
+                <div class="row"></div>
+        </div>
+        <div class="sm"></div>
+    </div>
 </section>
 
 </body>

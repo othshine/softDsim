@@ -30,7 +30,10 @@ def click_continue(request, sid):
         apply_changes(s, data)
         history.write(s.history_id, data, s.counter)
         if isinstance(s.get_decision(), SimulationDecision) and data.get('advance'):
-            training_hours = int(get_active_label(data_get(data['button_rows'], 'Team Training hours').get('answers', []))[0])
+            try:
+                training_hours = int(get_active_label(data_get(data['button_rows'], 'Team Training hours').get('answers', []))[0])
+            except:
+                training_hours = 0
             s.work(5, int(data['meetings']), training_hours)
         if s.counter >= 0:
             s.get_decision().eval(data)
@@ -66,7 +69,7 @@ def click_continue(request, sid):
         except StopIteration:
             context = {'done': True}
             user_model = UserMongoModel()
-            user_model.save_score(user=request.user.username, scenario_id=s.template.id, score=s.total_score())
+            user_model.save_score(user=request.user.username, scenario_template_id=s.template.id, score=s.total_score(), scenario_id=s.id)
         model.update(s)
         return HttpResponse(json.dumps(context), content_type="application/json")
 
