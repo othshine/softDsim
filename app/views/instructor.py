@@ -71,9 +71,9 @@ def create_scenario_template_inspection_overview(scenario):
         ranking.append(0)
     return ScenarioOverview(scenario_id=scenario.id, scenario_name=scenario.name, best_score=ranking[0],
                             score_median=ranking[int(len(ranking) / 2)],
-                            score_75=ranking[int(len(ranking) * 0.75)],
-                            score_90=ranking[int(len(ranking) * 0.9)], users=ranking[0:3], avg_time=10,
-                            total_tries=user_model.get_num_total_tries(scenario.id))
+                            score_75=ranking[int(len(ranking) * 0.25)],
+                            score_90=ranking[int(len(ranking) * 0.1)], users=ranking[0:3], avg_time=10,
+                            total_tries=user_model.get_num_total_tries(scenario.id), total_users=len(ranking))
 
 
 def instructor_inspect(request, sid):

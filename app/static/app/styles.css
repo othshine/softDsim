@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap'); /* COLORS */
 :root {
-    --neon: #5863f8ff;
-    --blue: #90ddf0ff;
+    --neon: #1b98e0;
+    --blue: #8b85c1;
     --black: #22181cff;
-    --jet: #312f2fff;
-    --red: #d7263dff;
-    --light: #F0F0F0;
+    --jet: #2e3532;
+    --red: #8b2635;
+    --light: #E0E2DB;
 }
 
 /* ======== GENERAL  ======== */
@@ -356,8 +356,13 @@ tr.clickable:hover {
     cursor: pointer;
 }
 
+table.std-stripped tr:nth-child(even) > td {
+    background-color: rgba(99, 99, 99, 0.05);
+}
 
-
+.head {
+    background-color: var(--blue);
+}
 
 
 
