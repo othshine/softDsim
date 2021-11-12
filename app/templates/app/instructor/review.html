@@ -1,17 +1,14 @@
+{% extends 'app/base.html' %}
 {% load static %}
 {% load filters %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Playback</title>
-    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+
+{% block head %}
     <link rel="stylesheet" href="{% static 'app/instructor/instructor.css' %}">
     <link rel="stylesheet" href="{% static 'app/instructor/review.css' %}">
+{% endblock %}
 
-</head>
-<body>
+{% block content %}
 <section>
     <div class="row">
         <h1>SoftDSimulator Review</h1>
@@ -181,5 +178,4 @@
     </div>
 </section>
 
-</body>
-</html>
+{% endblock %}

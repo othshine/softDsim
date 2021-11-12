@@ -91,7 +91,7 @@ def inpect_user(request, sid, username):
     scenario_model = ScenarioMongoModel()
     user = history_model.get_user_scorecard(user=username, template_id=sid)
     name = scenario_model.get(sid).name
-    return render(request, "app/instructor/inspect_user.html", {"user": user, "name": name})
+    return render(request, "app/instructor/inspect_user.html", {"user_data": user, "name": name})
 
 def login(request):
     return render(request, "app/instructor/login.html")

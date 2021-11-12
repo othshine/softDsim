@@ -300,6 +300,7 @@ nav .logo {
     width: 20%;
     text-align: center;
     line-height: 90px;
+    cursor: pointer;
 }
 
 #nav-menu {

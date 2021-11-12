@@ -1,17 +1,13 @@
+{% extends 'app/base.html' %}
 {% load static %}
 {% load filters %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Scenario Overview</title>
-    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+{% block head %}
     <link rel="stylesheet" href="{% static 'app/instructor/instructor.css' %}">
     <link rel="stylesheet" href="{% static 'app/instructor/review.css' %}">
+{% endblock %}
+{% block content %}
 
-</head>
-<body>
 <section>
     <div class="row">
         <h1>SoftDSimulator Scenario Overview</h1>
@@ -76,5 +72,4 @@
 
 </section>
 
-</body>
-</html>
+{% endblock %}

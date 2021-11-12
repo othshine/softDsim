@@ -1,21 +1,16 @@
+{% extends 'app/base.html' %}
 {% load static %}
 {% load filters %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Scenario Inspection</title>
-    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+{% block head %}
     <link rel="stylesheet" href="{% static 'app/instructor/instructor.css' %}">
     <link rel="stylesheet" href="{% static 'app/instructor/review.css' %}">
 
-</head>
-<body>
+{% endblock %}
+{% block content %}
 <section>
     <div class="row">
         <h1>SoftDSimulator Scenario Inspection</h1>
-        <p>{{ user }}</p>
     </div>
     <div class="row">
         <div class="sm"></div>
@@ -30,7 +25,7 @@
                 <td colspan="6">Score</td>
                 <td colspan="6">Date</td>
             </tr>
-                {%  for entry in user %}
+                {%  for entry in user_data %}
                 <tr onclick="location.href='/review/{{ entry |dict_key:'scenario_id' }}'" class="clickable">
                     <td colspan="6">{{ entry | dict_key:'score' }}</td>
                     <td colspan="6">{{ entry | dict_key:'time' | format_time }}</td>
@@ -44,6 +39,4 @@
 
 </section>
 
-
-</body>
-</html>
+{% endblock %}
