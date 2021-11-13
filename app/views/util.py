@@ -26,12 +26,13 @@ def get_points(param, data):
 
 def apply_changes(s: UserScenario, data: dict):
     if staff := data_get(data['numeric_rows'], 'staff'):
-        print(staff)
         s.team.adjust(staff.get('values'))
     if staff := data_get(data['numeric_rows'], 'Scrum Management'):
         adjust_scrum_management(s, staff.get('values'))
+        # Scrum teams always do error checking:
+        s.perform_quality_check = True
+        s.error_fixing = True
     if isinstance(s.team, ScrumTeam):
-        print(data['numeric_rows'])
         s.team.adjust([t for t in data['numeric_rows'] if "scrum team" in t.get('title').lower()])
     if q := data_get(data['button_rows'], 'Quality Review'):
         if data_get(q['answers'], 'Perform', attr='label').get('active'):
@@ -44,7 +45,6 @@ def apply_changes(s: UserScenario, data: dict):
         funcs = {'model': set_model}
         if func := funcs.get(action.get('title').lower()):
             func(s, get_active_label(action.get('answers')))
-
 
 def set_model(s: UserScenario, model):
     s.model = model.lower()

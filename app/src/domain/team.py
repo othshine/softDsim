@@ -171,12 +171,15 @@ class Team:
         total_meeting_h = work_package.meeting_hours
         total_training_h = work_package.training_hours
         for day in range(work_package.days):
+            print(f"Day {day+1}")
             day_hours = 8
             if total_training_h > 0:
+                print(f"Training {total_training_h} hours.")
                 self.train(total_training_h)
                 day_hours -= total_training_h
                 total_training_h = 0
-            if total_meeting_h > 0 and nt > 0 and day_hours > 0:
+            if total_meeting_h > 0 and day_hours > 0:  # Removed 'and nt > 0'
+                print(f"Meeting {total_meeting_h} hours.")
                 if day_hours < total_meeting_h:
                     self.meeting(day_hours, nt, work_package.total_tasks_done)
                     total_meeting_h -= day_hours
@@ -184,12 +187,19 @@ class Team:
                 else:
                     self.meeting(total_meeting_h, nt, work_package.total_tasks_done)
                     day_hours -= total_meeting_h
-            print(f"Day {day}, {day_hours} for solving.")
+                    total_meeting_h = 0
+            print(f"Working {day_hours} hours.")
             nt, ne = self.solve_tasks(day_hours)
             t += nt
             e += ne
-            print(f"nt: {nt}")
-            print(f"t:  {t}")
+            print(f"{nt} tasks solved, {ne} errors.")
+            print(f"Day {day+1} is over")
+            print(f"Trainig left: {total_training_h}")
+            print(f"Meeting left: {total_meeting_h}")
+            print(f"Tasks left: {work_package.total_tasks_done - t}")
+            print(f"Tasks done: {t}")
+            print(f"Errors done: {e}")
+            print("-------------------------")
 
         wr.unidentified_errors += e
         if work_package.error_fixing:

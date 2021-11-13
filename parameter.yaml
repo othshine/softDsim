@@ -58,6 +58,10 @@ actions:
         - Don't Perform
       active: 2
       hover: Perform a quality check to find unidentified errors. If you decide to perform a quality check, the team first tries to find errors before continuing with solving new tasks.
+      restrictions:
+        model-pick:
+          - Waterfall
+          - Kanban
     training:
       title: Team Training hours
       values:
@@ -74,6 +78,10 @@ actions:
         - Don't Perform
       active: 2
       hover: The team will prioritize fixing errors before continuing solving new tasks, to fix errors they first have to be identified (Quality Review).
+      restrictions:
+        model-pick:
+          - Waterfall
+          - Kanban
   numeric-rows:
     staff-pick:
       title: Staff

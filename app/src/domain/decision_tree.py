@@ -1,6 +1,6 @@
 from abc import ABC
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from bson import ObjectId
 
@@ -62,16 +62,17 @@ class Decision(ABC):
             self.text = [t]
 
 
+
 class AnsweredDecision(Decision):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.actions: List[Action] = [Action(**a) for a in kwargs.get('actions', []) or []]
 
-    def add_button_action(self, title, answers, id=None, required=False, hover=""):
+    def add_button_action(self, title, answers, id=None, required=False, hover="", restrictions=None):
         if id is None:
             id = str(ObjectId())
         self.actions.append(
-            Action(id=id, title=title, typ='button', active=True, answers=answers, required=required, hover=hover))
+            Action(id=id, title=title, typ='button', active=True, answers=answers, required=required, hover=hover, restrictions=restrictions))
 
     @property
     def json(self):
@@ -110,7 +111,8 @@ class SimulationDecision(Decision):
 
 
 class Action:
-    def __init__(self, id, title: str, typ: str, active: bool = False, answers=None, required=False, hover=""):
+    def __init__(self, id, title: str, typ: str, active: bool = False, answers=None, required=False, hover="",
+                 restrictions=None):
         self.id = id
         self.title = title
         self.typ = typ
@@ -118,6 +120,7 @@ class Action:
         self.hover = hover
         self.answers: List[Answer] = []
         self.required: bool = required
+        self.restrictions: Dict[str:List[str]] = restrictions
         if answers:
             for answer in answers:
                 self.answers.append(Answer(**answer))
@@ -130,7 +133,7 @@ class Action:
     @property
     def full_json(self):
         return {**self.json, 'id': self.id, 'typ': self.typ, 'answers': [a.json for a in self.answers],
-                'required': self.required, 'hover': self.hover}
+                'required': self.required, 'hover': self.hover, 'restrictions' : self.restrictions}
 
     def format_answers(self):
         ans = []
@@ -150,12 +153,19 @@ class Action:
                 return answer.points
         return 0
 
+    def get_restrictions(self):
+        if self.restrictions:
+            print(f"Restrictions for {self.title} are {self.restrictions}")
+            return self.restrictions
+        return {}
+
 
 class ActionList:
     def __init__(self, json=None):
         self.actions: List[Action] = []
         if json:
             for action in json:
+                print(action)
                 self.actions.append(Action(**action))
 
     @property
@@ -172,9 +182,9 @@ class ActionList:
         for id in YAMLReader.read('actions', 'button-rows'):
             if id not in [x.id for x in self.actions]:
                 data = YAMLReader.read('actions', 'button-rows', id)
-                a = Action(id, data.get('title'), 'button', hover=data.get('hover'))
+                a = Action(id, data.get('title'), 'button', hover=data.get('hover'), restrictions=data.get('restrictions'))
                 for i, label in enumerate(data.get('values')):
-                    a.answers.append(Answer(label, i+1 == (data.get('active'))))
+                    a.answers.append(Answer(label, i + 1 == (data.get('active'))))
                 self.actions.append(a)
 
     def adjust(self, data):

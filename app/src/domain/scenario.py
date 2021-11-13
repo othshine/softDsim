@@ -121,7 +121,7 @@ class UserScenario:
         d = self.decisions[self.counter]
         if isinstance(d, SimulationDecision):
             for a in d.active_actions or []:
-                if (action := self.actions.get(a)) is not None:
+                if (action := self.actions.get(a)) is not None and self.action_is_applicable(action):
                     json.append(action.json)
         else:
             for action in d.actions or []:
@@ -156,7 +156,8 @@ class UserScenario:
         return sum([d.get_max_points() for d in self.decisions])
 
     def work(self, days, meeting, training):
-        wp = WorkPackage(days=days, meeting_hours=meeting, training_hours=training, quality_check=self.perform_quality_check,
+        wp = WorkPackage(days=days, meeting_hours=meeting, training_hours=training,
+                         quality_check=self.perform_quality_check,
                          error_fixing=self.error_fixing, tasks=self.template.tasks_total - self.tasks_done,
                          unidentified_errors=self.errors, identified_errors=self.identified_errors,
                          total_tasks_done=self.tasks_done)
@@ -172,7 +173,6 @@ class UserScenario:
         self.identified_errors -= wr.fixed_errors
         self.errors += wr.unidentified_errors
         self.errors -= wr.identified_errors
-
 
     def get_id(self) -> str:
         return str(self.id)
@@ -218,3 +218,11 @@ class UserScenario:
 
     def quality_score(self) -> int:
         return quality(self.tasks_done, self.errors)
+
+    def action_is_applicable(self, action):
+        """Returns True if an action is applicable. Actions can have restrictions, e.g. model must be scrum or kanban.
+        This function checks whether the action's restrictions are applicable in this scenario."""
+        applicable = True
+        if self.model.lower() not in [x.lower() for x in action.get_restrictions().get('model-pick', [self.model])]:
+            applicable = False
+        return applicable
