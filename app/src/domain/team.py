@@ -20,16 +20,17 @@ def inc(x: float, factor: float = 1.0):
     Increase function for increasing member values (xp, motivation, familiarity). Currently just adds 0.1 with a
     limit of 1. :param x: current value  :return: float - x + 0.1
     """
-    return min([x + (0.01*factor), 1.0])  # ToDo: Find a fitting function that approaches 1
+    return min([x + (0.01 * factor), 1.0])  # ToDo: Find a fitting function that approaches 1
 
 
 class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
-                 familiarity: float = 0., id=None):
+                 familiarity: float = 0.1, familiar_tasks=0, id=None):
         self.skill_type = SkillType(skill_type)
         self.xp_factor = value_or_error(xp_factor, upper=float('inf'))
         self.motivation = value_or_error(motivation)  # ToDo: Calculate Motivation.
         self.familiarity = value_or_error(familiarity)
+        self.familiar_tasks = int(value_or_error(familiar_tasks, upper=float('inf')))
         self.halted = False
         self.id = ObjectId() if id is None else ObjectId(id) if isinstance(id, str) else id
 
@@ -45,6 +46,7 @@ class Member:
             'xp': self.xp_factor,
             'motivation': self.motivation,
             'familiarity': self.familiarity,
+            'familiar-tasks': self.familiar_tasks,
             'halted': self.halted,
             '_id': str(self.id)
         }
@@ -57,7 +59,7 @@ class Member:
         """
         return (self.skill_type.throughput + self.xp_factor) * mean([self.motivation, self.familiarity])
 
-    def solve_tasks(self, time: float, coeff=TASK_COMPLETION_COEF, team_efficiency:float=1.0) -> (int, int):
+    def solve_tasks(self, time: float, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
         """
         Simulates a member solving tasks for <time> hours.
         :param time: Number of hours.
@@ -68,9 +70,12 @@ class Member:
         number_tasks = 0
         number_tasks_with_unidentified_errors = 0
         for _ in range(round(time)):
-            number_tasks += probability(self.efficiency * team_efficiency * coeff)
+            p = probability(self.efficiency * team_efficiency * coeff)
+            print(f'Probability of success: {p}')
+            number_tasks += p
         for _ in range(number_tasks):
             number_tasks_with_unidentified_errors += probability(self.skill_type.error_rate)
+        self.familiar_tasks += number_tasks
         return number_tasks, number_tasks_with_unidentified_errors
 
     def train(self, hours=1):
@@ -78,7 +83,7 @@ class Member:
         Training a member increases it's xp factor.
         :return: float - new xp factor value
         """
-        self.xp_factor += (hours*TRAIN_SKILL_INCREASE_AMOUNT)
+        self.xp_factor += (hours * TRAIN_SKILL_INCREASE_AMOUNT)
         return self.xp_factor
 
     def halt(self):
@@ -92,8 +97,11 @@ class Member:
     def get_id(self) -> ObjectId:
         return self.id
 
-    def update_familiarity(self, new_familiarity, w):
-        self.familiarity = weighted((self.familiarity, w), (new_familiarity, 1))
+    def update_familiarity(self, total_tasks_done):
+        if self.familiar_tasks == 0 or total_tasks_done == 0:
+            self.familiarity = 0
+        else:
+            self.familiarity = self.familiar_tasks / total_tasks_done
 
 
 class Team:
@@ -171,32 +179,33 @@ class Team:
         total_meeting_h = work_package.meeting_hours
         total_training_h = work_package.training_hours
         for day in range(work_package.days):
-            print(f"Day {day+1}")
+            print(f"Day {day + 1}")
             day_hours = 8
             if total_training_h > 0:
                 print(f"Training {total_training_h} hours.")
                 self.train(total_training_h)
                 day_hours -= total_training_h
                 total_training_h = 0
-            if total_meeting_h > 0 and day_hours > 0:  # Removed 'and nt > 0'
+            if total_meeting_h > 0 and day_hours > 0 and nt > 0:
                 print(f"Meeting {total_meeting_h} hours.")
                 if day_hours < total_meeting_h:
-                    self.meeting(day_hours, nt, work_package.total_tasks_done)
+                    self.meeting(day_hours, t+work_package.total_tasks_done)
                     total_meeting_h -= day_hours
                     day_hours = 0
-                else:
-                    self.meeting(total_meeting_h, nt, work_package.total_tasks_done)
+                elif total_meeting_h > 0:
+                    self.meeting(total_meeting_h, t+work_package.total_tasks_done)
                     day_hours -= total_meeting_h
                     total_meeting_h = 0
             print(f"Working {day_hours} hours.")
             nt, ne = self.solve_tasks(day_hours)
             t += nt
             e += ne
-            print(f"{nt} tasks solved, {ne} errors.")
-            print(f"Day {day+1} is over")
-            print(f"Trainig left: {total_training_h}")
+            for member in self.staff:
+                member.update_familiarity(work_package.total_tasks_done+t)
+            print(f"Today: {nt} tasks solved, {ne} errors done.")
+            print(f"Day {day + 1} is over")
+            print(f"Training left: {total_training_h}")
             print(f"Meeting left: {total_meeting_h}")
-            print(f"Tasks left: {work_package.total_tasks_done - t}")
             print(f"Tasks done: {t}")
             print(f"Errors done: {e}")
             print("-------------------------")
@@ -225,20 +234,16 @@ class Team:
 
         return wr
 
-    def meeting(self, time, new_tasks, tasks_done):
+    def meeting(self, time, total_tasks_done):
         """
-        A meeting increases every members familiarity.
+        A meeting increases the number of familiar tasks for every member.
         :return: None
         """
-
-        if new_tasks == 0:
-            daily_familiarity = 1
-        else:
-            daily_familiarity = min((TASKS_PER_MEETING * time) / new_tasks, 1)
-
         for member in self.staff:
-            if not member.halted:
-                member.update_familiarity(daily_familiarity, int(tasks_done / DONE_TASKS_FAMILIARITY_IMPACT_FACTOR))
+            missing = total_tasks_done - member.familiar_tasks
+            new_familiar_tasks = min((TASKS_PER_MEETING * time), missing)
+            member.familiar_tasks += new_familiar_tasks
+
 
     def get_member(self, _id: ObjectId) -> Member:
         for m in self.staff:
@@ -276,12 +281,12 @@ class Team:
     def num_communication_channels(self):
         """Returns number of communication channels."""
         n = len(self.staff)
-        return (n*(n-1))/2
+        return (n * (n - 1)) / 2
 
     def efficiency(self):
         """Returns the team's efficiency. Which increases as the number of communication channels grows."""
         c = self.num_communication_channels
-        return 1/(1+(c/20-0.05))
+        return 1 / (1 + (c / 20 - 0.05))
 
     def train(self, total_training_h):
         for member in self.staff:

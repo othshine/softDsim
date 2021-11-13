@@ -11,7 +11,7 @@ def parse_team(t):
     team = Team(i)
     for m in t.get('staff'):
         member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
-                        familiarity=m.get('familiarity'), id=m.get('_id'))
+                        familiarity=m.get('familiarity'), familiar_tasks=m.get('familiar-tasks', 0), id=m.get('_id'))
         if m.get('halted'):
             member.halt()
         team += member

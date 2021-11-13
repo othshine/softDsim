@@ -3,7 +3,7 @@ skill-levels:
   junior:
     salary: 3000
     error-rate: 0.33
-    throughput: 3
+    throughput: 4
   senior:
     salary: 4500
     error-rate: 0.2
