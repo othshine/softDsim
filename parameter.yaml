@@ -22,9 +22,9 @@ manager:
     salary: 7000
 
 # Coefficients
-task-completion-coefficient: 0.5
+task-completion-coefficient: 0.4
 error-completion-coefficient: 0.3
-tasks-per-meeting-coefficient: 10 # Describes how many tasks can be discussed in a meeting, the higher this coeff is, the more meetings are required to maintain a high familiarity.
+tasks-per-meeting-coefficient: 50 # Describes how many tasks can be discussed in a meeting, the higher this coeff is, the less meetings are required to maintain a high familiarity.
 done-tasks-familiarity-impact-factor: 10 # Describes how high the impact of the number of done tasks is on the update of the familiarity. The lower its is the higher the impact.
 train-skill-increase-amount: 0.1 # Describes how much the skill level of the trainee increases when the trainee is trained for one hour.
 

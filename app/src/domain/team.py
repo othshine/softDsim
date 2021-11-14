@@ -8,6 +8,8 @@ from bson import ObjectId
 from app.src.domain.dataObjects import WorkPackage, WorkResult
 from utils import YAMLReader, value_or_error, probability, weighted
 
+from scipy.stats import poisson
+
 TASK_COMPLETION_COEF = YAMLReader.read('task-completion-coefficient')
 ERR_COMPLETION_COEF = YAMLReader.read('error-completion-coefficient')
 TASKS_PER_MEETING = YAMLReader.read('tasks-per-meeting-coefficient')
@@ -54,10 +56,10 @@ class Member:
     @property
     def efficiency(self) -> float:
         """
-        Efficiency of a Member. Throughput (of SkillType) * Mean of xp, motivation and familiarity.
+        Efficiency of a Member. Mean of motivation and familiarity and 1 - stress.
         :return: float
         """
-        return (self.skill_type.throughput + self.xp_factor) * mean([self.motivation, self.familiarity])
+        return mean([self.motivation, self.familiarity])
 
     def solve_tasks(self, time: float, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
         """
@@ -66,15 +68,11 @@ class Member:
         :return: Tuple of (Number of tasks solved, Number of these tasks that have errors)
         """
         if self.halted:
-            raise MemberIsHalted
-        number_tasks = 0
-        number_tasks_with_unidentified_errors = 0
-        for _ in range(round(time)):
-            p = probability(self.efficiency * team_efficiency * coeff)
-            print(f'Probability of success: {p}')
-            number_tasks += p
-        for _ in range(number_tasks):
-            number_tasks_with_unidentified_errors += probability(self.skill_type.error_rate)
+            raise MemberIsHalted()
+        mu = time * mean([self.efficiency, team_efficiency]) * (self.skill_type.throughput + self.xp_factor) * coeff
+        number_tasks = poisson.rvs(mu)
+        mu_error = number_tasks * self.skill_type.error_rate
+        number_tasks_with_unidentified_errors = min(poisson.rvs(mu_error), number_tasks)
         self.familiar_tasks += number_tasks
         return number_tasks, number_tasks_with_unidentified_errors
 
