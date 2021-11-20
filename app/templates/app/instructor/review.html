@@ -10,9 +10,14 @@
 
 {% block content %}
 <section>
-    <div class="row">
-        <h1>SoftDSimulator Review</h1>
+    <div class="row section-header">
+        <h1>Review</h1>
+        <ul>
+            <li>User: {{ scenario.user }}</li>
+            <li>Scenario: {{ scenario.template.name }}</li>
+        </ul>
     </div>
+<div class="row"></div>
     <div class="row">
         <div class="sm"></div>
         <table class="std-stripped">
@@ -120,19 +125,19 @@
                     </tr>
                     <tr>
                         <td colspan="3" class="title">Stress</td>
-                        <td colspan="3" class="value">{{ event.stress | round }}% ({{ event.d_stress | round }})</td>
+                        <td colspan="3" class="value">{{ event.stress | round }}% (<a class="{{ event.d_stress | css_color_class }}">{{ event.d_stress | round }}</a>)</td>
                         <td colspan="3" class="title">Cost</td>
                         <td colspan="3" class="value">{{ event.cost }}</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="title">Motivation</td>
-                        <td colspan="3" class="value">{{ event.motivation | round }}% ({{ event.d_motivation }})</td>
+                        <td colspan="3" class="value">{{ event.motivation | round }}% (<a class="{{ event.d_motivation | css_color_class }}">{{ event.d_motivation }}</a>)</td>
                         <td colspan="3" class="title">Tasks Done</td>
-                        <td colspan="3" class="value">{{ event.tasks_done }} ({{ event.d_tasks_done }})</td>
+                        <td colspan="3" class="value">{{ event.tasks_done }} (<a class="{{ event.d_tasks_done | css_color_class }}">{{ event.d_tasks_done }}</a>)</td>
                     </tr>
                     <tr>
                         <td colspan="3" class="title">Familiarity</td>
-                        <td colspan="3" class="value">{{ event.familiarity | round }}% ({{ event.d_familiarity|round }}%)</td>
+                        <td colspan="3" class="value">{{ event.familiarity | round }}% (<a class="{{ event.d_familiarity | css_color_class }}">{{ event.d_familiarity|round }}%</a>)</td>
                         <td colspan="3" class="title">Total Tasks</td>
                         <td colspan="3" class="value">{{ event.tasks_total }} </td>
                     </tr>
@@ -160,7 +165,7 @@
                                 <tr>
                                     <td colspan="6" class="title">{{ key | title }}</td>
                                     <td colspan="6" class="value">{{ opt.values|dict_key:key }}
-                                        ({{ opt.d_values|dict_key:key }})
+                                        (<a class="{{ opt.d_values|css_color_class_from_dict:key}}">{{ opt.d_values|dict_key:key }}</a>)
                                     </td>
                                 </tr>
                             {% endfor %}

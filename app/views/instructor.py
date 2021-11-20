@@ -22,6 +22,7 @@ CSV_SEPARATOR = ";"
 
 PASSWORD_LEN = 8
 
+
 @staff_member_required
 def review(request, sid):
     # Scenario
@@ -47,6 +48,7 @@ def review(request, sid):
 
     return render(request, "app/instructor/review.html",
                   {'history': history, 'scenario': scenario, 'ranking': i, 'ranks': len(ranking) + 1})
+
 
 @staff_member_required
 def instructor_(request):
@@ -76,6 +78,7 @@ def create_scenario_template_inspection_overview(scenario):
                             total_tries=user_model.get_num_total_tries(scenario.id), total_users=len(ranking))
 
 
+@staff_member_required
 def instructor_inspect(request, sid):
     model = ScenarioMongoModel()
     try:
@@ -86,19 +89,24 @@ def instructor_inspect(request, sid):
     except NoObjectWithIdException:
         return HttpResponseRedirect("/instructor")
 
+
+@staff_member_required
 def inpect_user(request, sid, username):
     history_model = UserMongoModel()
     scenario_model = ScenarioMongoModel()
-    user = history_model.get_user_scorecard(user=username, template_id=sid)
+    user_score_data = history_model.get_user_scorecard(user=username, template_id=sid)
     name = scenario_model.get(sid).name
-    return render(request, "app/instructor/inspect_user.html", {"user_data": user, "name": name})
+    return render(request, "app/instructor/inspect_user.html", {"user_data": user_score_data, "name": name, "username": username, "tries": len(user_score_data)})
+
 
 def login(request):
     return render(request, "app/instructor/login.html")
 
+
 @staff_member_required
 def instructor_search(request):
     return render(request, "app/instructor/search.html")
+
 
 @staff_member_required
 @csrf_exempt
@@ -113,6 +121,7 @@ def scenarios(request):
         x = model.find_all_templates()
         context = {'scenarios': [s.json for s in x]}
         return HttpResponse(json.dumps(context), content_type="application/json")
+
 
 @staff_member_required
 def scenario_search_result(request):
@@ -129,6 +138,7 @@ def get_scenario(request, sid):
         except NoObjectWithIdException:
             return HttpResponse(status=404)
     return HttpResponse(json.dumps(model.get(sid).json), content_type="application/json")
+
 
 @staff_member_required
 def add_scenario(request):
@@ -150,6 +160,7 @@ def add_scenario(request):
         ]
     }
     return render(request, "app/instructor/instructor_edit.html", context)
+
 
 @staff_member_required
 def edit(request, sid):
@@ -176,6 +187,7 @@ def edit(request, sid):
     }
     return render(request, "app/instructor/instructor_edit.html", context)
 
+
 @staff_member_required
 def add_decision(request, sid):
     mongo = ScenarioMongoModel()
@@ -184,6 +196,7 @@ def add_decision(request, sid):
     s.add(Decision())
     mongo.update(s)
     return HttpResponseRedirect("/instructor/edit/" + sid + "/" + str(nr))
+
 
 @staff_member_required
 def edit_decision(request, sid, nr):
@@ -214,7 +227,7 @@ def create_users(request):
             csv = ""
             sep = CSV_SEPARATOR if data.get('csv_separator') == "" else data.get('csv_separator')
             for i in range(int(data.get('number', 0))):
-                username = data.get('prefix', PREFIX) + f"{i+1:03d}"
+                username = data.get('prefix', PREFIX) + f"{i + 1:03d}"
                 if data.get('suffix'):
                     username += data.get('suffix')
                 password = create_password()

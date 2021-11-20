@@ -5,6 +5,9 @@ from mongo_models import ClickHistoryModel
 
 
 def write(history_id, data, index):
+    print("XXXXXX")
+    print(data)
+    print("XXXXXX")
     event = {'decision_index': index, 'user_opts': [], 'timestamp': int(time.time())}
     for answer in data.get('button_rows', []):
         event['user_opts'].append({'title': answer.get('title'),

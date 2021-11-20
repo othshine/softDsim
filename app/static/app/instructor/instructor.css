@@ -12,23 +12,10 @@
     border: 1px solid var(--black);
 }
 
-.row{
-    width: 100%;
-    min-height: 3rem;
-    text-align: center;
-}
-
-.row > * {
-    width: 100%;
-}
-
-h1 {
-    font-size: 3rem;
-}
 
 input {
     height: 2rem;
-    width: 100%;
+    width: 33%;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
 }

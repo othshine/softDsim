@@ -4,13 +4,13 @@
 {% block nav-content %}
     <div class="row">
     <div id="task-container" class="row-container">
-        <button>Tasks: [[ tasks_done ]] / [[ tasks_total ]]
+        <button class="unclickable">Tasks: [[ tasks_done ]] / [[ tasks_total ]]
             <template v-if="current_workday"></template>
             (+[[ current_workday.tasks ]])
         </button>
     </div>
     <div class="row-container">
-        <button>Monthly Expenditure: [[ cost | toCurrency ]]</button>
+        <button class="unclickable">Monthly Expenditure: [[ cost | toCurrency ]]</button>
     </div>
 {% endblock %}
 

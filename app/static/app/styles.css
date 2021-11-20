@@ -1,11 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap'); /* COLORS */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* COLORS */
 :root {
     --neon: #1b98e0;
     --blue: #8b85c1;
     --black: #22181cff;
     --jet: #2e3532;
     --red: #8b2635;
+    --green: green;
     --light: #E0E2DB;
+    --bg-light: #E0E2DB;
 }
 
 /* ======== GENERAL  ======== */
@@ -112,7 +116,7 @@ table {
 }
 
 .main-division-third:nth-child(2n) {
-    background-color: #F0F0F0
+    background-color: var(--bg-light)
 }
 
 .main-division-third > .division-title {
@@ -146,7 +150,8 @@ button {
 }
 
 button:hover {
-    background-color: rgba(99, 99, 99, 0.12);
+    background-color: var(--bg-light);
+    border: 1px solid var(--neon);
 }
 
 button:disabled:hover {
@@ -188,6 +193,14 @@ button.active-button {
     background-color: var(--red);
     color: white;
     font-weight: bold;
+}
+
+button.unclickable, button.unclickable:hover, button.unclickable:active {
+    cursor: default;
+    background-color: var(--light);
+    color: var(--jet);
+    box-shadow: none;
+    border: none;
 }
 
 /* Charts */
@@ -283,7 +296,7 @@ nav {
     display: block;
     width: 100%;
     height: 100px;
-    background-color: #F0F0F0;
+    background-color: var(--bg-light);
     border-bottom: 1px solid var(--jet);
     text-align: right;
     position: relative;
@@ -326,14 +339,19 @@ nav .logo {
     color: var(--neon);
 }
 
-.row {
+.row{
     width: 100%;
+    min-height: 3rem;
+    text-align: center;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    text-align: center;
     border: 0;
+}
+
+.row > * {
+    width: 100%;
 }
 
 nav .row > div {
@@ -366,26 +384,38 @@ table.std-stripped tr:nth-child(even) > td {
 }
 
 
+.button-bar > button {
+    width: 100%;
+    max-width: 10rem;
+    height: 2rem;
+    border-radius: 0.1rem;
+    margin-bottom: 0.1rem;
+}
 
 
+.section-header {
+    border-bottom: 1px solid var(--jet);
+    font-weight: normal;
+}
 
 
+.section-header > ul {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.section-header > ul > li {
+  margin: 1rem;
+}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.positive {
+    color: var(--green);
+}
+.negative {
+    color: var(--red);
+}
 
 
 
