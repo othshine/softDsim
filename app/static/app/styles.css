@@ -9,6 +9,14 @@
     --red: #8b2635;
     --green: green;
     --light: #E0E2DB;
+    --light-s2: #C9CBC5;
+    --light-s3: #B3B4AF;
+    --light-s4: #9C9E99;
+    --light-s5: #868783;
+    --light-s6: #70716D;
+    --light-s7: #595A57;
+    --light-s8: #434341;
+    --light-s9: #2C2D2B;
     --bg-light: #E0E2DB;
 }
 
@@ -150,18 +158,21 @@ button {
 }
 
 button:hover {
-    background-color: var(--bg-light);
-    border: 1px solid var(--neon);
+    border: none;
+    color: var(--neon)
 }
 
 button:disabled:hover {
+    border: none;
     background-color: var(--light);
     cursor: not-allowed;
+    color: var(--red)
 }
 
 button:active {
-    background-color: rgba(99, 99, 99, 0.12);
-    box-shadow: rgb(204, 219, 232) 3px 3px 6px 0px inset, rgba(255, 255, 255, 0.5) -3px -3px 6px 1px inset;
+    border: none;
+    background-color: var(--light-s2);
+    box-shadow: var(--light-s4) 3px 3px 6px 0px inset, var(--light-s2) -3px -3px 6px 1px inset;
 }
 
 button.active-button {
