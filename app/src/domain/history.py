@@ -5,9 +5,6 @@ from mongo_models import ClickHistoryModel
 
 
 def write(history_id, data, index):
-    print("XXXXXX")
-    print(data)
-    print("XXXXXX")
     event = {'decision_index': index, 'user_opts': [], 'timestamp': int(time.time())}
     for answer in data.get('button_rows', []):
         event['user_opts'].append({'title': answer.get('title'),
@@ -35,6 +32,7 @@ class UserOption:
         self.answers = kwargs.get('answers')
         self.values = kwargs.get('values')
         self.d_values = {}
+        self.changed = False
 
 
 class Event:
@@ -60,9 +58,11 @@ class Event:
             ou = self.user_opts[i]
             try:
                 prou = pre.user_opts[i]
-
-                for key in ou.values:
-                    ou.d_values[key] = ou.values.get(key) - prou.values.get(key)
+                if ou.values:
+                    for key in ou.values:
+                        ou.d_values[key] = ou.values.get(key) - prou.values.get(key)
+                elif ou.answers:
+                    ou.changed = not all([a in prou.answers for a in ou.answers])
             except:
                 pass
 
@@ -118,6 +118,7 @@ class Event:
     @property
     def week(self):
         return int(self.current_day / 5)
+
 
 
 class History:

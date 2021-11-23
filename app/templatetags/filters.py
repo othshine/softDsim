@@ -64,3 +64,11 @@ def css_color_class(value):
 def css_color_class_from_dict(d, k):
     """Returns a CSS class name for a given dict and key."""
     return css_color_class(d.get(k))
+
+
+@register.filter('bold_if_true')
+def bold_if_true(value):
+    """Returns a bolded string for a given boolean value."""
+    if value == True:
+        return "bold"
+    return ""

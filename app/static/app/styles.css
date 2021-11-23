@@ -417,5 +417,6 @@ table.std-stripped tr:nth-child(even) > td {
     color: var(--red);
 }
 
-
-
+.bold {
+    font-weight: bold;
+}

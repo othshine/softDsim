@@ -151,7 +151,7 @@
                                 <td colspan="6" class="title">
                                     {{ opt.title }}
                                 </td>
-                                <td colspan="6" class="value">
+                                <td colspan="6" class="value {{ opt.changed | bold_if_true }}">
                                     {% for a in opt.answers %}
                                         {{ a }}
                                     {% endfor %}
@@ -177,6 +177,10 @@
 
                 </table>
                 <div class="row"></div>
+                <div class="row">{{ event.user_opts.pop.values }}</div>
+                <div class="row">{{ event.user_opts.pop.answers }}</div>
+                <div class="row"></div>
+
             {% endfor %}
         </div>
         <div class="sm"></div>
