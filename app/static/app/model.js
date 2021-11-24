@@ -22,7 +22,7 @@ async function cont() {
         }
     );
 
-    if (response.status == 403){
+    if (response.status === 403){
         alert("This is not a valid scenario id")
     }
     const data = await response.json();
@@ -41,4 +41,8 @@ async function cont() {
         }
     }
     set_continue_button()
+}
+
+async function endScenario(){
+
 }

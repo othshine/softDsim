@@ -11,7 +11,7 @@
             {% csrf_token %}
         <div class="half-box spaced">
             {% for field in login_form %}
-                <div class="row">
+                <div class="row" id="login-container">
                     {{ field.label }}
                     {{ field }}
                 </div>
