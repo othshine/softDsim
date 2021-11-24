@@ -13,11 +13,13 @@ def make():
     YAMLReader = _YAMLReader('test.yaml')
     data = YAMLReader.read()
     s = Scenario(name=data.get('name', "DefaultName"),
-                 tasks_total=data.get('tasks_total', 0),
                  budget=data.get('budget', 10000),
                  desc=data.get('desc', ''),
                  scheduled_days=data.get('scheduled_days', 100),
-                 id=ObjectId()
+                 id=ObjectId(),
+                 tasks_easy=data.get('tasks_easy', 0),
+                 tasks_medium=data.get('tasks_medium', 0),
+                 tasks_hard=data.get('tasks_hard', 0),
                  )
     for decision in data.get('decisions', []):
         kwargs = {}

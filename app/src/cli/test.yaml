@@ -1,5 +1,7 @@
-name: 100-week-challenge
-tasks_total: 10000
+name: New Tasks
+tasks_easy: 0
+tasks_medium: 5000
+tasks_hard: 5000
 budget: 250000
 scheduled_days: 500
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'

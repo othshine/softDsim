@@ -12,12 +12,18 @@ from utils import month_to_day, quality
 @dataclass
 class Scenario:
     name: str
-    tasks_total: int
     budget: int
     scheduled_days: int
     decisions: list = field(default_factory=list)
     id: ObjectId = ObjectId()
     desc: str = ""
+    tasks_easy: int = 0
+    tasks_medium: int = 0
+    tasks_hard: int = 0
+
+    @property
+    def tasks_total(self):
+        return self.tasks_easy + self.tasks_medium + self.tasks_hard
 
     def add(self, decision):
         self.decisions.append(decision)
@@ -27,6 +33,9 @@ class Scenario:
         return {'name': self.name,
                 'decisions': [dec.json for dec in self.decisions],
                 'tasks_total': self.tasks_total,
+                'tasks_easy': self.tasks_easy,
+                'tasks_medium': self.tasks_medium,
+                'tasks_hard': self.tasks_hard,
                 'budget': self.budget,
                 'scheduled_days': self.scheduled_days,
                 '_id': str(self.id),
@@ -52,7 +61,9 @@ def create_staff_row(team: Team, title: str = 'staff'):
 class UserScenario:
     def __init__(self, **kwargs):
         self.identified_errors = int(kwargs.get('identified_errors', 0) or 0)
-        self.tasks_done = int(kwargs.get('tasks_done', 0) or 0)
+        self.tasks_easy_done = int(kwargs.get('tasks_easy_done', 0) or 0)
+        self.tasks_medium_done = int(kwargs.get('tasks_medium_done', 0) or 0)
+        self.tasks_hard_done = int(kwargs.get('tasks_hard_done', 0) or 0)
         self.errors = int(kwargs.get('errors', 0) or 0)
         self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
         self.current_day = int(kwargs.get('current_day', 0) or 0)
@@ -90,8 +101,15 @@ class UserScenario:
         return False
 
     @property
+    def tasks_done(self) -> int:
+        return self.tasks_easy_done + self.tasks_medium_done + self.tasks_hard_done
+
+    @property
     def json(self):
         d = {'tasks_done': self.tasks_done,
+             'tasks_easy_done': self.tasks_easy_done,
+             'tasks_medium_done': self.tasks_medium_done,
+             'tasks_hard_done': self.tasks_hard_done,
              'errors': self.errors,
              'identified_errors': self.identified_errors,
              'decisions': [dec.json for dec in self.decisions],
@@ -158,7 +176,9 @@ class UserScenario:
     def work(self, days, meeting, training):
         wp = WorkPackage(days=days, meeting_hours=meeting, training_hours=training,
                          quality_check=self.perform_quality_check,
-                         error_fixing=self.error_fixing, tasks=self.template.tasks_total - self.tasks_done,
+                         error_fixing=self.error_fixing, tasks_easy=self.template.tasks_easy - self.tasks_easy_done,
+                         tasks_medium=self.template.tasks_medium - self.tasks_medium_done,
+                         tasks_hard=self.template.tasks_hard - self.tasks_hard_done,
                          unidentified_errors=self.errors, identified_errors=self.identified_errors,
                          total_tasks_done=self.tasks_done)
         wr = self.team.work(wp)
@@ -168,7 +188,9 @@ class UserScenario:
         self.current_day += days
 
     def _apply_work_result(self, wr: WorkResult):
-        self.tasks_done += wr.tasks_completed
+        self.tasks_easy_done += wr.tasks_easy_completed
+        self.tasks_medium_done += wr.tasks_medium_completed
+        self.tasks_hard_done += wr.tasks_hard_completed
         self.identified_errors += wr.identified_errors
         self.identified_errors -= wr.fixed_errors
         self.errors += wr.unidentified_errors

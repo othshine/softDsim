@@ -27,10 +27,11 @@ def inc(x: float, factor: float = 1.0):
 
 class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
-                 familiarity: float = 0.1, familiar_tasks=0, id=None):
+                 familiarity: float = 0.1, stress: float = 0., familiar_tasks=0, id=None):
         self.skill_type = SkillType(skill_type)
         self.xp_factor = value_or_error(xp_factor, upper=float('inf'))
-        self.motivation = value_or_error(motivation)  # ToDo: Calculate Motivation.
+        self.motivation = value_or_error(motivation)
+        self.stress = value_or_error(stress)
         self.familiarity = value_or_error(familiarity)
         self.familiar_tasks = int(value_or_error(familiar_tasks, upper=float('inf')))
         self.halted = False
@@ -47,6 +48,7 @@ class Member:
             'skill-type': self.skill_type.name,
             'xp': self.xp_factor,
             'motivation': self.motivation,
+            'stress': self.stress,
             'familiarity': self.familiarity,
             'familiar-tasks': self.familiar_tasks,
             'halted': self.halted,
@@ -71,7 +73,7 @@ class Member:
             raise MemberIsHalted()
         mu = time * mean([self.efficiency, team_efficiency]) * (self.skill_type.throughput + self.xp_factor) * coeff
         number_tasks = poisson.rvs(mu)
-        mu_error = number_tasks * self.skill_type.error_rate
+        mu_error = number_tasks * self.skill_type.error_rate * (1- self.stress)
         number_tasks_with_unidentified_errors = min(poisson.rvs(mu_error), number_tasks)
         self.familiar_tasks += number_tasks
         return number_tasks, number_tasks_with_unidentified_errors

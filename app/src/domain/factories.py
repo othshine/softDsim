@@ -11,7 +11,8 @@ def parse_team(t):
     team = Team(i)
     for m in t.get('staff'):
         member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
-                        familiarity=m.get('familiarity'), familiar_tasks=m.get('familiar-tasks', 0), id=m.get('_id'))
+                        stress=m.get('stress'), familiarity=m.get('familiarity'),
+                        familiar_tasks=m.get('familiar-tasks', 0), id=m.get('_id'))
         if m.get('halted'):
             member.halt()
         team += member
@@ -34,7 +35,9 @@ class _Factory:
 
     def _create_scenario(self, data):
         s = Scenario(name=data.get('name', "DefaultName"),
-                     tasks_total=data.get('tasks_total', 0),
+                     tasks_easy=data.get('tasks_easy', 0),
+                     tasks_medium=data.get('tasks_medium', 0),
+                     tasks_hard=data.get('tasks_hard', 0),
                      budget=data.get('budget', 10000),
                      desc=data.get('desc', ''),
                      scheduled_days=data.get('scheduled_days', 100),
@@ -44,7 +47,9 @@ class _Factory:
         return s
 
     def _create_user_scenario(self, json) -> UserScenario:
-        us = UserScenario(tasks_done=json.get('tasks_done'),
+        us = UserScenario(tasks_easy_done=json.get('tasks_easy_done'),
+                          tasks_medium_done=json.get('tasks_medium_done'),
+                          tasks_hard_done=json.get('tasks_hard_done'),
                           actual_cost=json.get('actual_cost'),
                           current_day=json.get('current_day'),
                           id=json.get('_id'),
