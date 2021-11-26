@@ -452,3 +452,38 @@ table.std-stripped tr:nth-child(even) > td {
     width: 50%;
     height: 1rem;
 }
+
+
+table.task-chart{
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color: #ba98ff;
+    border-radius: 0.1rem;
+}
+table.task-chart * {
+    font-size: 0.75rem;
+    font-weight: normal;
+}
+
+table.task-chart:nth-of-type(2n){
+    margin-top: 0.4rem;
+}
+
+#task-board {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+}
+
+table.task-chart tr th:nth-child(2n) {
+    <!--background-color: yellow;-->
+}
+table.task-chart tr th:nth-child(3n) {
+    <!--background-color: green;-->
+}
+
+

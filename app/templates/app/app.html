@@ -3,12 +3,34 @@
 
 {% block nav-content %}
     <div class="row">
-    <div id="task-container" class="row-container">
-        <button class="unclickable">Tasks: [[ tasks_done ]] / [[ tasks_total ]]
-            <template v-if="current_workday"></template>
-            (+[[ current_workday.tasks ]])
-        </button>
-    </div>
+
+    <div id="task-board">
+    Task Board
+        <table class="task-chart">
+            <tr>
+                <th>Todo</th>
+                <th>Solved</th>
+                <th>Tested</th>
+            </tr>
+            <tr>
+                <th>560</th>
+                <th>40</th>
+                <th>0</th>
+            </tr>
+        </table>
+    <table class="task-chart">
+            <tr>
+                <th>Bugs</th>
+                <th>SLW</th>
+                <th>TLW</th>
+            </tr>
+            <tr>
+                <th>560</th>
+                <th>40</th>
+                <th>0</th>
+            </tr>
+        </table>
+</div>
     <div class="row-container">
         <button class="unclickable">Monthly Expenditure: [[ cost | toCurrency ]]</button>
     </div>
