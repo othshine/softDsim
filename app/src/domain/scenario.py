@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
+from random import random
 from typing import Optional
 
-import deprecated
 from bson import ObjectId
 from scipy.stats._discrete_distns import poisson
 
@@ -258,6 +258,21 @@ class TaskQueue:
         return self.easy.todo + self.medium.todo + self.hard.todo
 
     @property
+    def total_tasks_done(self) -> int:
+        """Returns the total number of tasks done."""
+        return self.easy.done + self.medium.done + self.hard.done
+
+    @property
+    def total_tasks_tested(self) -> int:
+        """Returns the total number of tasks tested."""
+        return self.easy.tested + self.medium.tested + self.hard.tested
+
+    @property
+    def total_error_identified(self) -> int:
+        """Returns the total number of identified errors."""
+        return self.easy.error_identified + self.medium.error_identified + self.hard.error_identified
+
+    @property
     def json(self) -> dict:
         """Returns a json representation of the Task Queue."""
         return {
@@ -267,26 +282,55 @@ class TaskQueue:
         }
 
     def solve(self, n, member: Member):
-        if n <= self.total_tasks_todo:
-            if member.skill_type.name == "junior":
-                n = self.easy.solve(n, member)
-                n = self.medium.solve(n, member)
-                n = self.hard.solve(n, member)
-            elif member.skill_type.name == "expert":
-                n = self.hard.solve(n, member)
-                n = self.medium.solve(n, member)
-                n = self.easy.solve(n, member)
-            elif member.skill_type.name == "senior":
-                n = self.medium.solve(n, member)
-                while n > 0:
-                    r = self.hard.solve(1, member)
-                    n -= (1-r)
-                    if n > 0:
-                        r = self.easy.solve(1, member)
-                        n -= (1-r)
+        """
+        Member m solves n tasks of the queue. Juniors prefer easy>medium>hard tasks. Experts prefer
+        hard>medium>easy tasks. And Seniors prefer medium tasks and will alternate between hard and easy after that.
 
+        Function returns the number of tasks that were NOT solved because there were no more tasks in the queue.
+        If all tasks were solved, the function therefore returns 0.
+        """
+        if member.skill_type.name == "junior":
+            n = self.easy.solve(n, member)
+            n = self.medium.solve(n, member, e=0.5)  # If a junior solves a medium tasks stress is increased by 50%
+            n = self.hard.solve(n, member, e=1.0)  # If a junior solves a hard tasks stress is increased by 100%
+        elif member.skill_type.name == "expert":
+            n = self.hard.solve(n, member)
+            n = self.medium.solve(n, member)
+            n = self.easy.solve(n, member)
+        elif member.skill_type.name == "senior":
+            n = self.medium.solve(n, member)
+            r = q = 0  # To make sure we dont end up in an infinite loop
+            while n > 0 and (r == 0 or q == 0):
+                r = self.hard.solve(1, member, e=0.75)  # If a senior solves a hard tasks stress is increased by 75%
+                n -= (1 - r)
+                if n > 0:
+                    q = self.easy.solve(1, member)
+                    n -= (1 - q)
+        return n
+
+    def test(self, n, member: Member):
+        """
+        Member m identifies n errors in the queue.
+        Juniors can only test easy tasks.
+        Seniors can only test medium and easy tasks.
+        Experts can test all tasks.
+
+        Return number of tasks that were NOT identified because there were no more tasks in the queue.
+        """
+        if member.skill_type.name == "junior":
+            n = self.easy.test(n, member)
+        elif member.skill_type.name == "expert":
+            n = self.hard.test(n, member)
+            n = self.medium.test(n, member)
+            n = self.easy.test(n, member)
+        elif member.skill_type.name == "senior":
+            n = self.medium.test(n, member)
+            n = self.easy.test(n, member)
+
+        return n
 
     def _to_tq(self, arg):
+        """Returns a _TaskQueue object from an int or a TQ in json form."""
         if isinstance(arg, int):
             return _TaskQueue(todo=arg)
         if isinstance(arg, _TaskQueue):
@@ -323,7 +367,7 @@ class _TaskQueue:
     def solve(self, n, member: Member, e: float = 0.0):
         """ Solves n tasks in the queue. If n is larger than the number of tasks in the queue, all tasks are solved. And
         the rest is returned."""
-        # m is the number of tasks to solve, m is either equal to m or the number of tasks to do.
+        # m is the number of tasks to solve, m is either equal to n or the number of tasks to do.
         m = min(n, self.todo)
 
         # Calculate the number of errors made
@@ -337,3 +381,21 @@ class _TaskQueue:
 
         # If all n tasks have been solved, return 0 else return the number of tasks that have not been solved (n - m)
         return n - m
+
+    def test(self, n, member):
+        # m is the number of tasks to test, m is either equal to n or the number of tasks to test (tasks done).
+        m = min(n, self.done)
+
+        for i in range(m):
+            # Either the tested task is actually an error or it is not.
+            # The probability of getting a tasks that is an error is:
+            prob = self.error_unidentified / (self.error_unidentified + self.solved)
+            if random() < prob:
+                self.error_identified += 1
+                self.error_unidentified -= 1
+            else:
+                self.solved -= 1
+                self.tested += 1
+        return n - m
+
+

@@ -46,6 +46,7 @@ def test_tq_from_json():
     assert tq.hard.error_identified == json.get('hard').get('error_identified')
     assert tq.hard.tested == json.get('hard').get('tested')
 
+
 def test_tq_to_json():
     tq = TaskQueue(easy=5, medium=10, hard=15)
     assert tq.json == {
@@ -140,6 +141,89 @@ def test_task_queue_solve_expert(tq):
     assert tq.easy.done == 0
     assert tq.medium.done == 5
     assert tq.hard.done == 15
+
+
+def test_task_queue_solve_errors_are_made():
+    tq_easy = TaskQueue(easy=500)
+    m = Member(skill_type='junior')
+    tq_easy.solve(500, m)
+    assert tq_easy.easy.todo == 0
+    assert tq_easy.easy.done == 500
+
+    tq_medium = TaskQueue(medium=500)
+    m = Member(skill_type='junior')
+    tq_medium.solve(500, m)
+    assert tq_medium.medium.todo == 0
+    assert tq_medium.medium.done == 500
+
+    tq_hard = TaskQueue(hard=500)
+    m = Member(skill_type='junior')
+    tq_hard.solve(500, m)
+    assert tq_hard.hard.todo == 0
+    assert tq_hard.hard.done == 500
+
+    # A junior should make more errors on medium and even more on hard, in a really really unlucky coincidence this test
+    # might fail due to the randomness of the error calculation, but n=500 should cover most of the cases
+    assert tq_easy.easy.error_unidentified < tq_medium.medium.error_unidentified
+    assert tq_medium.medium.error_unidentified < tq_hard.hard.error_unidentified
+
+    assert tq_easy.easy.error_unidentified + tq_easy.easy.solved == tq_easy.easy.done
+    assert tq_medium.medium.error_unidentified + tq_medium.medium.solved == tq_medium.medium.done
+    assert tq_hard.hard.error_unidentified + tq_hard.hard.solved == tq_hard.hard.done
+
+
+def test_task_queue_more_tasks_than_todo():
+    tq = TaskQueue(easy=3, medium=3, hard=3)
+    n = tq.solve(10, Member(skill_type='expert'))
+
+    assert tq.easy.todo == 0
+    assert tq.medium.todo == 0
+    assert tq.hard.todo == 0
+
+    assert tq.easy.done == 3
+    assert tq.medium.done == 3
+    assert tq.hard.done == 3
+
+    assert n == 1  # n=1 tasks are left
+
+
+def test_tq_testing():
+    tq = TaskQueue(easy=_TaskQueue(error_unidentified=10, solved=10))
+
+    n = tq.test(10, Member(skill_type='junior'))
+
+    assert n == 0
+
+    assert tq.easy.error_unidentified + tq.easy.solved == 10
+    assert tq.easy.tested + tq.easy.error_identified == 10
+
+
+def test_tq_juniors_cant_test_hard_tasks():
+    tq = TaskQueue(hard=_TaskQueue(error_unidentified=10, solved=10))
+
+    n = tq.test(10, Member(skill_type='junior'))
+
+    assert n == 10
+
+    assert tq.hard.error_unidentified == 10
+    assert tq.hard.tested == 0
+    assert tq.hard.solved == 10
+
+
+def test_tq_expert_testing():
+    tq = TaskQueue(easy=_TaskQueue(error_unidentified=3, solved=3), hard=_TaskQueue(error_unidentified=10, solved=5))
+
+    n = tq.test(20, Member(skill_type='expert'))
+
+    assert n == 0
+
+    assert tq.hard.error_unidentified == 0
+    assert tq.hard.tested == 5
+    assert tq.hard.solved == 0
+    assert tq.hard.error_identified == 10
+
+    assert tq.easy.tested + tq.easy.error_identified == 5
+    assert tq.easy.error_unidentified + tq.easy.solved == 1
 
 
 @pytest.fixture
