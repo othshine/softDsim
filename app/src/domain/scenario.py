@@ -310,12 +310,12 @@ class TaskQueue:
 
     def test(self, n, member: Member):
         """
-        Member m identifies n errors in the queue.
+        Member m tests n errors in the queue.
         Juniors can only test easy tasks.
         Seniors can only test medium and easy tasks.
         Experts can test all tasks.
 
-        Return number of tasks that were NOT identified because there were no more tasks in the queue.
+        Return number of tasks that were NOT used for testing because there were no more tasks in the queue.
         """
         if member.skill_type.name == "junior":
             n = self.easy.test(n, member)
@@ -326,6 +326,27 @@ class TaskQueue:
         elif member.skill_type.name == "senior":
             n = self.medium.test(n, member)
             n = self.easy.test(n, member)
+
+        return n
+
+    def fix(self, n, member: Member):
+        """
+        Member m fixes n errors in the queue.
+        Juniors can fix test easy tasks.
+        Seniors can fix test medium and easy tasks.
+        Experts can fix all tasks.
+
+        Return number of tasks that were NOT used for fixing because there were no more tasks in the queue.
+        """
+        if member.skill_type.name == "junior":
+            n = self.easy.fix(n, member)
+        elif member.skill_type.name == "expert":
+            n = self.hard.fix(n, member)
+            n = self.medium.fix(n, member)
+            n = self.easy.fix(n, member)
+        elif member.skill_type.name == "senior":
+            n = self.medium.fix(n, member)
+            n = self.easy.fix(n, member)
 
         return n
 
@@ -398,4 +419,12 @@ class _TaskQueue:
                 self.tested += 1
         return n - m
 
+    def fix(self, n, member):
+        # m is the number of tasks to fix, m is either equal to n or the number of tasks to fix (identified errors).
+        m = min(n, self.error_identified)
+
+        self.error_identified -= m
+        self.tested += m
+
+        return n - m
 

@@ -225,6 +225,50 @@ def test_tq_expert_testing():
     assert tq.easy.tested + tq.easy.error_identified == 5
     assert tq.easy.error_unidentified + tq.easy.solved == 1
 
+def test_tq_fixing():
+    tq = TaskQueue(easy=_TaskQueue(error_identified=10))
+
+    n = tq.fix(20, Member(skill_type='junior'))
+
+    assert n == 10
+
+    assert tq.easy.error_identified == 0
+    assert tq.easy.tested == 10
+
+
+def test_complex_scenarios_of_task_queues():
+    tq = TaskQueue(
+        easy=_TaskQueue(todo=300, error_unidentified=10, solved=10, error_identified=10, tested=0),
+        medium=_TaskQueue(todo=10, error_unidentified=0, solved=10, error_identified=10, tested=50),
+        hard=_TaskQueue(todo=5, error_unidentified=0, solved=0, error_identified=0, tested=0),
+    )
+
+    n = tq.solve(300, Member(skill_type='junior'))
+    assert n == 0
+    assert tq.easy.todo == 0
+    assert tq.easy.done == 320
+
+    n = tq.solve(10, Member(skill_type='expert'))
+    assert n == 0
+    assert tq.medium.todo == 5
+    assert tq.medium.done == 15
+    assert tq.hard.todo == 0
+    assert tq.hard.done == 5
+
+    n = tq.test(120, Member(skill_type='senior'))
+    assert n == 0
+    assert tq.total_error_identified > 20
+    assert tq.total_tasks_tested > 50
+
+    tested = tq.total_tasks_tested
+
+    errors = tq.total_error_identified
+
+    n = tq.fix(errors, Member(skill_type='expert'))
+    assert n == 0
+    assert tq.total_tasks_tested == tested + errors
+
+
 
 @pytest.fixture
 def tq_inner():
