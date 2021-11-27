@@ -2,7 +2,7 @@ from bson import ObjectId
 
 from app.src.domain.dataObjects import SimulationGoal
 from app.src.domain.decision_tree import SimulationDecision, AnsweredDecision, ActionList
-from app.src.domain.scenario import Scenario, UserScenario
+from app.src.domain.scenario import Scenario, UserScenario, TaskQueue
 from app.src.domain.team import Member, Team
 
 
@@ -29,7 +29,9 @@ class _Factory:
 
     def create_user_scenario(self, user: str, template: dict, history_id: ObjectId) -> UserScenario:
         template = self.deserialize(template, 'scenario')
-        us = UserScenario(user=user, id=ObjectId(), scenario=template, decisions=template.decisions, history=history_id)
+        us = UserScenario(user=user, id=ObjectId(), scenario=template, decisions=template.decisions, history=history_id,
+                          tq=TaskQueue(easy=template.tasks_easy, medium=template.tasks_medium,
+                                               hard=template.tasks_hard))
         us.actions.scrap_actions()
         return us
 
@@ -47,9 +49,7 @@ class _Factory:
         return s
 
     def _create_user_scenario(self, json) -> UserScenario:
-        us = UserScenario(tasks_easy_done=json.get('tasks_easy_done'),
-                          tasks_medium_done=json.get('tasks_medium_done'),
-                          tasks_hard_done=json.get('tasks_hard_done'),
+        us = UserScenario(task_queue=json.get('task_queue'),
                           actual_cost=json.get('actual_cost'),
                           current_day=json.get('current_day'),
                           id=json.get('_id'),

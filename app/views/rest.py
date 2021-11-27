@@ -18,6 +18,7 @@ from utils import data_get, get_active_label
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
+    tasks_done_before = s.task_queue.tasks_done
     if not isinstance(s, UserScenario) or s.user != request.user.username:
         return HttpResponse(status=403)
 
@@ -34,6 +35,7 @@ def click_continue(request, sid):
                 training_hours = int(get_active_label(data_get(data['button_rows'], 'Team Training hours').get('answers', []))[0])
             except:
                 training_hours = 0
+
             s.work(5, int(data['meetings']), training_hours)
         if s.counter >= 0:
             s.get_decision().eval(data)
@@ -59,7 +61,7 @@ def click_continue(request, sid):
             }
             if s.current_wr:
                 context['current_workday'] = {
-                    'tasks': s.current_wr.tasks_completed,
+                    'tasks': s.task_queue.tasks_done-tasks_done_before,
                     'ident_errs': s.current_wr.identified_errors,
                     'ident_total': s.identified_errors,
                     'fixed_errs': s.current_wr.fixed_errors

@@ -63,7 +63,7 @@ class Member:
         """
         return mean([self.motivation, self.familiarity])
 
-    def solve_tasks(self, time: float, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
+    def solve_tasks(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
         """
         Simulates a member solving tasks for <time> hours.
         :param time: Number of hours.
@@ -73,7 +73,8 @@ class Member:
             raise MemberIsHalted()
         mu = time * mean([self.efficiency, team_efficiency]) * (self.skill_type.throughput + self.xp_factor) * coeff
         number_tasks = poisson.rvs(mu)
-        mu_error = number_tasks * self.skill_type.error_rate * (1- self.stress)
+        err = tq.solve(number_tasks, self.skill_type.name)
+        mu_error = number_tasks * self.skill_type.error_rate * (self.stress + err)
         number_tasks_with_unidentified_errors = min(poisson.rvs(mu_error), number_tasks)
         self.familiar_tasks += number_tasks
         return number_tasks, number_tasks_with_unidentified_errors
@@ -157,25 +158,26 @@ class Team:
         """
         return sum([m.skill_type.salary for m in self.staff] or [0])
 
-    def solve_tasks(self, time, err=False):
+    def solve_tasks(self, time, tq, err=False):
         num_tasks = 0
         num_errs = 0
         for member in self.staff:
             if not member.halted:
                 if err:
-                    t, e = member.solve_tasks(time, coeff=ERR_COMPLETION_COEF, team_efficiency=self.efficiency())
+                    t, e = member.solve_tasks(time, tq, coeff=ERR_COMPLETION_COEF, team_efficiency=self.efficiency())
                     print(f"{member.skill_type.name} solved {t} tasks with {e} errors.")
                 else:
-                    t, e = member.solve_tasks(time, team_efficiency=self.efficiency())
+                    t, e = member.solve_tasks(time, tq, team_efficiency=self.efficiency())
                 num_tasks += t
                 num_errs += e
         return num_tasks, num_errs
 
-    def work(self, work_package: WorkPackage) -> WorkResult:
+    def work(self, work_package: WorkPackage, tq) -> WorkResult:
         wr = WorkResult()
         t = 0
         e = 0
         nt = 1
+        total_left = len(tq)
         total_meeting_h = work_package.meeting_hours
         total_training_h = work_package.training_hours
         for day in range(work_package.days):
@@ -197,7 +199,7 @@ class Team:
                     day_hours -= total_meeting_h
                     total_meeting_h = 0
             print(f"Working {day_hours} hours.")
-            nt, ne = self.solve_tasks(day_hours)
+            nt, ne = self.solve_tasks(day_hours, tq)
             t += nt
             e += ne
             for member in self.staff:
@@ -219,18 +221,10 @@ class Team:
             while t > 0 and wr.identified_errors < work_package.unidentified_errors:
                 t -= 1
                 wr.identified_errors += 1
-        t_comp = min(t, work_package.tasks)
-        wr.tasks_completed += t_comp
-        while t - work_package.tasks >= 2:
+        while t - total_left >= 2:
             if wr.unidentified_errors > 0:
                 wr.unidentified_errors -= 1
             t -= 2
-
-        print("WEEK RESULT")
-        print("Completed Tasks:", wr.tasks_completed)
-        print("Fixed Errors:", wr.fixed_errors)
-        print("Identified Errors:", wr.identified_errors)
-        print("Unidentified Errors:", wr.unidentified_errors)
 
         return wr
 

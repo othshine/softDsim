@@ -61,9 +61,7 @@ def create_staff_row(team: Team, title: str = 'staff'):
 class UserScenario:
     def __init__(self, **kwargs):
         self.identified_errors = int(kwargs.get('identified_errors', 0) or 0)
-        self.tasks_easy_done = int(kwargs.get('tasks_easy_done', 0) or 0)
-        self.tasks_medium_done = int(kwargs.get('tasks_medium_done', 0) or 0)
-        self.tasks_hard_done = int(kwargs.get('tasks_hard_done', 0) or 0)
+        self.task_queue = kwargs.get('tq') or TaskQueue(**kwargs.get('task_queue', {}))
         self.errors = int(kwargs.get('errors', 0) or 0)
         self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
         self.current_day = int(kwargs.get('current_day', 0) or 0)
@@ -102,14 +100,11 @@ class UserScenario:
 
     @property
     def tasks_done(self) -> int:
-        return self.tasks_easy_done + self.tasks_medium_done + self.tasks_hard_done
+        return self.task_queue.tasks_done
 
     @property
     def json(self):
-        d = {'tasks_done': self.tasks_done,
-             'tasks_easy_done': self.tasks_easy_done,
-             'tasks_medium_done': self.tasks_medium_done,
-             'tasks_hard_done': self.tasks_hard_done,
+        d = {'task_queue': self.task_queue.json,
              'errors': self.errors,
              'identified_errors': self.identified_errors,
              'decisions': [dec.json for dec in self.decisions],
@@ -176,21 +171,16 @@ class UserScenario:
     def work(self, days, meeting, training):
         wp = WorkPackage(days=days, meeting_hours=meeting, training_hours=training,
                          quality_check=self.perform_quality_check,
-                         error_fixing=self.error_fixing, tasks_easy=self.template.tasks_easy - self.tasks_easy_done,
-                         tasks_medium=self.template.tasks_medium - self.tasks_medium_done,
-                         tasks_hard=self.template.tasks_hard - self.tasks_hard_done,
+                         error_fixing=self.error_fixing,
                          unidentified_errors=self.errors, identified_errors=self.identified_errors,
                          total_tasks_done=self.tasks_done)
-        wr = self.team.work(wp)
+        wr = self.team.work(wp, self.task_queue)
         self.current_wr = wr
         self._apply_work_result(wr)
         self.actual_cost += month_to_day(self.team.salary, days)
         self.current_day += days
 
     def _apply_work_result(self, wr: WorkResult):
-        self.tasks_easy_done += wr.tasks_easy_completed
-        self.tasks_medium_done += wr.tasks_medium_completed
-        self.tasks_hard_done += wr.tasks_hard_completed
         self.identified_errors += wr.identified_errors
         self.identified_errors -= wr.fixed_errors
         self.errors += wr.unidentified_errors
@@ -248,3 +238,145 @@ class UserScenario:
         if self.model.lower() not in [x.lower() for x in action.get_restrictions().get('model-pick', [self.model])]:
             applicable = False
         return applicable
+
+
+class TaskQueue:
+    def __init__(self, easy=0, medium=0, hard=0):
+        self.easy = self._to_tq(easy)
+        self.medium = self._to_tq(medium)
+        self.hard = self._to_tq(hard)
+
+    def __len__(self) -> int:
+        """Returns the total number of tasks to do."""
+        return self.total_tasks_todo
+
+    @property
+    def total_tasks_todo(self) -> int:
+        """Returns the total number of tasks to do."""
+        return self.easy.todo + self.medium.todo + self.hard.todo
+
+    @property
+    def json(self) -> dict:
+        """Returns a json representation of the Task Queue."""
+        return {
+            'easy': self.easy.json,
+            'medium': self.medium.json,
+            'hard': self.hard.json,
+        }
+
+    def solve(self, n, level):  # ToDo: This can be done more clean.
+        """Solves n tasks of the given level."""
+        # This function is easy but due to the logic of the 'senior' members, it is not very readable.
+        if n == 0:
+            return 0
+        if level == 'junior':
+            if n < self.easy:
+                self.easy -= n
+                self.easy_done += n
+                return 0
+            elif n < self.easy + self.medium:
+                self.medium -= n - self.easy
+                self.medium_done += n - self.easy
+                tb = self.easy
+                self.easy_done += self.easy
+                self.easy = 0
+                return 1 - (tb / n)
+            else:
+                h = n - self.easy - self.medium
+                if h > self.hard:
+                    h = self.hard
+                self.hard -= h
+                self.hard_done += h
+                self.medium_done += self.medium
+                self.medium = 0
+                self.easy_done += self.easy
+                tb = self.easy
+                self.easy = 0
+                return 1 - (tb / n)
+        elif level == 'senior':
+            if n < self.medium:
+                self.medium -= n
+                self.medium_done += n
+                return 0
+            else:
+                self.medium_done += self.medium
+                a = b = (n - self.medium) // 2
+                if (n - self.medium) % 2 == 1:
+                    a += 1
+                if self.hard > a:
+                    self.hard -= a
+                    self.hard_done += a
+                else:
+                    self.hard_done += self.hard
+                    b += self.hard
+                    self.hard = 0
+                if b > self.easy:
+                    self.easy_done += self.easy
+                    b -= self.easy
+                    self.easy = 0
+                    b = min(b, self.hard)
+                    a += b
+                    self.hard -= b
+                    self.hard_done += b
+                else:
+                    self.easy -= b
+                    self.easy_done += b
+                self.medium = 0
+                return 1 - (a / n)
+
+        else:
+            if n < self.hard:
+                self.hard -= n
+                self.hard_done += n
+                return 0
+            elif n < self.hard + self.medium:
+                self.medium -= n - self.hard
+                self.medium_done += n - self.hard
+                self.hard_done += self.hard
+                self.hard = 0
+                return 0
+            else:
+                e = n - self.hard - self.medium
+                if e > self.easy:
+                    e = self.easy
+                self.easy -= e
+                self.easy_done += e
+                self.medium_done += self.medium
+                self.medium = 0
+                self.hard_done += self.hard
+                self.hard = 0
+                return 0
+
+    def _to_tq(self, arg):
+        if isinstance(arg, int):
+            return _TaskQueue(todo=arg)
+        if isinstance(arg, _TaskQueue):
+            return arg
+        if isinstance(arg, dict):
+            return _TaskQueue(**arg)
+        raise ValueError('Invalid argument for TaskQueue')
+
+
+class _TaskQueue:
+    def __init__(self, todo: int = 0, solved: int = 0, error_unidentified: int = 0, error_identified: int = 0,
+                 tested: int = 0):
+        self.todo = todo
+        self.solved = solved
+        self.error_unidentified = error_unidentified
+        self.error_identified = error_identified
+        self.tested = tested
+
+    @property
+    def done(self):
+        return self.solved + self.error_unidentified
+
+    @property
+    def json(self):
+        """Returns a json representation of the Task Queue."""
+        return {
+            'todo': self.todo,
+            'solved': self.solved,
+            'error_unidentified': self.error_unidentified,
+            'error_identified': self.error_identified,
+            'tested': self.tested
+        }
