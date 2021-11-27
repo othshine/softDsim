@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+import deprecated
 from bson import ObjectId
+from scipy.stats._discrete_distns import poisson
 
 from app.src.domain.dataObjects import WorkPackage, WorkResult
 from app.src.domain.decision_tree import ActionList, Decision, SimulationDecision
-from app.src.domain.team import Team, ScrumTeam
+from app.src.domain.team import Team, ScrumTeam, Member
 from utils import month_to_day, quality
 
 
@@ -264,88 +266,25 @@ class TaskQueue:
             'hard': self.hard.json,
         }
 
-    def solve(self, n, level):  # ToDo: This can be done more clean.
-        """Solves n tasks of the given level."""
-        # This function is easy but due to the logic of the 'senior' members, it is not very readable.
-        if n == 0:
-            return 0
-        if level == 'junior':
-            if n < self.easy:
-                self.easy -= n
-                self.easy_done += n
-                return 0
-            elif n < self.easy + self.medium:
-                self.medium -= n - self.easy
-                self.medium_done += n - self.easy
-                tb = self.easy
-                self.easy_done += self.easy
-                self.easy = 0
-                return 1 - (tb / n)
-            else:
-                h = n - self.easy - self.medium
-                if h > self.hard:
-                    h = self.hard
-                self.hard -= h
-                self.hard_done += h
-                self.medium_done += self.medium
-                self.medium = 0
-                self.easy_done += self.easy
-                tb = self.easy
-                self.easy = 0
-                return 1 - (tb / n)
-        elif level == 'senior':
-            if n < self.medium:
-                self.medium -= n
-                self.medium_done += n
-                return 0
-            else:
-                self.medium_done += self.medium
-                a = b = (n - self.medium) // 2
-                if (n - self.medium) % 2 == 1:
-                    a += 1
-                if self.hard > a:
-                    self.hard -= a
-                    self.hard_done += a
-                else:
-                    self.hard_done += self.hard
-                    b += self.hard
-                    self.hard = 0
-                if b > self.easy:
-                    self.easy_done += self.easy
-                    b -= self.easy
-                    self.easy = 0
-                    b = min(b, self.hard)
-                    a += b
-                    self.hard -= b
-                    self.hard_done += b
-                else:
-                    self.easy -= b
-                    self.easy_done += b
-                self.medium = 0
-                return 1 - (a / n)
+    def solve(self, n, member: Member):
+        if n <= self.total_tasks_todo:
+            if member.skill_type.name == "junior":
+                n = self.easy.solve(n, member)
+                n = self.medium.solve(n, member)
+                n = self.hard.solve(n, member)
+            elif member.skill_type.name == "expert":
+                n = self.hard.solve(n, member)
+                n = self.medium.solve(n, member)
+                n = self.easy.solve(n, member)
+            elif member.skill_type.name == "senior":
+                n = self.medium.solve(n, member)
+                while n > 0:
+                    r = self.hard.solve(1, member)
+                    n -= (1-r)
+                    if n > 0:
+                        r = self.easy.solve(1, member)
+                        n -= (1-r)
 
-        else:
-            if n < self.hard:
-                self.hard -= n
-                self.hard_done += n
-                return 0
-            elif n < self.hard + self.medium:
-                self.medium -= n - self.hard
-                self.medium_done += n - self.hard
-                self.hard_done += self.hard
-                self.hard = 0
-                return 0
-            else:
-                e = n - self.hard - self.medium
-                if e > self.easy:
-                    e = self.easy
-                self.easy -= e
-                self.easy_done += e
-                self.medium_done += self.medium
-                self.medium = 0
-                self.hard_done += self.hard
-                self.hard = 0
-                return 0
 
     def _to_tq(self, arg):
         if isinstance(arg, int):
@@ -380,3 +319,21 @@ class _TaskQueue:
             'error_identified': self.error_identified,
             'tested': self.tested
         }
+
+    def solve(self, n, member: Member, e: float = 0.0):
+        """ Solves n tasks in the queue. If n is larger than the number of tasks in the queue, all tasks are solved. And
+        the rest is returned."""
+        # m is the number of tasks to solve, m is either equal to m or the number of tasks to do.
+        m = min(n, self.todo)
+
+        # Calculate the number of errors made
+        mu_error = m * member.skill_type.error_rate * (member.stress + e)
+        number_tasks_with_unidentified_errors = min(poisson.rvs(mu_error), m)
+
+        # Adjust the numbers in the queue
+        self.todo -= m
+        self.solved += m - number_tasks_with_unidentified_errors
+        self.error_unidentified += number_tasks_with_unidentified_errors
+
+        # If all n tasks have been solved, return 0 else return the number of tasks that have not been solved (n - m)
+        return n - m

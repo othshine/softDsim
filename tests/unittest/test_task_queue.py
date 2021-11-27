@@ -3,6 +3,8 @@ from app.src.domain.scenario import _TaskQueue
 
 import pytest
 
+from app.src.domain.team import Member
+
 
 @pytest.fixture
 def tq():
@@ -82,7 +84,7 @@ def test_task_queue_len(tq):
 
 
 def test_task_queue_solve_junior(tq):
-    tq.solve(7, 'junior')
+    tq.solve(7, Member(skill_type='junior'))
 
     assert tq.easy.todo == 0
     assert tq.medium.todo == 8
@@ -93,52 +95,51 @@ def test_task_queue_solve_junior(tq):
     assert tq.hard.done == 0
 
 
-# def test_task_queue_solve_senior(tq):
-#     err = tq.solve(2, 'senior')
-#     assert err == 0
-#     assert tq.easy == 5
-#     assert tq.medium == 8
-#     assert tq.hard == 15
-#
-#     assert tq.easy_done == 0
-#     assert tq.medium_done == 2
-#     assert tq.hard_done == 0
-#
-#
-# def test_task_queue_solve_senior2(tq):
-#     err = tq.solve(25, 'senior')
-#     assert err == 1 - (10 / 25)
-#     assert tq.easy == 0
-#     assert tq.medium == 0
-#     assert tq.hard == 5
-#
-#     assert tq.easy_done == 5
-#     assert tq.medium_done == 10
-#     assert tq.hard_done == 10
-#
-#
-# def test_task_queue_solve_senior3(tq):
-#     err = tq.solve(14, 'senior')
-#     assert err == 1 - (2 / 14)
-#     assert tq.easy == 3
-#     assert tq.medium == 0
-#     assert tq.hard == 13
-#
-#     assert tq.easy_done == 2
-#     assert tq.medium_done == 10
-#     assert tq.hard_done == 2
-#
-#
-# def test_task_queue_solve_expert(tq):
-#     err = tq.solve(20, 'expert')
-#     assert err == 0
-#     assert tq.easy == 5
-#     assert tq.medium == 5
-#     assert tq.hard == 0
-#
-#     assert tq.easy_done == 0
-#     assert tq.medium_done == 5
-#     assert tq.hard_done == 15
+def test_task_queue_solve_senior(tq):
+    tq.solve(2, Member(skill_type='senior'))
+
+    assert tq.easy.todo == 5
+    assert tq.medium.todo == 8
+    assert tq.hard.todo == 15
+
+    assert tq.easy.done == 0
+    assert tq.medium.done == 2
+    assert tq.hard.done == 0
+
+
+def test_task_queue_solve_senior2(tq):
+    tq.solve(25, Member(skill_type='senior'))
+
+    assert tq.easy.todo == 0
+    assert tq.medium.todo == 0
+    assert tq.hard.todo == 5
+
+    assert tq.easy.done == 5
+    assert tq.medium.done == 10
+    assert tq.hard.done == 10
+
+
+def test_task_queue_solve_senior3(tq):
+    tq.solve(14, Member(skill_type='senior'))
+
+    assert tq.easy.todo == 3
+    assert tq.medium.todo == 0
+    assert tq.hard.todo == 13
+
+    assert tq.easy.done == 2
+    assert tq.medium.done == 10
+    assert tq.hard.done == 2
+
+
+def test_task_queue_solve_expert(tq):
+    tq.solve(20, Member(skill_type='expert'))
+    assert tq.easy.todo == 5
+    assert tq.medium.todo == 5
+    assert tq.hard.todo == 0
+
+    assert tq.easy.done == 0
+    assert tq.medium.done == 5
+    assert tq.hard.done == 15
 
 
 @pytest.fixture
