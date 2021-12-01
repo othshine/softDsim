@@ -401,7 +401,6 @@ class _TaskQueue:
 
         # Calculate the number of errors made
         mu_error = m * member.skill_type.error_rate * (member.stress + e)
-        print(f"MU ERROR IS {mu_error}")
         number_tasks_with_unidentified_errors = min(poisson.rvs(mu_error), m)
 
         # Adjust the numbers in the queue

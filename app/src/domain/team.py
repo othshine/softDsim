@@ -111,12 +111,14 @@ class Member:
         number_tasks = poisson.rvs(mu)
         return number_tasks
 
-    def train(self, hours=1):
+    def train(self, hours=1, delta=0):
         """
         Training a member increases it's xp factor.
         :return: float - new xp factor value
         """
-        self.xp_factor += (hours * TRAIN_SKILL_INCREASE_AMOUNT)
+        self.xp_factor += (hours * delta * TRAIN_SKILL_INCREASE_AMOUNT)/((1+self.xp_factor)**2)  # Divide by xp_factor^2 to make it grow less with increasing xp factor
+        print(self.skill_type.throughput)
+        print(self.xp_factor)
         return self.xp_factor
 
     def halt(self):
@@ -303,8 +305,11 @@ class Team:
         return 1 / (1 + (c / 20 - 0.05))
 
     def train(self, total_training_h):
+        m = mean([member.skill_type.throughput for member in self.staff if not member.halted])
         for member in self.staff:
-            member.train(total_training_h)
+            delta = m - member.skill_type.throughput
+            if delta > 0:
+                member.train(total_training_h, delta)
 
     def increase_stress(self, amount):
         for member in self.staff:

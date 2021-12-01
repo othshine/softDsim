@@ -37,7 +37,6 @@ def click_continue(request, sid):
 
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-        print(data)
         apply_changes(s, data)
         history.write(s.history_id, data, s.counter)
         if isinstance(s.get_decision(), SimulationDecision) and data.get('advance'):
@@ -49,7 +48,6 @@ def click_continue(request, sid):
                 overtime = 0
 
             s.work(5, int(data['meetings']), training_hours, overtime)
-            print(s.task_queue)
         if s.counter >= 0:
             s.get_decision().eval(data)
         try:
