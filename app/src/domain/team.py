@@ -220,10 +220,14 @@ class Team:
                     self.meeting(total_meeting_h, 10)
                     day_hours -= total_meeting_h
                     total_meeting_h = 0
-            if day_hours > 0 and wp.error_fixing:
+            if day_hours > 0 and wp.error_fixing and not wp.quality_check:
                 self.fix_errors(day_hours, tq)
-            elif day_hours > 0 and wp.quality_check:
+            elif day_hours > 0 and wp.quality_check and not wp.error_fixing:
                 self.test_tasks(day_hours, tq)
+            elif day_hours > 0 and wp.error_fixing and  wp.quality_check:
+                td = day_hours // 2
+                self.fix_errors(day_hours-td, tq)
+                self.test_tasks(td, tq)
             elif day_hours > 0:
                 self.solve_tasks(day_hours, tq)
 
@@ -316,11 +320,9 @@ class ScrumTeam:
     def familiarity(self):
         return mean([t.familiarity for t in self.teams] or [0])
 
-    def work(self, wp: WorkPackage) -> WorkResult:
-        wr = WorkResult()
+    def work(self, wp: WorkPackage, tq):
         for team in self.teams:
-            wr += team.work(wp)
-        return wr
+            team.work(wp, tq)
 
     def get_team(self, id):
         for t in self.teams:
