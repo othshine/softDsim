@@ -104,7 +104,6 @@ class UserScenario:
     def tasks_done(self) -> int:
         return self.task_queue.total_tasks_done
 
-
     @property
     def json(self):
         d = {'task_queue': self.task_queue.json,
@@ -171,12 +170,12 @@ class UserScenario:
     def get_max_points(self) -> int:
         return sum([d.get_max_points() for d in self.decisions])
 
-    def work(self, days, meeting, training):
+    def work(self, days, meeting, training, overtime):
         wp = WorkPackage(days=days, meeting_hours=meeting, training_hours=training,
                          quality_check=self.perform_quality_check,
                          error_fixing=self.error_fixing,
                          unidentified_errors=self.errors, identified_errors=self.identified_errors,
-                         total_tasks_done=self.tasks_done)
+                         total_tasks_done=self.tasks_done, day_hours=8+overtime)
         wr = self.team.work(wp, self.task_queue)
         self.current_wr = wr
         self.actual_cost += month_to_day(self.team.salary, days)
@@ -375,6 +374,7 @@ class _TaskQueue:
     def __str__(self):
         return f'{self.todo} tasks to do, {self.solved} solved, {self.error_unidentified} unidentified errors, ' \
                f'{self.error_identified} identified errors, {self.tested} tested'
+
     @property
     def done(self):
         return self.solved + self.error_unidentified
@@ -432,4 +432,3 @@ class _TaskQueue:
         self.tested += m
 
         return n - m
-

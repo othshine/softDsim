@@ -63,7 +63,7 @@ actions:
           - Waterfall
           - Kanban
     training:
-      title: Team Training hours
+      title: Team Training Hours
       values:
         - 0 hours
         - 2 hours
@@ -82,6 +82,15 @@ actions:
         model-pick:
           - Waterfall
           - Kanban
+    overtime:
+      title: Overtime
+      values:
+        - leave early
+        - normal hours
+        - 1 hour overtime
+        - 3 hours overtime
+      active: 2
+      hover: The team will work overtime hours. This will increase the team's output but also increase the team's stress. You can reduce stress in the team by working letting every on leave early.
   numeric-rows:
     staff-pick:
       title: Staff

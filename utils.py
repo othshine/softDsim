@@ -94,6 +94,10 @@ def get_active_label(data):
     """
     return data_get(data, True, attr='active').get('label') or None
 
+def read_button(data, title):
+    """Returns the value of the button in data with the given title."""
+    return get_active_label(data_get(data['button_rows'], title).get('answers', []))
+
 
 class _YAMLReader:
     def __init__(self, path):

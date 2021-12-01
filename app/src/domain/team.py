@@ -207,7 +207,7 @@ class Team:
         total_meeting_h = wp.meeting_hours
         total_training_h = wp.training_hours
         for day in range(wp.days):
-            day_hours = 8  # todo wp.hours_per_day
+            day_hours = wp.day_hours
             if total_training_h > 0:
                 self.train(total_training_h)
                 day_hours -= total_training_h

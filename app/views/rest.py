@@ -10,7 +10,16 @@ from app.src.domain.scenario import UserScenario
 from app.views.util import apply_changes
 from mongo_models import ScenarioMongoModel, UserMongoModel
 
-from utils import data_get, get_active_label
+from utils import data_get, get_active_label, read_button
+
+
+# Todo move to a different file
+def extract_overtime(param):
+    return {
+        'leave early': -1,
+        '1 hour overtime': 1,
+        '3 hours overtime': 3
+    }.get(param, 0)
 
 
 @login_required
@@ -28,15 +37,18 @@ def click_continue(request, sid):
 
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
+        print(data)
         apply_changes(s, data)
         history.write(s.history_id, data, s.counter)
         if isinstance(s.get_decision(), SimulationDecision) and data.get('advance'):
             try:
-                training_hours = int(get_active_label(data_get(data['button_rows'], 'Team Training hours').get('answers', []))[0])
+                training_hours = int(read_button(data, "Team Training Hours")[0])
+                overtime = int(extract_overtime(read_button(data, "Overtime")))
             except:
                 training_hours = 0
+                overtime = 0
 
-            s.work(5, int(data['meetings']), training_hours)
+            s.work(5, int(data['meetings']), training_hours, overtime)
             print(s.task_queue)
         if s.counter >= 0:
             s.get_decision().eval(data)

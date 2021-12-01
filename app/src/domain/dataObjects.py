@@ -4,6 +4,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class WorkPackage:
     days: int
+    day_hours: int
     meeting_hours: int
     training_hours: int
     unidentified_errors: int

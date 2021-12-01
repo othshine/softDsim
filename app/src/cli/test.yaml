@@ -1,4 +1,4 @@
-name: Realism
+name: Overtime
 tasks_easy: 200
 tasks_medium: 500
 tasks_hard: 300
@@ -43,6 +43,7 @@ decisions:
       - quality-check
       - error-fixing
       - training
+      - overtime
     text:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.
