@@ -1,12 +1,10 @@
-import time
-from math import floor
 from statistics import mean
 from typing import List
 
 from bson import ObjectId
 
-from app.src.domain.dataObjects import WorkPackage, WorkResult
-from utils import YAMLReader, value_or_error, probability, weighted
+from app.src.domain.dataObjects import WorkPackage
+from utils import YAMLReader, value_or_error
 
 from scipy.stats import poisson
 
@@ -15,6 +13,10 @@ ERR_COMPLETION_COEF = YAMLReader.read('error-completion-coefficient')
 TASKS_PER_MEETING = YAMLReader.read('tasks-per-meeting-coefficient')
 DONE_TASKS_FAMILIARITY_IMPACT_FACTOR = YAMLReader.read('done-tasks-familiarity-impact-factor')
 TRAIN_SKILL_INCREASE_AMOUNT = YAMLReader.read('train-skill-increase-amount')
+
+STRESS_PER_OVERTIME = YAMLReader.read('stress', 'overtime')
+STRESS_REDUCTION_PER_WEEKEND = YAMLReader.read('stress', 'weekend-reduction')
+
 
 
 def inc(x: float, factor: float = 1.0):
@@ -27,7 +29,7 @@ def inc(x: float, factor: float = 1.0):
 
 class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
-                 familiarity: float = 0.1, stress: float = 0., familiar_tasks=0, id=None):
+                 familiarity: float = 0.1, stress: float = 0.3, familiar_tasks=0, id=None):
         self.skill_type = SkillType(skill_type)
         self.xp_factor = value_or_error(xp_factor, upper=float('inf'))
         self.motivation = value_or_error(motivation)
@@ -134,6 +136,9 @@ class Member:
         else:
             self.familiarity = self.familiar_tasks / total_tasks_done
 
+    def increase_stress(self, amount):
+        self.stress = max(min(self.stress + amount, 1), 0)
+
 
 class Team:
     def __init__(self, id: str):
@@ -165,7 +170,7 @@ class Team:
         }
 
     @property
-    def motivation(self):
+    def motivation(self) -> float:
         """
         The teams motivation. Is considered to be the average (mean) of each team members motivation. 0 if team has
         no staff. :return: float
@@ -173,12 +178,20 @@ class Team:
         return mean([m.motivation for m in self.staff] or [0])
 
     @property
-    def familiarity(self):
+    def familiarity(self) -> float:
         """
         The teams familiarity. Is considered to be the average (mean) of each team members familiarity. 0 if team has
         no staff. :return: float
         """
         return mean([m.familiarity for m in self.staff] or [0])
+
+    @property
+    def stress(self) -> float:
+        """
+        The teams stress. Is considered to be the average (mean) of each team members stress. 0 if team has
+        no staff. :return: float
+        """
+        return mean([m.stress for m in self.staff] or [0])
 
     @property
     def salary(self):
@@ -207,6 +220,8 @@ class Team:
         total_meeting_h = wp.meeting_hours
         total_training_h = wp.training_hours
         for day in range(wp.days):
+            if day % 5 == 0:  # Reduce stress on the weekends
+                self.increase_stress(STRESS_REDUCTION_PER_WEEKEND)
             day_hours = wp.day_hours
             if total_training_h > 0:
                 self.train(total_training_h)
@@ -231,6 +246,7 @@ class Team:
                 self.test_tasks(td, tq)
             elif day_hours > 0:
                 self.solve_tasks(day_hours, tq)
+            self.increase_stress((wp.day_hours-8)*STRESS_PER_OVERTIME)
 
     def meeting(self, time, total_tasks_done):
         """
@@ -289,6 +305,10 @@ class Team:
     def train(self, total_training_h):
         for member in self.staff:
             member.train(total_training_h)
+
+    def increase_stress(self, amount):
+        for member in self.staff:
+            member.increase_stress(amount)
 
 
 class ScrumTeam:

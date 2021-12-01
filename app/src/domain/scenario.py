@@ -8,7 +8,10 @@ from scipy.stats._discrete_distns import poisson
 from app.src.domain.dataObjects import WorkPackage, WorkResult
 from app.src.domain.decision_tree import ActionList, Decision, SimulationDecision
 from app.src.domain.team import Team, ScrumTeam, Member
-from utils import month_to_day, quality
+from utils import month_to_day, quality, YAMLReader
+
+# Config Variables
+STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
 
 
 @dataclass
@@ -398,12 +401,14 @@ class _TaskQueue:
 
         # Calculate the number of errors made
         mu_error = m * member.skill_type.error_rate * (member.stress + e)
+        print(f"MU ERROR IS {mu_error}")
         number_tasks_with_unidentified_errors = min(poisson.rvs(mu_error), m)
 
         # Adjust the numbers in the queue
         self.todo -= m
         self.solved += m - number_tasks_with_unidentified_errors
         self.error_unidentified += number_tasks_with_unidentified_errors
+        member.stress = min(1, member.stress + number_tasks_with_unidentified_errors * STRESS_ERROR_INCREASE)
 
         # If all n tasks have been solved, return 0 else return the number of tasks that have not been solved (n - m)
         return n - m

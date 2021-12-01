@@ -21,6 +21,12 @@ manager:
   po:
     salary: 7000
 
+# Stress Settings
+stress:
+  weekend-reduction: -0.2 # The stress level of a member reduces by 20% over each weekend.
+  overtime: 0.05 # The stress level of a member increases by 5% for each hour of overtime, or decreases by 5% for each hour of leaving early. This number is applied every day.
+  error: 0.02 # The stress level of a member increases by 2% for each error.
+
 # Coefficients
 task-completion-coefficient: 0.4
 error-completion-coefficient: 0.3

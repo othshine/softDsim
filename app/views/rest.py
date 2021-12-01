@@ -69,6 +69,7 @@ def click_continue(request, sid):
                 'meeting_planner': 'meeting-planner' in d.active_actions,
                 'motivation': s.team.motivation,
                 'familiarity': s.team.familiarity,
+                'stress': s.team.stress,
                 'done': False,
                 'scrum': s.model == 'scrum' and isinstance(s.get_decision(), SimulationDecision),
                 "tasks": {
