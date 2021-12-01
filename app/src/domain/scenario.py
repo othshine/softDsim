@@ -270,6 +270,11 @@ class TaskQueue:
         return self.easy.error_identified + self.medium.error_identified + self.hard.error_identified
 
     @property
+    def total_tasks_done_or_tested(self) -> int:
+        """Returns the total number of tasks done or tested."""
+        return self.total_tasks_done + self.total_tasks_tested + self.total_error_identified
+
+    @property
     def json(self) -> dict:
         """Returns a json representation of the Task Queue."""
         return {

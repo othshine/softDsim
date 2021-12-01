@@ -70,6 +70,7 @@ class Member:
         number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
         m = tq.solve(number_tasks, self)
         self.familiar_tasks += (number_tasks - m)  # ToDo This should be done in the task queue
+        self.update_familiarity(tq.total_tasks_done_or_tested)
 
         # If there were less than n tasks in the queue to do the member will go over to testing and fixing
         if m > 0:
@@ -213,11 +214,11 @@ class Team:
                 total_training_h = 0
             if total_meeting_h > 0 and day_hours > 0:
                 if total_meeting_h > day_hours:
-                    self.meeting(day_hours, 10)
+                    self.meeting(day_hours, tq.total_tasks_done_or_tested)
                     total_meeting_h -= day_hours
                     day_hours = 0
                 else:
-                    self.meeting(total_meeting_h, 10)
+                    self.meeting(total_meeting_h, tq.total_tasks_done_or_tested)
                     day_hours -= total_meeting_h
                     total_meeting_h = 0
             if day_hours > 0 and wp.error_fixing and not wp.quality_check:
@@ -240,6 +241,7 @@ class Team:
             missing = total_tasks_done - member.familiar_tasks
             new_familiar_tasks = min((TASKS_PER_MEETING * time), missing)
             member.familiar_tasks += new_familiar_tasks
+            member.update_familiarity(total_tasks_done)
 
     def get_member(self, _id: ObjectId) -> Member:
         for m in self.staff:
