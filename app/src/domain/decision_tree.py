@@ -155,7 +155,6 @@ class Action:
 
     def get_restrictions(self):
         if self.restrictions:
-            print(f"Restrictions for {self.title} are {self.restrictions}")
             return self.restrictions
         return {}
 
@@ -165,7 +164,6 @@ class ActionList:
         self.actions: List[Action] = []
         if json:
             for action in json:
-                print(action)
                 self.actions.append(Action(**action))
 
     @property

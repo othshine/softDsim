@@ -66,18 +66,47 @@ class Member:
     def solve_tasks(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
         """
         Simulates a member solving tasks for <time> hours.
-        :param time: Number of hours.
-        :return: Tuple of (Number of tasks solved, Number of these tasks that have errors)
         """
+        number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
+        m = tq.solve(number_tasks, self)
+        self.familiar_tasks += (number_tasks - m)  # ToDo This should be done in the task queue
+
+        # If there were less than n tasks in the queue to do the member will go over to testing and fixing
+        if m > 0:
+            m = tq.test(m, self)
+            tq.fix(m, self)
+
+    def fix_errors(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
+        """
+        Simulates a member fixing errors for <time> hours.
+        """
+        number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
+        m = tq.fix(number_tasks, self)
+
+        # If there were less than n tasks in the queue to fix the member will go over to solving and testing
+        if m > 0:
+            m = tq.solve(m, self)
+            tq.test(m, self)
+
+    def test_tasks(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
+        """
+        Simulates a member testing tasks for <time> hours.
+        """
+        number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
+        m = tq.test(number_tasks, self)
+
+        # If there were less than n tasks in the queue to test the member will go over to solving and fixing
+        if m > 0:
+            m = tq.solve(m, self)
+            tq.fix(m, self)
+
+    def get_number_of_tasks(self, coeff, team_efficiency, time):
+        """Returns the number of tasks that a member can solve/test/fix for <time> hours."""
         if self.halted:
             raise MemberIsHalted()
         mu = time * mean([self.efficiency, team_efficiency]) * (self.skill_type.throughput + self.xp_factor) * coeff
         number_tasks = poisson.rvs(mu)
-        err = tq.solve(number_tasks, self.skill_type.name)
-        mu_error = number_tasks * self.skill_type.error_rate * (self.stress + err)
-        number_tasks_with_unidentified_errors = min(poisson.rvs(mu_error), number_tasks)
-        self.familiar_tasks += number_tasks
-        return number_tasks, number_tasks_with_unidentified_errors
+        return number_tasks
 
     def train(self, hours=1):
         """
@@ -158,75 +187,45 @@ class Team:
         """
         return sum([m.skill_type.salary for m in self.staff] or [0])
 
-    def solve_tasks(self, time, tq, err=False):
-        num_tasks = 0
-        num_errs = 0
+    def solve_tasks(self, time, tq):
         for member in self.staff:
             if not member.halted:
-                if err:
-                    t, e = member.solve_tasks(time, tq, coeff=ERR_COMPLETION_COEF, team_efficiency=self.efficiency())
-                    print(f"{member.skill_type.name} solved {t} tasks with {e} errors.")
-                else:
-                    t, e = member.solve_tasks(time, tq, team_efficiency=self.efficiency())
-                num_tasks += t
-                num_errs += e
-        return num_tasks, num_errs
+                member.solve_tasks(time, tq, team_efficiency=self.efficiency())
 
-    def work(self, work_package: WorkPackage, tq) -> WorkResult:
-        wr = WorkResult()
-        t = 0
-        e = 0
-        nt = 1
-        total_left = len(tq)
-        total_meeting_h = work_package.meeting_hours
-        total_training_h = work_package.training_hours
-        for day in range(work_package.days):
-            print(f"Day {day + 1}")
-            day_hours = 8
+    def fix_errors(self, time, tq):
+        for member in self.staff:
+            if not member.halted:
+                member.fix_errors(time, tq, team_efficiency=self.efficiency())
+
+    def test_tasks(self, time, tq):
+        for member in self.staff:
+            if not member.halted:
+                member.test_tasks(time, tq, team_efficiency=self.efficiency())
+
+    def work(self, wp: WorkPackage, tq):
+        total_meeting_h = wp.meeting_hours
+        total_training_h = wp.training_hours
+        for day in range(wp.days):
+            day_hours = 8  # todo wp.hours_per_day
             if total_training_h > 0:
-                print(f"Training {total_training_h} hours.")
                 self.train(total_training_h)
                 day_hours -= total_training_h
                 total_training_h = 0
-            if total_meeting_h > 0 and day_hours > 0 and nt > 0:
-                print(f"Meeting {total_meeting_h} hours.")
-                if day_hours < total_meeting_h:
-                    self.meeting(day_hours, t+work_package.total_tasks_done)
+            if total_meeting_h > 0 and day_hours > 0:
+                if total_meeting_h > day_hours:
+                    self.meeting(day_hours, 10)
                     total_meeting_h -= day_hours
                     day_hours = 0
-                elif total_meeting_h > 0:
-                    self.meeting(total_meeting_h, t+work_package.total_tasks_done)
+                else:
+                    self.meeting(total_meeting_h, 10)
                     day_hours -= total_meeting_h
                     total_meeting_h = 0
-            print(f"Working {day_hours} hours.")
-            nt, ne = self.solve_tasks(day_hours, tq)
-            t += nt
-            e += ne
-            for member in self.staff:
-                member.update_familiarity(work_package.total_tasks_done+t)
-            print(f"Today: {nt} tasks solved, {ne} errors done.")
-            print(f"Day {day + 1} is over")
-            print(f"Training left: {total_training_h}")
-            print(f"Meeting left: {total_meeting_h}")
-            print(f"Tasks done: {t}")
-            print(f"Errors done: {e}")
-            print("-------------------------")
-
-        wr.unidentified_errors += e
-        if work_package.error_fixing:
-            while t > 0 and wr.fixed_errors < work_package.identified_errors:
-                t -= 1
-                wr.fixed_errors += 1
-        if work_package.quality_check:
-            while t > 0 and wr.identified_errors < work_package.unidentified_errors:
-                t -= 1
-                wr.identified_errors += 1
-        while t - total_left >= 2:
-            if wr.unidentified_errors > 0:
-                wr.unidentified_errors -= 1
-            t -= 2
-
-        return wr
+            if day_hours > 0 and wp.error_fixing:
+                self.fix_errors(day_hours, tq)
+            elif day_hours > 0 and wp.quality_check:
+                self.test_tasks(day_hours, tq)
+            elif day_hours > 0:
+                self.solve_tasks(day_hours, tq)
 
     def meeting(self, time, total_tasks_done):
         """
@@ -237,7 +236,6 @@ class Team:
             missing = total_tasks_done - member.familiar_tasks
             new_familiar_tasks = min((TASKS_PER_MEETING * time), missing)
             member.familiar_tasks += new_familiar_tasks
-
 
     def get_member(self, _id: ObjectId) -> Member:
         for m in self.staff:

@@ -21,7 +21,8 @@ let x = new Vue({
         stress: 0,
         scrum: false,
         current_workday: false,
-        advance: false
+        advance: false,
+        tasks: {}
 
     },
     filters: {

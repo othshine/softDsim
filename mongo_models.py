@@ -191,12 +191,12 @@ class ClickHistoryModel(MongoConnection):
 
     def get_start_time(self, id):
         try:
-            print(self.collection.find_one({'_id': id})['events'][0]['timestamp'])
+            return self.collection.find_one({'_id': id})['events'][0]['timestamp']
         except:
             return None
 
     def get_end_time(self, id):
         try:
-            print(self.collection.find_one({'_id': id})['events'][-1]['timestamp'])
+            return self.collection.find_one({'_id': id})['events'][-1]['timestamp']
         except:
             return None

@@ -18,7 +18,7 @@ from utils import data_get, get_active_label
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
-    tasks_done_before = s.task_queue.tasks_done
+    tasks_done_before = s.task_queue.total_tasks_done
     if not isinstance(s, UserScenario) or s.user != request.user.username:
         return HttpResponse(status=403)
 
@@ -37,13 +37,14 @@ def click_continue(request, sid):
                 training_hours = 0
 
             s.work(5, int(data['meetings']), training_hours)
+            print(s.task_queue)
         if s.counter >= 0:
             s.get_decision().eval(data)
         try:
             d = next(s)
             context = {
                 "continue_text": d.continue_text,
-                "tasks_done": s.tasks_done,
+                "tasks_done": s.tasks_done + s.task_queue.total_tasks_tested + s.task_queue.total_error_identified,
                 "tasks_total": s.template.tasks_total,
                 "blocks": [],
                 "cost": s.team.salary,
@@ -57,7 +58,15 @@ def click_continue(request, sid):
                 'motivation': s.team.motivation,
                 'familiarity': s.team.familiarity,
                 'done': False,
-                'scrum': s.model == 'scrum' and isinstance(s.get_decision(), SimulationDecision)
+                'scrum': s.model == 'scrum' and isinstance(s.get_decision(), SimulationDecision),
+                "tasks": {
+                    "todo": s.task_queue.total_tasks_todo,
+                    "done": s.task_queue.total_tasks_done + s.task_queue.total_tasks_tested,
+                    
+                    "tested": s.task_queue.total_tasks_tested,
+                    "errors": s.task_queue.total_error_identified,
+                    "done_week": s.task_queue.total_tasks_done - tasks_done_before
+                }
             }
             if s.current_wr:
                 context['current_workday'] = {

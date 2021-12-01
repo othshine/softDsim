@@ -37,7 +37,8 @@ async function cont() {
         }
         if ((costChart.data.datasets[0].data.length - 1) * 5 < data['current_day']) {
             addWeek(costChart, data['actual_cost'])
-            addWeek(taskChart, data['tasks_done'])
+            addWeek(taskChart, data['tasks_done'], 'Tasks Done')
+            addWeek(taskChart, data['tasks']['tested'], 'Tasks Tested')
         }
     }
     set_continue_button()

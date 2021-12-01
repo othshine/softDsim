@@ -102,7 +102,8 @@ class UserScenario:
 
     @property
     def tasks_done(self) -> int:
-        return self.task_queue.tasks_done
+        return self.task_queue.total_tasks_done
+
 
     @property
     def json(self):
@@ -178,15 +179,8 @@ class UserScenario:
                          total_tasks_done=self.tasks_done)
         wr = self.team.work(wp, self.task_queue)
         self.current_wr = wr
-        self._apply_work_result(wr)
         self.actual_cost += month_to_day(self.team.salary, days)
         self.current_day += days
-
-    def _apply_work_result(self, wr: WorkResult):
-        self.identified_errors += wr.identified_errors
-        self.identified_errors -= wr.fixed_errors
-        self.errors += wr.unidentified_errors
-        self.errors -= wr.identified_errors
 
     def get_id(self) -> str:
         return str(self.id)
@@ -200,7 +194,7 @@ class UserScenario:
         else:
             d = self.decisions[self.counter]
             if (not isinstance(d, SimulationDecision)) or (
-                    isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.tasks_done)):
+                    isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.task_queue.total_tasks_tested)):
                 self.counter += 1
 
     def get_decision(self, nr: int = None) -> Optional[Decision]:
@@ -251,6 +245,9 @@ class TaskQueue:
     def __len__(self) -> int:
         """Returns the total number of tasks to do."""
         return self.total_tasks_todo
+
+    def __str__(self):
+        return f'Easy:\n {self.easy}\nMedium:\n {self.medium}\nHard:\n {self.hard}'
 
     @property
     def total_tasks_todo(self) -> int:
@@ -370,6 +367,9 @@ class _TaskQueue:
         self.error_identified = error_identified
         self.tested = tested
 
+    def __str__(self):
+        return f'{self.todo} tasks to do, {self.solved} solved, {self.error_unidentified} unidentified errors, ' \
+               f'{self.error_identified} identified errors, {self.tested} tested'
     @property
     def done(self):
         return self.solved + self.error_unidentified

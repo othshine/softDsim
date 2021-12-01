@@ -13,10 +13,15 @@ const taskChart = new Chart(ctxTasks, {
         labels: chartLabels,
         datasets: [{
             data: [0],
-            label: "Actual",
+            label: "Tasks Done",
             borderColor: "#FF55AA",
             fill: false
-        }
+        }, {
+            data: [0],
+            label: "Tasks Tested",
+            borderColor: "#55FF55",
+            fill: true
+        },
         ]
     },
     options: {
@@ -24,7 +29,7 @@ const taskChart = new Chart(ctxTasks, {
             display: true,
             text: 'Cost'
         },
-         maintainAspectRatio: false,
+        maintainAspectRatio: false,
 
     }
 });
@@ -86,22 +91,22 @@ function addChartDataRow(chart, dataArr, label, color = "#55AAFF") {
     chart.update()
 }
 
-function initializeCharts(budget, tasks,  weeks){
+function initializeCharts(budget, tasks, weeks) {
     const weekly_budget = budget / weeks
     const cost_data = []
     for (let i = 0; i <= weeks; i++) {
-        cost_data.push(i*weekly_budget)
+        cost_data.push(i * weekly_budget)
     }
 
     const weekly_tasks = tasks / weeks
     const task_data = []
     for (let i = 0; i <= weeks; i++) {
-        task_data.push(i*weekly_tasks)
+        task_data.push(i * weekly_tasks)
     }
 
     /*Add null values for weeks that have passed (if a scenario is loaded that already is half way through)*/
-    if (x.$data.current_day > 0){
-        for (let i = 0; i < x.$data.current_day/5; i++) {
+    if (x.$data.current_day > 0) {
+        for (let i = 0; i < x.$data.current_day / 5; i++) {
             addWeek(costChart, null)
             addWeek(taskChart, null)
         }
@@ -113,9 +118,9 @@ function initializeCharts(budget, tasks,  weeks){
     addChartDataRow(taskChart, task_data, "Management Goal")
 }
 
-function adjustWeekLabel(chart, week){
+function adjustWeekLabel(chart, week) {
     if (chart.data.labels.length <= week) {
-        for (let i = chart.data.labels.length; i <= week ; i++) {
+        for (let i = chart.data.labels.length; i <= week; i++) {
             chart.data.labels.push("Week " + i);
         }
     }

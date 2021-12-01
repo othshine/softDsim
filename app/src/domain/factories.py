@@ -65,9 +65,6 @@ class _Factory:
             if t := json.get('team'):
                 if t := t.get('teams'):
                     for team in t:
-                        print(team)
-                        print(parse_team(team))
-                        print(us.team.teams)
                         us.team.teams.append(parse_team(team))
         else:
             if t := json.get('team'):
