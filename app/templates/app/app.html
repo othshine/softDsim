@@ -6,7 +6,7 @@
 
     <div id="task-board">
     Task Board
-        <table class="task-chart">
+        <table class="task-chart shadow-all">
             <tr>
                 <th>Todo</th>
                 <th>Done</th>
@@ -18,7 +18,7 @@
                 <th>[[ tasks.tested ]]</th>
             </tr>
         </table>
-    <table class="task-chart">
+    <table class="task-chart shadow-all">
             <tr>
                 <th>Bugs</th>
                 <th>SLW</th>
@@ -51,14 +51,9 @@
             </ul>
 
         </section>
-        <section class="main-division-third">
+        <section class="main-division-third shadow-all">
             <div class="division-title none-select" title="Here you can find statistics">
                 Statistics
-            </div>
-            <h3 class="element-header pointer none-select" onclick="toggleVisibility('gantt-chart')">Project Plan <span
-                    class="smaller">&#x25bc;</span></h3>
-            <div id="gantt-chart" style="width:100%; height: 1rem;">
-
             </div>
 
             <h3 class="element-header pointer none-select" onclick="toggleVisibility('cost-chart-container')">Cost <span
@@ -150,7 +145,7 @@
 
             <div id="continue-container">
                 <div class="fade-up"></div>
-                <button id="continue-button" onclick="cont()">[[ continue_text ]]</button>
+                <button id="continue-button" class="shadow-all" onclick="cont()">[[ continue_text ]]</button>
             </div>
 
             <div class="row"></div>

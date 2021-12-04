@@ -453,6 +453,9 @@ table.std-stripped tr:nth-child(even) > td {
     height: 1rem;
 }
 
+.shadow-all {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
 
 table.task-chart{
     width: 100%;
@@ -460,6 +463,7 @@ table.task-chart{
     border-spacing: 0;
     background-color: #ba98ff;
     border-radius: 0.1rem;
+    table-layout: fixed;
 }
 table.task-chart * {
     font-size: 0.75rem;
@@ -477,6 +481,7 @@ table.task-chart:nth-of-type(2n){
     flex-flow: column;
     justify-content: center;
     align-items: center;
+    margin-left: 0.33rem;
 }
 
 table.task-chart tr th:nth-child(2n) {
