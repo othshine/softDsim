@@ -22,6 +22,14 @@ def extract_overtime(param):
     }.get(param, 0)
 
 
+def end_scenario(s, username):
+    context = {'done': True}
+    user_model = UserMongoModel()
+    user_model.save_score(user=username, scenario_template_id=s.template.id, score=s.total_score(),
+                          scenario_id=s.id)
+    return HttpResponse(json.dumps(context), content_type="application/json")
+
+
 @login_required
 @csrf_exempt
 def click_continue(request, sid):
@@ -37,6 +45,8 @@ def click_continue(request, sid):
 
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
+        if data.get('done', False):
+            return end_scenario(s, request.user.username)
         apply_changes(s, data)
         history.write(s.history_id, data, s.counter)
         if isinstance(s.get_decision(), SimulationDecision) and data.get('advance'):
@@ -48,6 +58,7 @@ def click_continue(request, sid):
                 overtime = 0
 
             s.work(5, int(data['meetings']), training_hours, overtime)
+            print(s.task_queue)
         if s.counter >= 0:
             s.get_decision().eval(data)
         try:
@@ -89,9 +100,7 @@ def click_continue(request, sid):
             for t in d.text or []:
                 context.get('blocks').append({'header': t.header, 'text': t.content})
         except StopIteration:
-            context = {'done': True}
-            user_model = UserMongoModel()
-            user_model.save_score(user=request.user.username, scenario_template_id=s.template.id, score=s.total_score(), scenario_id=s.id)
+            return end_scenario(s, request.user.username)
         model.update(s)
         return HttpResponse(json.dumps(context), content_type="application/json")
 

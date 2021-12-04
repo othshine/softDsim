@@ -1,6 +1,3 @@
-
-
-
 /* Load Continue */
 
 /**
@@ -22,7 +19,7 @@ async function cont() {
         }
     );
 
-    if (response.status === 403){
+    if (response.status === 403) {
         alert("This is not a valid scenario id")
     }
     const data = await response.json();
@@ -40,10 +37,29 @@ async function cont() {
             addWeek(taskChart, data['tasks_done'], 'Tasks Done')
             addWeek(taskChart, data['tasks']['tested'], 'Tasks Tested')
         }
+        if (data['tasks']) {
+            if (data['tasks']['todo'] <= 0) {
+                addEndProjectButton()
+            }
+        }
     }
     set_continue_button()
 }
 
-async function endScenario(){
-
+async function endScenario() {
+    const s = window.location.pathname.split('/').slice(-1)[0]
+    fetch('/continue/' + s,
+        {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify({'done': true})
+        }
+    ).then(() => {
+        window.location.href = '/result/' + s
+    }).catch(() => {
+        alert("Something went wrong")
+    })
 }
