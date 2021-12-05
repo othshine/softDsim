@@ -178,7 +178,7 @@ class UserScenario:
                          quality_check=self.perform_quality_check,
                          error_fixing=self.error_fixing,
                          unidentified_errors=self.errors, identified_errors=self.identified_errors,
-                         total_tasks_done=self.tasks_done, day_hours=8+overtime)
+                         total_tasks_done=self.tasks_done, day_hours=8 + overtime)
         wr = self.team.work(wp, self.task_queue)
         self.current_wr = wr
         self.actual_cost += month_to_day(self.team.salary, days)
@@ -215,7 +215,7 @@ class UserScenario:
             p += d.points
         p += self.time_score()
         p += self.budget_score()
-        p += self.quality_score()
+        p += self.task_queue.quality_score
         return p
 
     def time_score(self) -> int:
@@ -225,9 +225,6 @@ class UserScenario:
 
     def budget_score(self) -> int:
         return round((self.template.budget / self.actual_cost) * 100)
-
-    def quality_score(self) -> int:
-        return quality(self.tasks_done, self.errors)
 
     def action_is_applicable(self, action):
         """Returns True if an action is applicable. Actions can have restrictions, e.g. model must be scrum or kanban.
@@ -245,8 +242,8 @@ class TaskQueue:
         self.hard = self._to_tq(hard)
 
     def __len__(self) -> int:
-        """Returns the total number of tasks to do."""
-        return self.total_tasks_todo
+        """Returns the total number of tasks. Any task with any status."""
+        return len(self.easy) + len(self.medium) + len(self.hard)
 
     def __str__(self):
         return f'Easy:\n {self.easy}\nMedium:\n {self.medium}\nHard:\n {self.hard}'
@@ -256,9 +253,14 @@ class TaskQueue:
         """Returns the total number of tasks to do."""
         return self.easy.todo + self.medium.todo + self.hard.todo
 
+    def total_tasks_solved(self) -> int:
+        """Returns the total number of tasks solved."""
+        return self.easy.solved + self.medium.solved + self.hard.solved
+
     @property
     def total_tasks_done(self) -> int:
-        """Returns the total number of tasks done."""
+        """Returns the total number of tasks done. A done tasks is a task that has been solved but it is unknown if
+        the tasks is solved or has an uniedentified error. done + solved + unidentified_error """
         return self.easy.done + self.medium.done + self.hard.done
 
     @property
@@ -277,6 +279,10 @@ class TaskQueue:
         return self.total_tasks_done + self.total_tasks_tested + self.total_error_identified
 
     @property
+    def total_tasks_with_faults(self):
+        return self.easy.tasks_with_faults + self.medium.tasks_with_faults + self.hard.tasks_with_faults
+
+    @property
     def json(self) -> dict:
         """Returns a json representation of the Task Queue."""
         return {
@@ -284,6 +290,11 @@ class TaskQueue:
             'medium': self.medium.json,
             'hard': self.hard.json,
         }
+
+    @property
+    def quality_score(self):
+        k = 8
+        return int(((len(self) - self.total_tasks_with_faults) * 1/len(self))**k * 100)
 
     def solve(self, n, member: Member):
         """
@@ -378,9 +389,19 @@ class _TaskQueue:
         return f'{self.todo} tasks to do, {self.solved} solved, {self.error_unidentified} unidentified errors, ' \
                f'{self.error_identified} identified errors, {self.tested} tested'
 
+    def __len__(self):
+        return self.todo + self.solved + self.error_unidentified + self.error_identified + self.tested
+
     @property
     def done(self):
         return self.solved + self.error_unidentified
+
+    @property
+    def tasks_with_faults(self):
+        """Returns the number of tasks that have faults. Every task that is not correclty solved is considered
+        faulty. This number should not be readable by the team or a member but only be used for the calculation of
+        the quality score. It can be unserstood as the number of all tasks that the customer finds faulty """
+        return self.todo + self.error_unidentified + self.error_identified
 
     @property
     def json(self):

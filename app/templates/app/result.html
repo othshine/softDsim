@@ -16,7 +16,11 @@
         <h3>Budget</h3>
         <p>Points: {{ scenario.budget_score }}</p>
         <h3>Quality</h3>
-        <p>Points: {{ scenario.quality_score }}</p>
+        <p>Solved Tasks: {{ scenario.task_queue.total_tasks_solved }}</p>
+        <p>Tested Tasks: {{ scenario.task_queue.total_tasks_tested }}</p>
+        <p>Tasks with Errors: {{ scenario.task_queue.total_tasks_with_faults }}</p>
+        <p>Unsolved Tasks: {{ scenario.task_queue.total_tasks_todo }}</p>
+        <p>Points: {{ scenario.task_queue.quality_score }}</p>
         <h2>Total Score: {{ scenario.total_score }} </h2>
 
 

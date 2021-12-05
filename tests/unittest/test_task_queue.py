@@ -83,6 +83,12 @@ def test_task_queue_init(tq):
 def test_task_queue_len(tq):
     assert len(tq) == 30
 
+    tq2 = TaskQueue(easy=_TaskQueue(todo=100, solved=25, error_unidentified=5),
+                    medium=_TaskQueue(todo=200, solved=25, error_unidentified=5),
+                    hard=_TaskQueue(todo=50, solved=25, error_unidentified=5))
+
+    assert len(tq2) == 100 + 200 + 50 + 25 * 3 + 5 * 3
+
 
 def test_task_queue_solve_junior(tq):
     tq.solve(7, Member(skill_type='junior'))
@@ -225,6 +231,7 @@ def test_tq_expert_testing():
     assert tq.easy.tested + tq.easy.error_identified == 5
     assert tq.easy.error_unidentified + tq.easy.solved == 1
 
+
 def test_tq_fixing():
     tq = TaskQueue(easy=_TaskQueue(error_identified=10))
 
@@ -269,7 +276,6 @@ def test_complex_scenarios_of_task_queues():
     assert tq.total_tasks_tested == tested + errors
 
 
-
 @pytest.fixture
 def tq_inner():
     return _TaskQueue(todo=400, solved=25, error_unidentified=5)
@@ -301,3 +307,13 @@ def test_inner_tq_json(tq_inner):
         'error_identified': 0,
         'tested': 0
     }
+
+
+def test_tq_qualitiy_score():
+    tq = TaskQueue(easy=_TaskQueue(todo=0, solved=25, error_unidentified=5, error_identified=12, tested=50),
+                   medium=_TaskQueue(todo=0, solved=25, error_unidentified=5, error_identified=12, tested=50),
+                   hard=_TaskQueue(todo=0, solved=25, error_unidentified=5, error_identified=12, tested=50))
+    er = 5 * 3 + 12 * 3
+    ok = 25 * 3 + 50 * 3
+    tot = er + ok
+    assert tq.quality_score == int(((tot - er) * (1 / tot)) ** 8 * 100)
