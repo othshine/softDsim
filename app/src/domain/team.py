@@ -347,6 +347,10 @@ class ScrumTeam:
     def familiarity(self):
         return mean([t.familiarity for t in self.teams] or [0])
 
+    @property
+    def stress(self):
+        return mean([t.stress for t in self.teams] or [0])
+
     def work(self, wp: WorkPackage, tq):
         for team in self.teams:
             team.work(wp, tq)

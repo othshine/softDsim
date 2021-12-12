@@ -7,15 +7,8 @@ class WorkPackage:
     day_hours: int
     meeting_hours: int
     training_hours: int
-    unidentified_errors: int
-    identified_errors: int
     quality_check: bool
     error_fixing: bool
-    total_tasks_done: int
-
-    @property
-    def daily_work_hours(self):
-        return 8 - self.meeting_hours  # ToDo: support for overtime.
 
 
 @dataclass(frozen=False)

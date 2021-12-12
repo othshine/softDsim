@@ -1,9 +1,9 @@
-name: Long Scenario
-tasks_easy: 2000
-tasks_medium: 5000
-tasks_hard: 3000
-budget: 250000
-scheduled_days: 500
+name: Short Scenario
+tasks_easy: 200
+tasks_medium: 500
+tasks_hard: 300
+budget: 25000
+scheduled_days: 50
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
 
 decisions:
@@ -52,4 +52,4 @@ decisions:
       - header: Story
         content: You're ready to go. Start off the project by managing the team. Its all on you now.
     goal:
-      tasks: 10000
+      tasks: 1000

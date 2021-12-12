@@ -117,6 +117,8 @@ class Event:
 
     @property
     def week(self):
+        if self.current_day == None:
+            self.current_day = 0
         return int(self.current_day / 5)
 
 

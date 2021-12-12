@@ -176,9 +176,7 @@ class UserScenario:
     def work(self, days, meeting, training, overtime):
         wp = WorkPackage(days=days, meeting_hours=meeting, training_hours=training,
                          quality_check=self.perform_quality_check,
-                         error_fixing=self.error_fixing,
-                         unidentified_errors=self.errors, identified_errors=self.identified_errors,
-                         total_tasks_done=self.tasks_done, day_hours=8 + overtime)
+                         error_fixing=self.error_fixing , day_hours=8 + overtime)
         wr = self.team.work(wp, self.task_queue)
         self.current_wr = wr
         self.actual_cost += month_to_day(self.team.salary, days)
@@ -235,7 +233,7 @@ class UserScenario:
         return applicable
 
 
-class TaskQueue:
+class TaskQueue:  # Maybe rename in TaskQueueWrapper
     def __init__(self, easy=0, medium=0, hard=0):
         self.easy = self._to_tq(easy)
         self.medium = self._to_tq(medium)
