@@ -222,6 +222,8 @@ class UserScenario:
         return round((self.template.scheduled_days / self.current_day) * 100)
 
     def budget_score(self) -> int:
+        if self.actual_cost == 0:
+            return 0  # If no money was spent, something is wrong and the score is 0.
         return round((self.template.budget / self.actual_cost) * 100)
 
     def action_is_applicable(self, action):

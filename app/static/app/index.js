@@ -86,18 +86,10 @@ function addScrumTeam() {
     x.$data.numeric_rows.push(j)
 }
 
-
-function removeScrumTeam(x) {
-    console.log(x)
-}
-
 function addEndProjectButton(){
     const end_project_button = "<button id=\"continue-button\" class=\"shadow-all\" onclick=\"endScenario()\">End Project</button><div style='height:5px; width:100%; background-color: white'></div>"
     const container = document.getElementById('continue-container');
-    if (container.childElementCount === 2) {
+     if (container.childElementCount === 2) {
         container.innerHTML = container.children[0].outerHTML + end_project_button + container.children[1].outerHTML;
-        container.parentElement.innerHTML += "<div class=\"row\"></div>";
-    }
-
-
+     }
 }

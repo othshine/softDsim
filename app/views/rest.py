@@ -35,7 +35,7 @@ def end_scenario(s, username):
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
-    tasks_done_before = s.task_queue.total_tasks_done
+    tasks_done_before = s.task_queue.total_tasks_done + s.task_queue.total_tasks_tested
     if not isinstance(s, UserScenario) or s.user != request.user.username:
         return HttpResponse(status=403)
 
@@ -87,12 +87,12 @@ def click_continue(request, sid):
                     
                     "tested": s.task_queue.total_tasks_tested,
                     "errors": s.task_queue.total_error_identified,
-                    "done_week": s.task_queue.total_tasks_done - tasks_done_before
+                    "done_week": s.task_queue.total_tasks_done - tasks_done_before + s.task_queue.total_tasks_tested
                 }
             }
             if s.current_wr:
                 context['current_workday'] = {
-                    'tasks': s.task_queue.tasks_done-tasks_done_before,
+                    'tasks': s.task_queue.total_tasks_done.tasks_done-tasks_done_before,
                     'ident_errs': s.current_wr.identified_errors,
                     'ident_total': s.identified_errors,
                     'fixed_errs': s.current_wr.fixed_errors
