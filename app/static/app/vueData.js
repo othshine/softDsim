@@ -29,6 +29,11 @@ let x = new Vue({
         toCurrency(value) {
             return `${value.toLocaleString('de-DE', {style: 'currency', currency: 'EUR'})}`
         },
+        orEmpty(value) {
+            if (value){
+                return value;
+            } return "-";
+        },
         uppercase(value) {
             if (!value) {
                 return '';

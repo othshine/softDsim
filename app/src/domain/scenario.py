@@ -282,6 +282,9 @@ class TaskQueue:  # Maybe rename in TaskQueueWrapper
     def total_tasks_with_faults(self):
         return self.easy.tasks_with_faults + self.medium.tasks_with_faults + self.hard.tasks_with_faults
 
+    def total_tasks(self):
+        return len(self)
+
     @property
     def json(self) -> dict:
         """Returns a json representation of the Task Queue."""

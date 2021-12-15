@@ -34,10 +34,10 @@ def apply_changes(s: UserScenario, data: dict):
         s.error_fixing = True
     if isinstance(s.team, ScrumTeam):
         s.team.adjust([t for t in data['numeric_rows'] if "scrum team" in t.get('title').lower()])
-    if q := data_get(data['button_rows'], 'Quality Review'):
+    if q := data_get(data['button_rows'], 'Testing'):
         if data_get(q['answers'], 'Perform', attr='label').get('active'):
             s.perform_quality_check = True
-    if q := data_get(data['button_rows'], 'Fix Errors'):
+    if q := data_get(data['button_rows'], 'Fix Bugs'):
         if data_get(q['answers'], 'Perform', attr='label').get('active'):
             s.error_fixing = True
     for action in data['button_rows']:

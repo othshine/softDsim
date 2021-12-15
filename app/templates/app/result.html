@@ -14,12 +14,10 @@
         <h3>Time</h3>
         <p>Points: {{ scenario.time_score }}</p>
         <h3>Budget</h3>
+        <p>Spent: {{ scenario.actual_cost }} / {{ scenario.template.budget }}</p>
         <p>Points: {{ scenario.budget_score }}</p>
         <h3>Quality</h3>
-        <p>Solved Tasks: {{ scenario.task_queue.total_tasks_solved }}</p>
-        <p>Tested Tasks: {{ scenario.task_queue.total_tasks_tested }}</p>
-        <p>Tasks with Errors: {{ scenario.task_queue.total_tasks_with_faults }}</p>
-        <p>Unsolved Tasks: {{ scenario.task_queue.total_tasks_todo }}</p>
+        <p>Defective Tasks: {{ scenario.task_queue.total_tasks_with_faults }} / {{ scenario.task_queue.total_tasks }}</p>
         <p>Points: {{ scenario.task_queue.quality_score }}</p>
         <h2>Total Score: {{ scenario.total_score }} </h2>
 

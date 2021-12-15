@@ -475,7 +475,7 @@ table.task-chart:nth-of-type(2n){
 }
 
 #task-board {
-    width: 100%;
+    width: 200%;
     height: 100%;
     display: flex;
     flex-flow: column;

@@ -16,7 +16,7 @@ class NoObjectWithIdException(Exception):
 class MongoConnection(object):
     def __init__(self):
         client = MongoClient('localhost', 2717)  # ToDo: Use env var.
-        self.db = client['v3']
+        self.db = client['v4']
 
     def get_collection(self, name):
         self.collection = self.db[name]

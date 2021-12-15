@@ -13,9 +13,9 @@
                 <th>Tested</th>
             </tr>
             <tr>
-                <th>[[ tasks.todo ]]</th>
-                <th>[[ tasks.done ]]</th>
-                <th>[[ tasks.tested ]]</th>
+                <th>[[ tasks.todo | orEmpty]]</th>
+                <th>[[ tasks.done | orEmpty]]</th>
+                <th>[[ tasks.tested | orEmpty]]</th>
             </tr>
         </table>
     <table class="task-chart shadow-all">
@@ -25,9 +25,9 @@
                 <th>TLW</th>
             </tr>
             <tr>
-                <th>[[ tasks.errors ]]</th>
-                <th>[[ tasks.done_week ]]</th>
-                <th>-</th>
+                <th>[[ tasks.errors | orEmpty]]</th>
+                <th>[[ tasks.done_week | orEmpty]]</th>
+                <th>[[ tasks.tested_week | orEmpty]]</th>
             </tr>
         </table>
 </div>

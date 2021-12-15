@@ -95,12 +95,15 @@ class Member:
         """
         Simulates a member testing tasks for <time> hours.
         """
+        print('TeST TASKS')
         number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
         m = tq.test(number_tasks, self)
 
         # If there were less than n tasks in the queue to test the member will go over to solving and fixing
         if m > 0:
+            print("LEFTOVERS", m)
             m = tq.solve(m, self)
+            print("Solved Some", m)
             tq.fix(m, self)
 
     def get_number_of_tasks(self, coeff, team_efficiency, time):

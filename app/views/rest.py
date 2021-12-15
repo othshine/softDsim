@@ -35,7 +35,8 @@ def end_scenario(s, username):
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
-    tasks_done_before = s.task_queue.total_tasks_done + s.task_queue.total_tasks_tested
+    tasks_done_before = s.task_queue.total_tasks_done + s.task_queue.total_tasks_tested + s.task_queue.total_error_identified
+    tasks_tested_before = s.task_queue.total_tasks_tested
     if not isinstance(s, UserScenario) or s.user != request.user.username:
         return HttpResponse(status=403)
 
@@ -87,7 +88,8 @@ def click_continue(request, sid):
                     
                     "tested": s.task_queue.total_tasks_tested,
                     "errors": s.task_queue.total_error_identified,
-                    "done_week": s.task_queue.total_tasks_done - tasks_done_before + s.task_queue.total_tasks_tested
+                    "done_week": s.task_queue.total_tasks_done - tasks_done_before + s.task_queue.total_tasks_tested + s.task_queue.total_error_identified,
+                    "tested_week": s.task_queue.total_tasks_tested - tasks_tested_before
                 }
             }
             if s.current_wr:
@@ -100,6 +102,7 @@ def click_continue(request, sid):
             for t in d.text or []:
                 context.get('blocks').append({'header': t.header, 'text': t.content})
         except StopIteration:
+            model.update(s)
             return end_scenario(s, request.user.username)
         model.update(s)
         return HttpResponse(json.dumps(context), content_type="application/json")

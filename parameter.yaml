@@ -13,6 +13,8 @@ skill-levels:
     error-rate: 0.05
     throughput: 7
 
+stress-error-optimum: 0.4  # At this stress-level (40%) the member works most efficiently.
+
 manager:
   junior:
     salary: 3000
@@ -58,7 +60,7 @@ actions:
         - Iterative
         - Agile
     quality-check:
-      title: Quality Review
+      title: Testing
       values:
         - Perform
         - Don't Perform
@@ -78,7 +80,7 @@ actions:
       active: 1
       hover: Perform a team trainig to increase the team memebers' skill level ??? XXX
     error-fixing:
-      title: Fix Errors
+      title: Fix Bugs
       values:
         - Perform
         - Don't Perform
