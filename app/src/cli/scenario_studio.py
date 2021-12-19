@@ -10,7 +10,7 @@ from utils import _YAMLReader
 
 
 def make():
-    YAMLReader = _YAMLReader('test.yaml')
+    YAMLReader = _YAMLReader('app/src/cli/test.yaml')
     data = YAMLReader.read()
     s = Scenario(name=data.get('name', "DefaultName"),
                  budget=data.get('budget', 10000),

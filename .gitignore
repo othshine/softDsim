@@ -4,3 +4,4 @@
 .DS*
 __pycache__
 env
+/static/
