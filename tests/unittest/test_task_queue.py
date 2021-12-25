@@ -1,5 +1,7 @@
-from app.src.domain.scenario import TaskQueue
-from app.src.domain.scenario import _TaskQueue
+from app.src.domain.task import Difficulty
+from app.src.domain.task_queue import TaskQueue
+from app.src.domain.task import Task
+from bson import ObjectId
 
 import pytest
 
@@ -9,6 +11,50 @@ from app.src.domain.team import Member
 @pytest.fixture
 def tq():
     return TaskQueue(easy=5, medium=10, hard=15)
+
+
+def test_instantiate_task_queue():
+    tq = TaskQueue()
+
+
+def test_task_queue_tasks():
+    tq = TaskQueue()
+    assert isinstance(tq.tasks, set)
+
+def test_task_queue_get():
+    tq = TaskQueue()
+    r = tq.get()
+    assert isinstance(r, set)
+
+def test_add():
+    tq = TaskQueue()
+
+    assert len(tq.get()) == 0
+    tq.add(Task())  # Add a single task.
+    assert len(tq.get()) == 1
+    tq.add([Task(), Task()])  # Add list of tasks
+    assert len(tq.get()) == 3
+
+    for e in ["String", 3, Difficulty.EASY]:
+        with pytest.raises(TypeError):
+            tq.add(e)
+
+def test_add_task():
+    tq = TaskQueue()
+    t_id = ObjectId()
+    t_d = Difficulty.HARD
+    t_done = True
+    t_bug = False
+
+    t = Task(id=t_id, difficulty=t_d, done=t_done, bug=t_bug)
+
+    assert tq.tasks == set()
+    assert tq.get() == set()
+
+    tq.add(t)
+
+    assert tq.tasks == {t}
+    assert tq.get() == {t}
 
 
 def test_tq_initialize():
@@ -23,28 +69,33 @@ def test_tq_initialize():
 
 
 def test_tq_from_json():
-    json = {'easy': {'todo': 5, 'solved': 5, 'error_unidentified': 2, 'error_identified': 15, 'tested': 900},
-            'medium': {'todo': 10, 'solved': 0, 'error_unidentified': 4, 'error_identified': 23, 'tested': 435},
-            'hard': {'todo': 15, 'solved': 0, 'error_unidentified': 23, 'error_identified': 1, 'tested': 0}
+    json = {'easy': {'todo': 5, 'solved': 5, 'error_unidentified': 2, 'error_identified': 15, 'unit_tested': 900},
+            'medium': {'todo': 10, 'solved': 0, 'error_unidentified': 4, 'error_identified': 23, 'unit_tested': 435},
+            'hard': {'todo': 15, 'solved': 0, 'error_unidentified': 23, 'error_identified': 1, 'unit_tested': 0}
             }
-    tq = TaskQueue(easy=json.get('easy'), medium=json.get('medium'), hard=json.get('hard'))
+    tq = TaskQueue(easy=json.get('easy'), medium=json.get(
+        'medium'), hard=json.get('hard'))
     assert tq.easy.todo == json.get('easy').get('todo')
     assert tq.easy.solved == json.get('easy').get('solved')
-    assert tq.easy.error_unidentified == json.get('easy').get('error_unidentified')
+    assert tq.easy.error_unidentified == json.get(
+        'easy').get('error_unidentified')
     assert tq.easy.error_identified == json.get('easy').get('error_identified')
-    assert tq.easy.tested == json.get('easy').get('tested')
+    assert tq.easy.unit_tested == json.get('easy').get('unit_tested')
 
     assert tq.medium.todo == json.get('medium').get('todo')
     assert tq.medium.solved == json.get('medium').get('solved')
-    assert tq.medium.error_unidentified == json.get('medium').get('error_unidentified')
-    assert tq.medium.error_identified == json.get('medium').get('error_identified')
-    assert tq.medium.tested == json.get('medium').get('tested')
+    assert tq.medium.error_unidentified == json.get(
+        'medium').get('error_unidentified')
+    assert tq.medium.error_identified == json.get(
+        'medium').get('error_identified')
+    assert tq.medium.unit_tested == json.get('medium').get('unit_tested')
 
     assert tq.hard.todo == json.get('hard').get('todo')
     assert tq.hard.solved == json.get('hard').get('solved')
-    assert tq.hard.error_unidentified == json.get('hard').get('error_unidentified')
+    assert tq.hard.error_unidentified == json.get(
+        'hard').get('error_unidentified')
     assert tq.hard.error_identified == json.get('hard').get('error_identified')
-    assert tq.hard.tested == json.get('hard').get('tested')
+    assert tq.hard.unit_tested == json.get('hard').get('unit_tested')
 
 
 def test_tq_to_json():
@@ -55,21 +106,24 @@ def test_tq_to_json():
             'solved': 0,
             'error_unidentified': 0,
             'error_identified': 0,
-            'tested': 0
+            'tested': 0,
+            'integration_tested': 0,
         },
         'medium': {
             'todo': 10,
             'solved': 0,
             'error_unidentified': 0,
             'error_identified': 0,
-            'tested': 0
+            'tested': 0,
+            'integration_tested': 0,
         },
         'hard': {
             'todo': 15,
             'solved': 0,
             'error_unidentified': 0,
             'error_identified': 0,
-            'tested': 0
+            'tested': 0,
+            'integration_tested': 0,
         }
     }
 
@@ -84,7 +138,8 @@ def test_task_queue_len(tq):
     assert len(tq) == 30
 
     tq2 = TaskQueue(easy=_TaskQueue(todo=100, solved=25, error_unidentified=5),
-                    medium=_TaskQueue(todo=200, solved=25, error_unidentified=5),
+                    medium=_TaskQueue(todo=200, solved=25,
+                                      error_unidentified=5),
                     hard=_TaskQueue(todo=50, solved=25, error_unidentified=5))
 
     assert len(tq2) == 100 + 200 + 50 + 25 * 3 + 5 * 3
@@ -173,9 +228,12 @@ def test_task_queue_solve_errors_are_made():
     assert tq_easy.easy.error_unidentified < tq_medium.medium.error_unidentified
     assert tq_medium.medium.error_unidentified < tq_hard.hard.error_unidentified
 
-    assert tq_easy.easy.error_unidentified + tq_easy.easy.solved == tq_easy.easy.done
-    assert tq_medium.medium.error_unidentified + tq_medium.medium.solved == tq_medium.medium.done
-    assert tq_hard.hard.error_unidentified + tq_hard.hard.solved == tq_hard.hard.done
+    assert tq_easy.easy.error_unidentified + \
+        tq_easy.easy.solved == tq_easy.easy.done
+    assert tq_medium.medium.error_unidentified + \
+        tq_medium.medium.solved == tq_medium.medium.done
+    assert tq_hard.hard.error_unidentified + \
+        tq_hard.hard.solved == tq_hard.hard.done
 
 
 def test_task_queue_more_tasks_than_todo():
@@ -201,7 +259,7 @@ def test_tq_testing():
     assert n == 0
 
     assert tq.easy.error_unidentified + tq.easy.solved == 10
-    assert tq.easy.tested + tq.easy.error_identified == 10
+    assert tq.easy.unit_tested + tq.easy.error_identified == 10
 
 
 def test_tq_juniors_cant_test_hard_tasks():
@@ -212,23 +270,24 @@ def test_tq_juniors_cant_test_hard_tasks():
     assert n == 10
 
     assert tq.hard.error_unidentified == 10
-    assert tq.hard.tested == 0
+    assert tq.hard.unit_tested == 0
     assert tq.hard.solved == 10
 
 
 def test_tq_expert_testing():
-    tq = TaskQueue(easy=_TaskQueue(error_unidentified=3, solved=3), hard=_TaskQueue(error_unidentified=10, solved=5))
+    tq = TaskQueue(easy=_TaskQueue(error_unidentified=3, solved=3),
+                   hard=_TaskQueue(error_unidentified=10, solved=5))
 
     n = tq.test(20, Member(skill_type='expert'))
 
     assert n == 0
 
     assert tq.hard.error_unidentified == 0
-    assert tq.hard.tested == 5
+    assert tq.hard.unit_tested == 5
     assert tq.hard.solved == 0
     assert tq.hard.error_identified == 10
 
-    assert tq.easy.tested + tq.easy.error_identified == 5
+    assert tq.easy.unit_tested + tq.easy.error_identified == 5
     assert tq.easy.error_unidentified + tq.easy.solved == 1
 
 
@@ -240,14 +299,17 @@ def test_tq_fixing():
     assert n == 10
 
     assert tq.easy.error_identified == 0
-    assert tq.easy.tested == 10
+    assert tq.easy.unit_tested == 10
 
 
 def test_complex_scenarios_of_task_queues():
     tq = TaskQueue(
-        easy=_TaskQueue(todo=300, error_unidentified=10, solved=10, error_identified=10, tested=0),
-        medium=_TaskQueue(todo=10, error_unidentified=0, solved=10, error_identified=10, tested=50),
-        hard=_TaskQueue(todo=5, error_unidentified=0, solved=0, error_identified=0, tested=0),
+        easy=_TaskQueue(todo=300, error_unidentified=10,
+                        solved=10, error_identified=10, unit_tested=0),
+        medium=_TaskQueue(todo=10, error_unidentified=0,
+                          solved=10, error_identified=10, unit_tested=50),
+        hard=_TaskQueue(todo=5, error_unidentified=0, solved=0,
+                        error_identified=0, unit_tested=0),
     )
 
     n = tq.solve(300, Member(skill_type='junior'))
@@ -265,15 +327,15 @@ def test_complex_scenarios_of_task_queues():
     n = tq.test(120, Member(skill_type='senior'))
     assert n == 0
     assert tq.total_error_identified > 20
-    assert tq.total_tasks_tested > 50
+    assert tq.total_tasks_unit_tested > 50
 
-    tested = tq.total_tasks_tested
+    tested = tq.total_tasks_unit_tested
 
     errors = tq.total_error_identified
 
     n = tq.fix(errors, Member(skill_type='expert'))
     assert n == 0
-    assert tq.total_tasks_tested == tested + errors
+    assert tq.total_tasks_unit_tested == tested + errors
 
 
 @pytest.fixture
@@ -287,15 +349,16 @@ def test_inner_tq_gets_initialized():
     assert tq.solved == 0
     assert tq.error_unidentified == 0
     assert tq.error_identified == 0
-    assert tq.tested == 0
+    assert tq.unit_tested == 0
     assert tq.done == 0
 
-    tq = _TaskQueue(todo=400, solved=25, error_unidentified=5, error_identified=12, tested=50)
+    tq = _TaskQueue(todo=400, solved=25, error_unidentified=5,
+                    error_identified=12, unit_tested=50)
     assert tq.todo == 400
     assert tq.solved == 25
     assert tq.error_unidentified == 5
     assert tq.error_identified == 12
-    assert tq.tested == 50
+    assert tq.unit_tested == 50
     assert tq.done == tq.solved + tq.error_unidentified
 
 
@@ -305,14 +368,16 @@ def test_inner_tq_json(tq_inner):
         'solved': 25,
         'error_unidentified': 5,
         'error_identified': 0,
-        'tested': 0
+        'tested': 0,
+        'integration_tested': 0,
     }
 
 
 def test_tq_qualitiy_score():
-    tq = TaskQueue(easy=_TaskQueue(todo=0, solved=25, error_unidentified=5, error_identified=12, tested=50),
-                   medium=_TaskQueue(todo=0, solved=25, error_unidentified=5, error_identified=12, tested=50),
-                   hard=_TaskQueue(todo=0, solved=25, error_unidentified=5, error_identified=12, tested=50))
+    tq = TaskQueue(easy=_TaskQueue(todo=0, solved=25, error_unidentified=5, error_identified=12, unit_tested=50),
+                   medium=_TaskQueue(
+                       todo=0, solved=25, error_unidentified=5, error_identified=12, unit_tested=50),
+                   hard=_TaskQueue(todo=0, solved=25, error_unidentified=5, error_identified=12, unit_tested=50))
     er = 5 * 3 + 12 * 3
     ok = 25 * 3 + 50 * 3
     tot = er + ok
