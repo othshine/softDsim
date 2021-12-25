@@ -4,6 +4,18 @@ from bson import ObjectId
 
 class Task:
     def __init__(self, id=None, difficulty=None, done: bool = False, bug: bool = False, correct_specification: bool = True, done_by=None, pred=None) -> None:
+        """A task is a unit of work that is to solve by the team to finish the scenario.
+
+        Args:
+            id (ObjectId, optional): Identification number.
+            difficulty (Difficulty enum or int 1-3, optional): Difficulty of the task. Defaults to Difficulty.EASY.
+            done (bool, optional): True if task was solved. Defaults to False.
+            bug (bool, optional): True if solved task has a bug (leads to error in unittest). Defaults to False.
+            correct_specification (bool, optional): True if specification is correct (leads to positive integration test). Defaults to True.
+            done_by (ObjectId, optional): ID of the member that solved the task. Defaults to None.
+            pred ([type], optional): ID of the task that this task builds directly on (if integration test of pred fails, this task's integration test fails as well.). Defaults to None.
+        """
+
         self.id = ObjectId() if id is None else id if isinstance(
             id, ObjectId) else ObjectId(id)
         self.difficulty = difficulty if isinstance(difficulty, Difficulty) else Difficulty(int(
@@ -18,6 +30,7 @@ class Task:
 
     @property
     def json(self):
+        """Returns a json (dict) representation of the task object."""
         j = {
             'id': str(self.id),
             'difficulty': self.difficulty.value,
@@ -32,7 +45,9 @@ class Task:
 
         return j
 
+
 class Difficulty(Enum):
+    """Difficulty level of a task."""
     EASY = 1
     MEDIUM = 2
     HARD = 3
