@@ -194,7 +194,7 @@ class UserScenario:
         else:
             d = self.decisions[self.counter]
             if (not isinstance(d, SimulationDecision)) or (
-                    isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.task_queue.total_tasks_tested)):
+                    isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.task_queue.total_tasks_unit_tested)):
                 self.counter += 1
 
     def get_decision(self, nr: int = None) -> Optional[Decision]:
@@ -264,9 +264,9 @@ class TaskQueue:  # Maybe rename in TaskQueueWrapper
         return self.easy.done + self.medium.done + self.hard.done
 
     @property
-    def total_tasks_tested(self) -> int:
+    def total_tasks_unit_tested(self) -> int:
         """Returns the total number of tasks tested."""
-        return self.easy.tested + self.medium.tested + self.hard.tested
+        return self.easy.unit_tested + self.medium.unit_tested + self.hard.unit_tested
 
     @property
     def total_error_identified(self) -> int:
@@ -276,11 +276,15 @@ class TaskQueue:  # Maybe rename in TaskQueueWrapper
     @property
     def total_tasks_done_or_tested(self) -> int:
         """Returns the total number of tasks done or tested."""
-        return self.total_tasks_done + self.total_tasks_tested + self.total_error_identified
+        return self.total_tasks_done + self.total_tasks_unit_tested + self.total_error_identified
 
     @property
     def total_tasks_with_faults(self):
         return self.easy.tasks_with_faults + self.medium.tasks_with_faults + self.hard.tasks_with_faults
+    
+    @property
+    def total_integration_tested(self):
+        return self.easy.integration_tested + self.medium.integration_tested + self.hard.integration_tested
 
     def total_tasks(self):
         return len(self)
@@ -381,19 +385,20 @@ class TaskQueue:  # Maybe rename in TaskQueueWrapper
 
 class _TaskQueue:
     def __init__(self, todo: int = 0, solved: int = 0, error_unidentified: int = 0, error_identified: int = 0,
-                 tested: int = 0):
+                 unit_tested: int = 0, integration_tested: int = 0):
         self.todo = todo
         self.solved = solved
         self.error_unidentified = error_unidentified
         self.error_identified = error_identified
-        self.tested = tested
+        self.unit_tested = unit_tested
+        self.integration_tested = integration_tested
 
     def __str__(self):
         return f'{self.todo} tasks to do, {self.solved} solved, {self.error_unidentified} unidentified errors, ' \
-               f'{self.error_identified} identified errors, {self.tested} tested'
+               f'{self.error_identified} identified errors, {self.unit_tested} tested, {self.integration_tested} integration_tested'
 
     def __len__(self):
-        return self.todo + self.solved + self.error_unidentified + self.error_identified + self.tested
+        return self.todo + self.solved + self.error_unidentified + self.error_identified + self.unit_tested + self.integration_tested
 
     @property
     def done(self):
@@ -414,7 +419,8 @@ class _TaskQueue:
             'solved': self.solved,
             'error_unidentified': self.error_unidentified,
             'error_identified': self.error_identified,
-            'tested': self.tested
+            'tested': self.unit_tested,
+            'integration_tested': self.integration_tested
         }
 
     def solve(self, n, member: Member, e: float = 0.0):
@@ -449,7 +455,7 @@ class _TaskQueue:
                 self.error_unidentified -= 1
             else:
                 self.solved -= 1
-                self.tested += 1
+                self.unit_tested += 1
         return n - m
 
     def fix(self, n, member):
@@ -457,6 +463,6 @@ class _TaskQueue:
         m = min(n, self.error_identified)
 
         self.error_identified -= m
-        self.tested += m
+        self.unit_tested += m
 
         return n - m

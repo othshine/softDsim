@@ -1,4 +1,4 @@
-import pytest
+""" import pytest
 
 from app.src.domain.dataObjects import SimulationGoal
 from app.src.domain.decision_tree import Decision, AnsweredDecision, SimulationDecision, TextBlock, Answer, \
@@ -8,11 +8,11 @@ from utils import YAMLReader
 
 
 def test_scenario_get_next_decision():
-    s = Scenario()
+    s = Scenario(name="", budget=10000, scheduled_days=10)
     s.add(AnsweredDecision())
     s.add(SimulationDecision(goal=SimulationGoal(tasks=350), max_points=200, points=100, continue_text="Week",
                              text=[TextBlock(header="a", content="b"), TextBlock(header='c', content='y')]))
-    s.add(AnsweredDecision(answers=[Answer(points=100, text="Hi"), Answer(points=0, text="Lo")],
+    s.add(AnsweredDecision(answers=[Answer(points=100, label="A"), Answer(points=0,label="B")],
                            text=[TextBlock(header="x", content="cont"), TextBlock(header='abc', content='3')], points=5,
                            continue_text="CC"))
 
@@ -65,15 +65,4 @@ def test_scenario_get_next_decision():
     with pytest.raises(StopIteration):
         next(s)
 
-
-def test_scenario_loads_yaml_actions():
-    ActionList()
-
-
-
-
-
-def test_scenario_actions():
-    s = Scenario()
-
-
+ """

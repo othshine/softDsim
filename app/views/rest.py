@@ -35,8 +35,8 @@ def end_scenario(s, username):
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
-    tasks_done_before = s.task_queue.total_tasks_done + s.task_queue.total_tasks_tested + s.task_queue.total_error_identified
-    tasks_tested_before = s.task_queue.total_tasks_tested
+    tasks_done_before = s.task_queue.total_tasks_done + s.task_queue.total_tasks_unit_tested + s.task_queue.total_error_identified
+    tasks_tested_before = s.task_queue.total_tasks_unit_tested
     if not isinstance(s, UserScenario) or s.user != request.user.username:
         return HttpResponse(status=403)
 
@@ -66,7 +66,7 @@ def click_continue(request, sid):
             d = next(s)
             context = {
                 "continue_text": d.continue_text,
-                "tasks_done": s.tasks_done + s.task_queue.total_tasks_tested + s.task_queue.total_error_identified,
+                "tasks_done": s.tasks_done + s.task_queue.total_tasks_unit_tested + s.task_queue.total_error_identified,
                 "tasks_total": s.template.tasks_total,
                 "blocks": [],
                 "cost": s.team.salary,
@@ -84,12 +84,12 @@ def click_continue(request, sid):
                 'scrum': s.model == 'scrum' and isinstance(s.get_decision(), SimulationDecision),
                 "tasks": {
                     "todo": s.task_queue.total_tasks_todo,
-                    "done": s.task_queue.total_tasks_done + s.task_queue.total_tasks_tested,
+                    "done": s.task_queue.total_tasks_done + s.task_queue.total_tasks_unit_tested,
                     
-                    "tested": s.task_queue.total_tasks_tested,
+                    "tested": s.task_queue.total_tasks_unit_tested,
                     "errors": s.task_queue.total_error_identified,
-                    "done_week": s.task_queue.total_tasks_done - tasks_done_before + s.task_queue.total_tasks_tested + s.task_queue.total_error_identified,
-                    "tested_week": s.task_queue.total_tasks_tested - tasks_tested_before
+                    "done_week": s.task_queue.total_tasks_done - tasks_done_before + s.task_queue.total_tasks_unit_tested + s.task_queue.total_error_identified,
+                    "tested_week": s.task_queue.total_tasks_unit_tested - tasks_tested_before
                 }
             }
             if s.current_wr:
