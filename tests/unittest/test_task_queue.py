@@ -1,16 +1,10 @@
-from app.src.domain.task import Difficulty
 from app.src.domain.task_queue import TaskQueue
-from app.src.domain.task import Task
+from app.src.domain.task import Task, Difficulty
 from bson import ObjectId
 
 import pytest
 
 from app.src.domain.team import Member
-
-
-@pytest.fixture
-def tq():
-    return TaskQueue(easy=5, medium=10, hard=15)
 
 
 def test_instantiate_task_queue():
@@ -21,10 +15,12 @@ def test_task_queue_tasks():
     tq = TaskQueue()
     assert isinstance(tq.tasks, set)
 
+
 def test_task_queue_get():
     tq = TaskQueue()
     r = tq.get()
     assert isinstance(r, set)
+
 
 def test_add():
     tq = TaskQueue()
@@ -38,6 +34,7 @@ def test_add():
     for e in ["String", 3, Difficulty.EASY]:
         with pytest.raises(TypeError):
             tq.add(e)
+
 
 def test_add_task():
     tq = TaskQueue()
@@ -95,7 +92,39 @@ def test_tq_get():
     assert tasks_all[3] in tasks_filtered
 
 
+def test_tq_deserialize():
+    tq = TaskQueue()
+    pid = ObjectId()
+    tq.add(Task(difficulty=Difficulty.HARD, done=True))
+    tq.add(Task(unit_tested=True, pred=pid, done_by=ObjectId()))
 
+    j = tq.json
+
+    tq2 = TaskQueue(**j)
+
+    assert len(tq.get()) == 2
+    assert len(tq2.get()) == 2
+
+    assert len(tq.get(pred=pid)) == 1
+    assert len(tq2.get(pred=pid)) == 1
+
+    assert len(tq.get(difficulty=Difficulty.HARD)) == 1
+    assert len(tq2.get(difficulty=Difficulty.HARD)) == 1
+
+    assert len(tq.get(difficulty=Difficulty.MEDIUM)) == 0
+    assert len(tq2.get(difficulty=Difficulty.MEDIUM)) == 0
+
+    assert len(tq.get(difficulty=Difficulty.EASY)) == 1
+    assert len(tq2.get(difficulty=Difficulty.EASY)) == 1
+
+    assert len(tq.get(pred=pid, unit_tested=True)) == 1
+    assert len(tq2.get(pred=pid, unit_tested=True)) == 1
+
+    assert len(tq.get(pred=pid, unit_tested=True, bug=True)) == 0
+    assert len(tq2.get(pred=pid, unit_tested=True, bug=True)) == 0
+
+
+"""
 def test_tq_initialize():
     tq = TaskQueue()
     assert tq.easy.todo == 0
@@ -421,3 +450,4 @@ def test_tq_qualitiy_score():
     ok = 25 * 3 + 50 * 3
     tot = er + ok
     assert tq.quality_score == int(((tot - er) * (1 / tot)) ** 8 * 100)
+"""

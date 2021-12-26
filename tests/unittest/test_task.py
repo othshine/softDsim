@@ -78,6 +78,8 @@ def test_task_to_json():
         'done': True,
         'bug': False,
         'correct_specification': True,
+        'unit_tested': False,
+        'integration_tested': False,
         'done_by': str(m.id)
     }
 
@@ -94,6 +96,8 @@ def test_task_to_json():
         'done': False,
         'bug': False,
         'correct_specification': False,
+        'unit_tested': False,
+        'integration_tested': False,
         'pred': str(t.id),
     }
 
