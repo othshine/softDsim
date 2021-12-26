@@ -45,6 +45,28 @@ class Task:
 
         return j
 
+    def filter(self, **kwargs):
+        """Checks if a tasks falls within given filters
+
+        Kwargs can be any subset of the attribtues that task object has (id, difficulty, done, bug...)
+
+        Example:
+        ```
+        task = Task(difficulty=Difficulty.HARD, done=True, bug=True)
+
+        task.filter(difficulty=Difficulty.HARD, done=True) --> True
+        task.filter(difficulty=Difficulty.HARD, done=False) --> False
+        task.filter(bug=False) --> False
+        task.filter(bug=True) --> True
+        ```
+        Returns:
+            bool: True if task has all given attributes as specified. Else False.
+        """
+        for key, val in kwargs.items():
+            if self.__dict__.get(key) != val:
+                return False
+        return True
+
 
 class Difficulty(Enum):
     """Difficulty level of a task."""

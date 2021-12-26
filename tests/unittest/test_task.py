@@ -3,7 +3,7 @@ import pytest
 from bson import ObjectId
 
 from app.src.domain.task import Task, Difficulty
-from app.src.domain.team import Member
+from app.src.domain.team import TASK_COMPLETION_COEF, Member
 
 
 def test_instantiate_task():
@@ -99,3 +99,82 @@ def test_task_to_json():
 
     assert t2.json == json2
     assert t2.json.get('done_by') is None
+
+
+def test_task_filter_difficulty():
+
+    t = Task(difficulty=3)
+    assert t.filter(difficulty=Difficulty.HARD) == True
+    assert t.filter(difficulty=1) == False
+    assert t.filter(difficulty=Difficulty.MEDIUM) == False
+
+    t = Task(difficulty=Difficulty.MEDIUM)
+    assert t.filter(difficulty=Difficulty.HARD) == False
+    assert t.filter(difficulty=1) == False
+    assert t.filter(difficulty=Difficulty.MEDIUM) == True
+
+    t = Task()
+    assert t.filter(difficulty=Difficulty.HARD) == False
+    assert t.filter(difficulty=Difficulty.EASY) == True
+    assert t.filter(difficulty=Difficulty.MEDIUM) == False
+
+
+def test_task_filter_done():
+    
+    t = Task(done=True)
+    assert t.filter(done=True) == True
+    assert t.filter(done=False) == False
+
+    t = Task(difficulty=3, id=ObjectId(), bug=True)
+    assert t.filter(done=True) == False
+    assert t.filter(done=False) == True
+
+    t = Task(difficulty=1, id=ObjectId(), done=True, bug=True)
+    assert t.filter(done=True) == True
+    assert t.filter(done=False) == False
+
+
+def test_task_filter_done_by():
+    
+    m = Member()
+    t = Task(done=True, done_by=m.id)
+
+    assert t.filter(done_by=m.id) == True
+    assert t.filter(done_by=ObjectId()) == False
+
+def test_task_filter_combination1():
+    m = Member()
+    t0 = Task()
+    _id = ObjectId()
+    t = Task(id=_id, difficulty=Difficulty.HARD, done=True, done_by=m.id, pred=t0.id, correct_specification=False, bug=True)
+
+    # Testing id
+    assert t.filter(id=_id)
+    assert t.filter(id=ObjectId(str(_id)))
+    assert not t.filter(id=m.id)
+
+    assert not t0.filter(id=_id)
+    assert not t0.filter(id=_id, done=False)
+    assert t0.filter(done=False)
+    assert t0.filter(done=False, bug=False)
+    assert t0.filter(done=False, bug=False, done_by=None)
+    assert not t0.filter(done=False, bug=True, done_by=None)
+    assert not t0.filter(done=True, bug=True, done_by=m.id)
+
+    assert t.filter()
+    assert t.filter(done=True)
+    assert t.filter(difficulty=Difficulty.HARD, done=True)
+    assert t.filter(done=True, id=_id)
+    assert not t.filter(done=False, id=_id)
+    assert t.filter(done_by=m.id, difficulty=Difficulty.HARD, correct_specification=False, bug=True)
+    assert t.filter(pred=t0.id, id=t.id, done=True, done_by=m.id, difficulty=Difficulty.HARD, correct_specification=False, bug=True)
+    assert not t.filter(pred=m.id, id=t.id, done=True, done_by=m.id, difficulty=Difficulty.HARD, correct_specification=False, bug=True)
+    assert not t.filter(pred=t0.id, id=t.id, done=False, done_by=m.id, difficulty=Difficulty.HARD, correct_specification=False, bug=True)
+    assert not t.filter(pred=t0.id, id=t.id, done=True, done_by=m.id, difficulty=Difficulty.EASY, correct_specification=False, bug=True)
+    assert not t.filter(pred=t0.id, id=t.id, done=True, done_by=m.id, difficulty=Difficulty.HARD, correct_specification=True, bug=True)
+    assert not t.filter(pred=t0.id, id=t.id, done=True, done_by=m.id, difficulty=Difficulty.HARD, correct_specification=False, bug=False)
+    assert not t.filter(pred=t0.id, id=t0.id, done=True, done_by=m.id, difficulty=Difficulty.HARD, correct_specification=False, bug=True)
+    assert not t.filter(pred=t0.id, id=t.id, done=True, done_by=ObjectId(), difficulty=Difficulty.HARD, correct_specification=False, bug=True)
+
+
+    

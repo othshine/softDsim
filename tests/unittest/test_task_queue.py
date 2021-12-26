@@ -56,6 +56,45 @@ def test_add_task():
     assert tq.tasks == {t}
     assert tq.get() == {t}
 
+def test_tq_get():
+    tq = TaskQueue()
+    tasks_all = [
+        Task(difficulty=2, done=True),
+        Task(difficulty=3),
+        Task(difficulty=2),
+        Task(difficulty=3, done=True)
+    ]
+    tq.add(tasks_all)
+
+    tasks_filtered = tq.get()
+    assert len(tasks_filtered) == 4
+
+    tasks_filtered = tq.get(difficulty=Difficulty.MEDIUM)
+    assert len(tasks_filtered) == 2
+    assert tasks_all[0] in tasks_filtered
+    assert tasks_all[1] not in tasks_filtered
+    assert tasks_all[2] in tasks_filtered
+
+    tasks_filtered = tq.get(done=False)
+    assert len(tasks_filtered) == 2
+    assert tasks_all[0] not in tasks_filtered
+    assert tasks_all[1] in tasks_filtered
+    assert tasks_all[2] in tasks_filtered
+
+    tasks_filtered = tq.get(done=True)
+    assert len(tasks_filtered) == 2
+    assert tasks_all[0] in tasks_filtered
+    assert tasks_all[1] not in tasks_filtered
+    assert tasks_all[3] in tasks_filtered
+
+    tasks_filtered = tq.get(difficulty=Difficulty.HARD, done=True)
+    assert len(tasks_filtered) == 1
+    assert tasks_all[0] not in tasks_filtered
+    assert tasks_all[1] not in tasks_filtered
+    assert tasks_all[2] not in tasks_filtered
+    assert tasks_all[3] in tasks_filtered
+
+
 
 def test_tq_initialize():
     tq = TaskQueue()
