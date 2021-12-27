@@ -6,8 +6,12 @@ class TaskQueue:
     def __init__(self, tasks=[]) -> None:
         self.tasks = set([Task(**t) for t in tasks])
     
-    def get(self, **kwargs) -> set:
-        return {t for t in self.tasks if t.filter(**kwargs)}
+    def get(self, n=None, **kwargs) -> set:
+        filtered =  {t for t in self.tasks if t.filter(**kwargs)}
+        if n and n < len(filtered):
+            filtered = set(list(filtered)[:n])
+        return filtered
+
 
     def add(self, t) -> None:
         """Adds a task or multiple tasks to the queue.

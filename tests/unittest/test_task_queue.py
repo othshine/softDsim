@@ -92,6 +92,27 @@ def test_tq_get():
     assert tasks_all[3] in tasks_filtered
 
 
+def test_get_set_size():
+    tq = TaskQueue()
+    tasks_all = [
+        Task(difficulty=2, done=True),
+        Task(difficulty=3),
+        Task(difficulty=2),
+        Task(difficulty=3, done=True)
+    ]
+    tq.add(tasks_all)
+
+    assert len(tq.get(n=1)) == 1
+    assert len(tq.get(n=10)) == 4
+    assert len(tq.get(n=3)) == 3
+
+
+    assert len(tq.get(done=True, n=2)) == 2
+    assert len(tq.get(done=True, n=1)) == 1
+    assert len(tq.get(done=True, n=3)) == 2
+
+
+
 def test_tq_deserialize():
     tq = TaskQueue()
     pid = ObjectId()

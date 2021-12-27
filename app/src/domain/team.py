@@ -1,9 +1,13 @@
+import random
+
 from statistics import mean
 from typing import List
 
 from bson import ObjectId
 
 from app.src.domain.dataObjects import WorkPackage
+from app.src.domain.task_queue import TaskQueue
+from app.src.domain.task import Task, Difficulty
 from utils import YAMLReader, value_or_error
 
 from scipy.stats import poisson
@@ -25,6 +29,29 @@ def inc(x: float, factor: float = 1.0):
     limit of 1. :param x: current value  :return: float - x + 0.1
     """
     return min([x + (0.01 * factor), 1.0])  # ToDo: Find a fitting function that approaches 1
+
+def order_tasks_for_member(tasks:set, skill_type)->list:
+    tasks = list(tasks)
+    if skill_type.name == "junior":
+        tasks = sorted(tasks, key=lambda t: t.difficulty.value)
+    elif skill_type.name == "expert":
+        tasks = sorted(tasks, key=lambda t: t.difficulty.value, reverse=True)
+    elif skill_type.name == "senior":
+        senior_tasks = []
+        other_tasks = []
+        for t in tasks:
+            if t.difficulty.value == 2:
+                senior_tasks.append(t)
+            else: 
+                print(t.difficulty)
+                other_tasks.append(t)
+        random.shuffle(other_tasks)
+        tasks = senior_tasks + other_tasks
+
+    return tasks
+
+
+
 
 
 class Member:
@@ -65,13 +92,18 @@ class Member:
         """
         return mean([self.motivation, self.familiarity])
 
-    def solve_tasks(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
+    def solve_tasks(self, time: float, tq: TaskQueue, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0):
         """
         Simulates a member solving tasks for <time> hours.
         """
         number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
+
+        tasks_to_solve = order_tasks_for_member(tq.get(done=False, n=number_tasks), self.skill_type)
+        
+
+
         m = tq.solve(number_tasks, self)
-        self.familiar_tasks += (number_tasks - m)  # ToDo This should be done in the task queue
+        self.familiar_tasks += (number_tasks - m)
         self.update_familiarity(tq.total_tasks_done_or_tested)
 
         # If there were less than n tasks in the queue to do the member will go over to testing and fixing
@@ -79,7 +111,7 @@ class Member:
             m = tq.test(m, self)
             tq.fix(m, self)
 
-    def fix_errors(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
+    def fix_errors(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0):
         """
         Simulates a member fixing errors for <time> hours.
         """
@@ -91,7 +123,7 @@ class Member:
             m = tq.solve(m, self)
             tq.test(m, self)
 
-    def test_tasks(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0) -> (int, int):
+    def test_tasks(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0):
         """
         Simulates a member testing tasks for <time> hours.
         """

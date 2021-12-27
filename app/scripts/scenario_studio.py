@@ -1,4 +1,5 @@
 import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "softDsim.settings")
 
 from bson import ObjectId
 
@@ -9,8 +10,8 @@ from mongo_models import ScenarioMongoModel
 from utils import _YAMLReader
 
 
-def make():
-    YAMLReader = _YAMLReader('app/src/cli/test.yaml')
+def run():
+    YAMLReader = _YAMLReader('app/scripts/scenarios/test.yaml')
     data = YAMLReader.read()
     s = Scenario(name=data.get('name', "DefaultName"),
                  budget=data.get('budget', 10000),
@@ -46,4 +47,4 @@ def make():
 
 
 if __name__ == "__main__":
-    make()
+    run()

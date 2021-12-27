@@ -35,8 +35,8 @@ def end_scenario(s, username):
 def click_continue(request, sid):
     model = ScenarioMongoModel()
     s = model.get(sid)
-    tasks_done_before = s.task_queue.total_tasks_done + s.task_queue.total_tasks_unit_tested + s.task_queue.total_error_identified
-    tasks_tested_before = s.task_queue.total_tasks_unit_tested
+    tasks_done_before = len(s.task_queue.get(done=True))
+    tasks_tested_before = len(s.task_queue.get(unit_tested=True))
     if not isinstance(s, UserScenario) or s.user != request.user.username:
         return HttpResponse(status=403)
 
@@ -66,7 +66,7 @@ def click_continue(request, sid):
             d = next(s)
             context = {
                 "continue_text": d.continue_text,
-                "tasks_done": s.tasks_done + s.task_queue.total_tasks_unit_tested + s.task_queue.total_error_identified,
+                "tasks_done": len(s.task_queue.get(done=True)),
                 "tasks_total": s.template.tasks_total,
                 "blocks": [],
                 "cost": s.team.salary,
@@ -83,18 +83,18 @@ def click_continue(request, sid):
                 'done': False,
                 'scrum': s.model == 'scrum' and isinstance(s.get_decision(), SimulationDecision),
                 "tasks": {
-                    "todo": s.task_queue.total_tasks_todo,
-                    "done": s.task_queue.total_tasks_done + s.task_queue.total_tasks_unit_tested,
+                    "todo": len(s.task_queue.get(done=False)),
+                    "done": len(s.task_queue.get(done=True)),
                     
-                    "tested": s.task_queue.total_tasks_unit_tested,
-                    "errors": s.task_queue.total_error_identified,
-                    "done_week": s.task_queue.total_tasks_done - tasks_done_before + s.task_queue.total_tasks_unit_tested + s.task_queue.total_error_identified,
-                    "tested_week": s.task_queue.total_tasks_unit_tested - tasks_tested_before
+                    "tested": len(s.task_queue.get(unit_tested=True)),
+                    "errors": len(s.task_queue.get(bug=True)),
+                    "done_week": len(s.task_queue.get(done=True)) - tasks_done_before,
+                    "tested_week": len(s.task_queue.get(unit_tested=True))- tasks_tested_before
                 }
             }
             if s.current_wr:
                 context['current_workday'] = {
-                    'tasks': s.task_queue.total_tasks_done.tasks_done-tasks_done_before,
+                    'tasks': len(s.task_queue.get(done=True)) - tasks_done_before,
                     'ident_errs': s.current_wr.identified_errors,
                     'ident_total': s.identified_errors,
                     'fixed_errs': s.current_wr.fixed_errors
