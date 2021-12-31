@@ -77,7 +77,7 @@ class Task:
         self.done_by = None
         self.integration_tested = False
         self.unit_tested = False
-        self.pred = False
+        self.pred = None
         self.correct_specification = True
 
 

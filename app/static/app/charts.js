@@ -13,14 +13,26 @@ const taskChart = new Chart(ctxTasks, {
         labels: chartLabels,
         datasets: [{
             data: [0],
-            label: "Tasks Done",
+            label: "Done",
             borderColor: "#FF55AA",
             fill: false
         }, {
             data: [0],
-            label: "Tasks Tested",
+            label: "Unit Tested",
             borderColor: "#55FF55",
             fill: true
+        },
+        {
+            data: [0],
+            label: "Integration Tested",
+            borderColor: "#5555AA",
+            fill: true
+        },
+        {
+            data: [0],
+            label: "Bugs",
+            borderColor: "#AA55AA",
+            fill: false
         },
         ]
     },

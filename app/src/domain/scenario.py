@@ -27,6 +27,7 @@ class Scenario:
     tasks_easy: int = 0
     tasks_medium: int = 0
     tasks_hard: int = 0
+    pred_c: float = 0.1
 
     @property
     def tasks_total(self):
@@ -47,7 +48,8 @@ class Scenario:
                 'scheduled_days': self.scheduled_days,
                 '_id': str(self.id),
                 'id': str(self.id),
-                'desc': self.desc
+                'desc': self.desc,
+                'pred_c': self.pred_c
                 }
 
 

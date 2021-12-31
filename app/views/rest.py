@@ -89,18 +89,13 @@ def click_continue(request, sid):
                     "done": len(s.task_queue.get(done=True)),
                     
                     "tested": len(s.task_queue.get(unit_tested=True)),
+                    "itested": len(s.task_queue.get(integration_tested=True)),
                     "errors": len(s.task_queue.get(bug=True)),
                     "done_week": len(s.task_queue.get(done=True)) - tasks_done_before,
                     "tested_week": len(s.task_queue.get(unit_tested=True))- tasks_tested_before
                 }
             }
-            if s.current_wr:
-                context['current_workday'] = {
-                    'tasks': len(s.task_queue.get(done=True)) - tasks_done_before,
-                    'ident_errs': s.current_wr.identified_errors,
-                    'ident_total': s.identified_errors,
-                    'fixed_errs': s.current_wr.fixed_errors
-                }
+
             for t in d.text or []:
                 context.get('blocks').append({'header': t.header, 'text': t.content})
         except StopIteration:

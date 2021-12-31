@@ -21,6 +21,7 @@ def run():
                  tasks_easy=data.get('tasks_easy', 0),
                  tasks_medium=data.get('tasks_medium', 0),
                  tasks_hard=data.get('tasks_hard', 0),
+                 pred_c = data.get('pred_coefficient', 0.1),
                  )
     for decision in data.get('decisions', []):
         kwargs = {}

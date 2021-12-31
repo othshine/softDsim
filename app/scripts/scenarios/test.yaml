@@ -1,7 +1,8 @@
-name: Short Scenario II
+name: Scenario with Integration Testing
 tasks_easy: 200
 tasks_medium: 500
 tasks_hard: 300
+pred_coefficient: 0.2  # Specifies the chance of each task having a predecessor.
 budget: 25000
 scheduled_days: 50
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
@@ -12,11 +13,11 @@ decisions:
     - header: Welcome
       content: Here is something explained to the user.
     - header: Choose the fitting strategy
-      content: You were just promoted to be a project coordiantor. It is your job to make decisions on how this project will be executed.
+      content: You were just promoted to be a project coordinator. It is your job to make decisions on how this project will be executed.
     - header: The Customer
-      content: The customer is a company that is looking for a new interactive website for their business. The customer doesnt have a lot of time to spend on the project, so you need to make sure that the project is executed in a timely manner. There are no tight restrictions on how exatly the website should be designed. It just needs to have a modern appearance and be easy to use. The customer wants to be included in the design process to make final decisons.
+      content: The customer is a company that is looking for a new interactive website for their business. The customer doesn't have a lot of time to spend on the project, so you need to make sure that the project is executed in a timely manner. There are no tight restrictions on how exatly the website should be designed. It just needs to have a modern appearance and be easy to use. The customer wants to be included in the design process to make final decisons.
     - header: Model and Product Life Cycle
-      content: While choosing the PM model it is also a good idea to also think about the produt life cycle.
+      content: While choosing the PM model it is also a good idea to also think about the product life cycle.
     actions:
       - title: Model
         answers:

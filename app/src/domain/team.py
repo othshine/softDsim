@@ -7,7 +7,7 @@ from bson import ObjectId
 
 from app.src.domain.dataObjects import WorkPackage
 from app.src.domain.task_queue import TaskQueue
-from app.src.domain.task import Task, Difficulty
+from app.src.domain.task import Task
 from utils import YAMLReader, probability, value_or_error
 
 from scipy.stats import poisson
@@ -20,6 +20,8 @@ TRAIN_SKILL_INCREASE_AMOUNT = YAMLReader.read('train-skill-increase-amount')
 
 STRESS_PER_OVERTIME = YAMLReader.read('stress', 'overtime')
 STRESS_REDUCTION_PER_WEEKEND = YAMLReader.read('stress', 'weekend-reduction')
+
+
 
 
 
@@ -116,9 +118,15 @@ class Member:
         tasks_to_solve = order_tasks_for_member(tq.get(done=False, n=number_tasks), self.skill_type)
 
         for task in tasks_to_solve:
-            task.done = True
             task.done_by = self.id
             task.bug = bool(probability(self.skill_type.error_rate * (self.stress + self.e(task))))
+            task.correct_specification = bool(probability(0.5))
+            if probability(0.5):
+                try:
+                    self.pred = random.sample(tq.get(done=True), 1)[0].id
+                except:
+                    pass
+            task.done = True
     
         m = number_tasks - len(tasks_to_solve)
         self.familiar_tasks += (number_tasks - m)
@@ -204,7 +212,7 @@ class Member:
         if self.familiar_tasks == 0 or total_tasks_done == 0:
             self.familiarity = 0
         else:
-            self.familiarity = self.familiar_tasks / total_tasks_done
+            self.familiarity = min(self.familiar_tasks / total_tasks_done, 1)
 
     def increase_stress(self, amount):
         self.stress = max(min(self.stress + amount, 1), 0)
@@ -327,7 +335,9 @@ class Team:
             self.integration_test(tq)
 
     def integration_test(self, tq: TaskQueue):
+        print("INTE")
         tasks = tq.get(done=True, unit_tested=True, integration_tested=False)
+        print(len(tasks))
         for task in tasks:
             if task.correct_specification:
                 task.integration_tested = True
