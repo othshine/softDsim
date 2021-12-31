@@ -145,6 +145,67 @@ def test_tq_deserialize():
     assert len(tq2.get(pred=pid, unit_tested=True, bug=True)) == 0
 
 
+
+def test_reset_cascade():
+    tq = TaskQueue()
+
+    i1 = ObjectId()
+    i2 = ObjectId()
+    i3 = ObjectId()
+    i4 = ObjectId()
+
+    t1 = Task(id=i1, done=True)
+    t2 = Task(id=i2, pred=i1, done=True)
+    t3 = Task(id=i3, pred=i2, done=True)
+    t4 = Task(id=i4, done=True)
+
+    tq.add([t1, t2, t3, t4])
+
+    assert len(tq.get(done=True)) == 4
+    tq.reset_cascade(t1)
+    assert len(tq.get(done=True)) == 1
+    assert tq.get(done=True).pop() == t4
+
+def test_reset_cascade2():
+    tq = TaskQueue()
+
+    i1 = ObjectId()
+    i2 = ObjectId()
+    i3 = ObjectId()
+    i4 = ObjectId()
+
+    t1 = Task(id=i1, done=True)
+    t2 = Task(id=i2, pred=i1, done=True)
+    t3 = Task(id=i3, pred=i1, done=True)
+    t4 = Task(id=i4, done=True)
+
+    tq.add([t1, t2, t3, t4])
+
+    assert len(tq.get(done=True)) == 4
+    tq.reset_cascade(t1)
+    assert len(tq.get(done=True)) == 1
+    assert tq.get(done=True).pop() == t4
+
+def test_reset_cascade_circluar():
+    tq = TaskQueue()
+
+    i1 = ObjectId()
+    i2 = ObjectId()
+    i3 = ObjectId()
+    i4 = ObjectId()
+
+    t1 = Task(id=i1, pred=i3, done=True)
+    t2 = Task(id=i2, pred=i1, done=True)
+    t3 = Task(id=i3, pred=i2, done=True)
+    t4 = Task(id=i4, done=True)
+
+    tq.add([t1, t2, t3, t4])
+
+    assert len(tq.get(done=True)) == 4
+    tq.reset_cascade(t1)
+    assert len(tq.get(done=True)) == 1
+    assert tq.get(done=True).pop() == t4
+
 """
 def test_tq_initialize():
     tq = TaskQueue()

@@ -44,6 +44,7 @@ decisions:
       - error-fixing
       - training
       - overtime
+      - integration
     text:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.

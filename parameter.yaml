@@ -99,6 +99,17 @@ actions:
         - 3 hours overtime
       active: 2
       hover: The team will work overtime hours. This will increase the team's output but also increase the team's stress. You can reduce stress in the team by working letting every on leave early.
+    integration:
+      title: Integration Test
+      values:
+        - Not Scheduled
+        - Scheduled
+      active: 1
+      hover: An integration takes 1-2 full days depending on how many tasks there are to test.
+      restrictions:
+        model-pick:
+          - Waterfall
+          - Kanban
   numeric-rows:
     staff-pick:
       title: Staff

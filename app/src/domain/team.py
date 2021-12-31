@@ -8,7 +8,7 @@ from bson import ObjectId
 from app.src.domain.dataObjects import WorkPackage
 from app.src.domain.task_queue import TaskQueue
 from app.src.domain.task import Task, Difficulty
-from utils import YAMLReader, value_or_error
+from utils import YAMLReader, probability, value_or_error
 
 from scipy.stats import poisson
 
@@ -30,7 +30,7 @@ def inc(x: float, factor: float = 1.0):
     """
     return min([x + (0.01 * factor), 1.0])  # ToDo: Find a fitting function that approaches 1
 
-def order_tasks_for_member(tasks:set, skill_type)->list:
+def order_tasks_for_member(tasks:set, skill_type)->list[Task]:
     tasks = list(tasks)
     if skill_type.name == "junior":
         tasks = sorted(tasks, key=lambda t: t.difficulty.value)
@@ -43,7 +43,6 @@ def order_tasks_for_member(tasks:set, skill_type)->list:
             if t.difficulty.value == 2:
                 senior_tasks.append(t)
             else: 
-                print(t.difficulty)
                 other_tasks.append(t)
         random.shuffle(other_tasks)
         tasks = senior_tasks + other_tasks
@@ -91,52 +90,88 @@ class Member:
         :return: float
         """
         return mean([self.motivation, self.familiarity])
+    
+    def e(self, task: Task):
+        if self.skill_type.name == "expert":
+            return 0
+        v = task.difficulty.value
+        if self.skill_type.name == "senior":
+            if v > 2:
+                return 0.75
+            return 0
+        if v == 3:
+            return 1
+        if v == 2:
+            return 0.5
+        return 0
+        
 
-    def solve_tasks(self, time: float, tq: TaskQueue, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0):
+    def solve_tasks(self, time: float, tq: TaskQueue, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0, number_tasks=0):
         """
         Simulates a member solving tasks for <time> hours.
         """
-        number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
+        if number_tasks == 0:
+            number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
 
         tasks_to_solve = order_tasks_for_member(tq.get(done=False, n=number_tasks), self.skill_type)
-        
 
-
-        m = tq.solve(number_tasks, self)
+        for task in tasks_to_solve:
+            task.done = True
+            task.done_by = self.id
+            task.bug = bool(probability(self.skill_type.error_rate * (self.stress + self.e(task))))
+    
+        m = number_tasks - len(tasks_to_solve)
         self.familiar_tasks += (number_tasks - m)
-        self.update_familiarity(tq.total_tasks_done_or_tested)
+        self.update_familiarity(len(tq.get(done=True)))
 
         # If there were less than n tasks in the queue to do the member will go over to testing and fixing
         if m > 0:
-            m = tq.test(m, self)
-            tq.fix(m, self)
+            if len(tq.get(done=True, unit_tested=False)):
+                self.test_tasks(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+            elif len(tq.get(done=True, bug=True, unit_tested=True)):
+                self.fix_errors(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+    
 
-    def fix_errors(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0):
+    def fix_errors(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0, number_tasks=0):
         """
         Simulates a member fixing errors for <time> hours.
         """
-        number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
-        m = tq.fix(number_tasks, self)
+        if number_tasks == 0:
+            number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
+        tasks_to_fix = order_tasks_for_member(tq.get(done=True, bug=True, unit_tested=True, n=number_tasks), self.skill_type)
+
+        for task in tasks_to_fix:
+            p = 1  # Todo: Calculate probability of fixing bug
+            task.bug = bool(probability(1-p))
+    
+        m = number_tasks - len(tasks_to_fix)
 
         # If there were less than n tasks in the queue to fix the member will go over to solving and testing
         if m > 0:
-            m = tq.solve(m, self)
-            tq.test(m, self)
+            if len(tq.get(done=False)):
+                self.solve_tasks(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+            elif len(tq.get(done=True, unit_tested=False)):
+                self.test_tasks(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
 
-    def test_tasks(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0):
+    def test_tasks(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0, number_tasks=0):
         """
         Simulates a member testing tasks for <time> hours.
         """
-        print('TeST TASKS')
-        number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
-        m = tq.test(number_tasks, self)
+        if number_tasks == 0:
+            number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
 
+        tasks_to_test = order_tasks_for_member(tq.get(done=True,unit_tested=False, n=number_tasks), self.skill_type)
+
+        for task in tasks_to_test:
+            task.unit_tested = True
+
+        m = number_tasks - len(tasks_to_test)
         # If there were less than n tasks in the queue to test the member will go over to solving and fixing
         if m > 0:
-            print("LEFTOVERS", m)
-            m = tq.solve(m, self)
-            print("Solved Some", m)
-            tq.fix(m, self)
+            if len(tq.get(done=False)):
+                self.solve_tasks(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+            elif len(tq.get(done=True, bug=True, unit_tested=True)):
+                self.fix_errors(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
 
     def get_number_of_tasks(self, coeff, team_efficiency, time):
         """Returns the number of tasks that a member can solve/test/fix for <time> hours."""
@@ -152,8 +187,6 @@ class Member:
         :return: float - new xp factor value
         """
         self.xp_factor += (hours * delta * TRAIN_SKILL_INCREASE_AMOUNT)/((1+self.xp_factor)**2)  # Divide by xp_factor^2 to make it grow less with increasing xp factor
-        print(self.skill_type.throughput)
-        print(self.xp_factor)
         return self.xp_factor
 
     def halt(self):
@@ -252,11 +285,17 @@ class Team:
         for member in self.staff:
             if not member.halted:
                 member.test_tasks(time, tq, team_efficiency=self.efficiency())
+    
+    def calculate_integration_test_duration(self, n):
+        return 1 if n < 300 else 2
 
-    def work(self, wp: WorkPackage, tq):
+    def work(self, wp: WorkPackage, tq, integration_test=False):
         total_meeting_h = wp.meeting_hours
         total_training_h = wp.training_hours
-        for day in range(wp.days):
+        integration_test_duration = 0
+        if integration_test:
+            integration_test_duration = self.calculate_integration_test_duration(len(tq.get(done=True, unit_tested=True, integration_test=False)))
+        for day in range(wp.days-integration_test_duration):
             if day % 5 == 0:  # Reduce stress on the weekends
                 self.increase_stress(STRESS_REDUCTION_PER_WEEKEND)
             day_hours = wp.day_hours
@@ -284,6 +323,16 @@ class Team:
             elif day_hours > 0:
                 self.solve_tasks(day_hours, tq)
             self.increase_stress((wp.day_hours-8)*STRESS_PER_OVERTIME)
+        if integration_test:
+            self.integration_test(tq)
+
+    def integration_test(self, tq: TaskQueue):
+        tasks = tq.get(done=True, unit_tested=True, integration_tested=False)
+        for task in tasks:
+            if task.correct_specification:
+                task.integration_tested = True
+            else: 
+                tq.reset_cascade(task=task)
 
     def meeting(self, time, total_tasks_done):
         """

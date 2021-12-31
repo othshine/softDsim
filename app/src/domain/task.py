@@ -70,6 +70,15 @@ class Task:
             if self.__dict__.get(key) != val:
                 return False
         return True
+    
+    def reset(self):
+        self.bug = False
+        self.done = False
+        self.done_by = None
+        self.integration_tested = False
+        self.unit_tested = False
+        self.pred = False
+        self.correct_specification = True
 
 
 class Difficulty(Enum):

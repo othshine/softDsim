@@ -175,11 +175,11 @@ class UserScenario:
     def get_max_points(self) -> int:
         return sum([d.get_max_points() for d in self.decisions])
 
-    def work(self, days, meeting, training, overtime):
+    def work(self, days, meeting, training, overtime, integration_test=False):
         wp = WorkPackage(days=days, meeting_hours=meeting, training_hours=training,
                          quality_check=self.perform_quality_check,
                          error_fixing=self.error_fixing , day_hours=8 + overtime)
-        wr = self.team.work(wp, self.task_queue)
+        wr = self.team.work(wp, self.task_queue, integration_test=integration_test)
         self.current_wr = wr
         self.actual_cost += month_to_day(self.team.salary, days)
         self.current_day += days
@@ -196,7 +196,7 @@ class UserScenario:
         else:
             d = self.decisions[self.counter]
             if (not isinstance(d, SimulationDecision)) or (
-                    isinstance(d, SimulationDecision) and d.goal.reached(tasks=self.task_queue.total_tasks_unit_tested)):
+                    isinstance(d, SimulationDecision) and d.goal.reached(tasks=len(self.task_queue.get(unit_tested=True, integration_tested=True)))):
                 self.counter += 1
 
     def get_decision(self, nr: int = None) -> Optional[Decision]:

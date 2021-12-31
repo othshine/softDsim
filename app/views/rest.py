@@ -1,4 +1,5 @@
 import json
+from os import read
 
 from django.contrib.auth.decorators import login_required
 from django.http.response import HttpResponse
@@ -52,13 +53,14 @@ def click_continue(request, sid):
         history.write(s.history_id, data, s.counter)
         if isinstance(s.get_decision(), SimulationDecision) and data.get('advance'):
             try:
+                integration_test = read_button(data, "Integration Test") == 'Scheduled'
                 training_hours = int(read_button(data, "Team Training Hours")[0])
                 overtime = int(extract_overtime(read_button(data, "Overtime")))
             except:
                 training_hours = 0
                 overtime = 0
 
-            s.work(5, int(data['meetings']), training_hours, overtime)
+            s.work(5, int(data['meetings']), training_hours, overtime, integration_test=integration_test)
             print(s.task_queue)
         if s.counter >= 0:
             s.get_decision().eval(data)
