@@ -98,6 +98,26 @@ def read_button(data, title):
     """Returns the value of the button in data with the given title."""
     return get_active_label(data_get(data['button_rows'], title).get('answers', []))
 
+def min_max_scaling(value, s_min, s_max, v_min=0, v_max=1.0) -> float:
+    """Returns the min max scaled value of the given value. 
+    Example: 
+    We have a % value in the format of 0.0 - 1.0 with a value of 0.4.
+    min_max_scaling(0.4, s_min=0, s_max=100, v_min=0, v_max=1.0) -> 40%
+
+    Somtimes we might want to scale a value that is in the range from 0-100 to a range of 100-1000 for som reason.
+    min_max_scaling(<value>, s_min=100, s_max=1000, v_min=0, v_max=100) -> <scaled value>
+
+    Args:
+        value (float): The value to be scaled
+        s_min (float): The min value of the OUTPUT value.
+        s_max (float): The max value of the OUTPUT value.
+        v_min (float, optional): The min value of the input range the the value lies in. Defaults to 0.
+        v_max (float, optional): The max value of the input range the the value lies in. Defaults to 1.0.
+
+    Returns:
+        float: The scaled value.
+    """
+    return s_min + (((value - v_min)*(s_max-s_min)) / (v_max - v_min))
 
 class _YAMLReader:
     def __init__(self, path):
