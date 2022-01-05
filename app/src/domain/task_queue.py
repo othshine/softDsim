@@ -18,9 +18,13 @@ class TaskQueue:
     
     def get(self, n=None, **kwargs) -> set[Task]:
         filtered =  {t for t in self.tasks if t.filter(**kwargs)}
-        if n and n < len(filtered):
+        if not n is None and n < len(filtered):
             filtered = set(list(filtered)[:n])
         return filtered
+    
+    def size(self, **kwargs) -> int:
+        """Returns the len of the TQ with all given filters applied."""
+        return len({t for t in self.tasks if t.filter(**kwargs)})
 
 
     def add(self, t) -> None:
@@ -65,3 +69,19 @@ class TaskQueue:
         for task in tasks_to_reset:
             task.reset()
 
+    def false_spec(self) -> int:
+        return (len(self.get(correct_specification=False)))
+    
+    def bugs(self) -> int:
+        return (len(self.get(bug=True)))
+    
+    def deploy(self) -> int:
+        return (len(self.get(done=True, unit_tested=True, integration_tested=True, bug=False, correct_specification=True)))
+
+    def total(self) -> int:
+        return len(self.tasks)
+    
+    def not_done(self) -> int:
+        return len(self.get(done=False))
+
+    
