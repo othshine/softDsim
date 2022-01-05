@@ -1,9 +1,9 @@
-name: Scenario with Integration Testing
+name: Social Event
 tasks_easy: 200
 tasks_medium: 500
 tasks_hard: 300
 pred_coefficient: 0.2  # Specifies the chance of each task having a predecessor.
-budget: 25000
+budget: 50000
 scheduled_days: 50
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
 
@@ -46,6 +46,7 @@ decisions:
       - training
       - overtime
       - integration
+      - social
     text:
       - header: This is a Simulation Decision
         content: You will need to make your own decision to reach the goal.

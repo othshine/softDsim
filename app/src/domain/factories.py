@@ -8,13 +8,13 @@ from app.src.domain.task import Task
 from app.src.domain.team import Member, Team
 
 
-def parse_team(t):
+def parse_team(t, s):
     i = t.get('id') or str(ObjectId())
     team = Team(i)
     for m in t.get('staff'):
         member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
                         stress=m.get('stress'), familiarity=m.get('familiarity'),
-                        familiar_tasks=m.get('familiar-tasks', 0), id=m.get('_id'))
+                        familiar_tasks=m.get('familiar-tasks', 0), id=m.get('_id'), scenario=s)
         if m.get('halted'):
             member.halt()
         team += member
@@ -72,10 +72,10 @@ class _Factory:
             if t := json.get('team'):
                 if t := t.get('teams'):
                     for team in t:
-                        us.team.teams.append(parse_team(team))
+                        us.team.teams.append(parse_team(team, us))
         else:
             if t := json.get('team'):
-                us.team = parse_team(t)
+                us.team = parse_team(t, us)
         self._add_decisions(json.get('decisions', []), us)
 
         return us

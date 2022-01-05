@@ -54,13 +54,14 @@ def click_continue(request, sid):
         if isinstance(s.get_decision(), SimulationDecision) and data.get('advance'):
             try:
                 integration_test = read_button(data, "Integration Test") == 'Scheduled'
+                social_event = read_button(data, "Social Event") == 'Scheduled'
                 training_hours = int(read_button(data, "Team Training Hours")[0])
                 overtime = int(extract_overtime(read_button(data, "Overtime")))
             except:
                 training_hours = 0
                 overtime = 0
 
-            s.work(5, int(data['meetings']), training_hours, overtime, integration_test=integration_test)
+            s.work(5, int(data['meetings']), training_hours, overtime, integration_test=integration_test, social=social_event)
             print(s.task_queue)
         if s.counter >= 0:
             s.get_decision().eval(data)

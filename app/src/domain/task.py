@@ -78,7 +78,6 @@ class Task:
         self.integration_tested = False
         self.unit_tested = False
         self.pred = None
-        self.correct_specification = True
 
 
 class Difficulty(Enum):

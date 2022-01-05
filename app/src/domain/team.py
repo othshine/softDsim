@@ -6,9 +6,10 @@ from typing import List
 from bson import ObjectId
 
 from app.src.domain.dataObjects import WorkPackage
+import app.src.domain.scenario as sc
 from app.src.domain.task_queue import TaskQueue
 from app.src.domain.task import Task
-from utils import YAMLReader, probability, value_or_error
+from utils import YAMLReader, probability, value_or_error, min_max_scaling
 
 from scipy.stats import poisson
 
@@ -57,7 +58,7 @@ def order_tasks_for_member(tasks:set, skill_type)->list[Task]:
 
 class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
-                 familiarity: float = 0.1, stress: float = 0.3, familiar_tasks=0, id=None):
+                 familiarity: float = 0.1, stress: float = 0.3, familiar_tasks=0, id=None, scenario=None):
         self.skill_type = SkillType(skill_type)
         self.xp_factor = value_or_error(xp_factor, upper=float('inf'))
         self.motivation = value_or_error(motivation)
@@ -66,6 +67,7 @@ class Member:
         self.familiar_tasks = int(value_or_error(familiar_tasks, upper=float('inf')))
         self.halted = False
         self.id = ObjectId() if id is None else ObjectId(id) if isinstance(id, str) else id
+        self.scenario: sc.UserScenario = scenario
 
     def __eq__(self, other):
         if isinstance(other, Member):
@@ -108,20 +110,29 @@ class Member:
         return 0
         
 
-    def solve_tasks(self, time: float, tq: TaskQueue, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0, number_tasks=0):
+    def solve_tasks(self, time: float, number_tasks=0, coeff=TASK_COMPLETION_COEF, **kwargs):
         """
         Simulates a member solving tasks for <time> hours.
         """
+        print(f"{self.id} Solving Tasks for {time}")
+        tq = self.scenario.task_queue
         if number_tasks == 0:
-            number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
+            number_tasks = self.get_number_of_tasks(coeff, time)
 
-        tasks_to_solve = order_tasks_for_member(tq.get(done=False, n=number_tasks), self.skill_type)
+        print(f"I can solve: {number_tasks} Tasks")
+        tqg = tq.get(done=False, n=number_tasks)
+        print(f"TQ was queried: {len(tqg)}")
+        tasks_to_solve = order_tasks_for_member(tqg, self.skill_type)
+        print(f"Solving {len(tasks_to_solve)} Tasks")
 
         for task in tasks_to_solve:
             task.done_by = self.id
             task.bug = bool(probability(self.skill_type.error_rate * (self.stress + self.e(task))))
-            task.correct_specification = bool(probability(0.5))
-            if probability(0.5):
+
+            
+            task.correct_specification = bool(probability(self.scenario.team.specification_p())) or not task.correct_specification # VAR
+
+            if probability(self.scenario.template.pred_c):
                 try:
                     self.pred = random.sample(tq.get(done=True), 1)[0].id
                 except:
@@ -135,17 +146,18 @@ class Member:
         # If there were less than n tasks in the queue to do the member will go over to testing and fixing
         if m > 0:
             if len(tq.get(done=True, unit_tested=False)):
-                self.test_tasks(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+                self.test_tasks(time=None, number_tasks=m)
             elif len(tq.get(done=True, bug=True, unit_tested=True)):
-                self.fix_errors(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+                self.fix_errors(time=None, number_tasks=m)
     
 
-    def fix_errors(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0, number_tasks=0):
+    def fix_errors(self, time: float, coeff=TASK_COMPLETION_COEF, number_tasks=0):
         """
         Simulates a member fixing errors for <time> hours.
         """
+        tq = self.scenario.task_queue
         if number_tasks == 0:
-            number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
+            number_tasks = self.get_number_of_tasks(coeff, time)
         tasks_to_fix = order_tasks_for_member(tq.get(done=True, bug=True, unit_tested=True, n=number_tasks), self.skill_type)
 
         for task in tasks_to_fix:
@@ -157,16 +169,17 @@ class Member:
         # If there were less than n tasks in the queue to fix the member will go over to solving and testing
         if m > 0:
             if len(tq.get(done=False)):
-                self.solve_tasks(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+                self.solve_tasks(time=None, number_tasks=m)
             elif len(tq.get(done=True, unit_tested=False)):
-                self.test_tasks(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+                self.test_tasks(time=None, number_tasks=m)
 
-    def test_tasks(self, time: float, tq, coeff=TASK_COMPLETION_COEF, team_efficiency: float = 1.0, number_tasks=0):
+    def test_tasks(self, time: float, coeff=TASK_COMPLETION_COEF, number_tasks=0):
         """
         Simulates a member testing tasks for <time> hours.
         """
+        tq = self.scenario.task_queue
         if number_tasks == 0:
-            number_tasks = self.get_number_of_tasks(coeff, team_efficiency, time)
+            number_tasks = self.get_number_of_tasks(coeff, time)
 
         tasks_to_test = order_tasks_for_member(tq.get(done=True,unit_tested=False, n=number_tasks), self.skill_type)
 
@@ -177,15 +190,15 @@ class Member:
         # If there were less than n tasks in the queue to test the member will go over to solving and fixing
         if m > 0:
             if len(tq.get(done=False)):
-                self.solve_tasks(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+                self.solve_tasks(time=None, number_tasks=m)
             elif len(tq.get(done=True, bug=True, unit_tested=True)):
-                self.fix_errors(tq=tq, time=None, team_efficiency=team_efficiency, number_tasks=m)
+                self.fix_errors(time=None, number_tasks=m)
 
-    def get_number_of_tasks(self, coeff, team_efficiency, time):
+    def get_number_of_tasks(self, coeff, time):
         """Returns the number of tasks that a member can solve/test/fix for <time> hours."""
         if self.halted:
             raise MemberIsHalted()
-        mu = time * mean([self.efficiency, team_efficiency]) * (self.skill_type.throughput + self.xp_factor) * coeff
+        mu = time * mean([self.efficiency, self.scenario.team.efficiency]) * (self.skill_type.throughput + self.xp_factor) * coeff
         number_tasks = poisson.rvs(mu)
         return number_tasks
 
@@ -282,28 +295,28 @@ class Team:
     def solve_tasks(self, time, tq):
         for member in self.staff:
             if not member.halted:
-                member.solve_tasks(time, tq, team_efficiency=self.efficiency())
+                member.solve_tasks(time)
 
     def fix_errors(self, time, tq):
         for member in self.staff:
             if not member.halted:
-                member.fix_errors(time, tq, team_efficiency=self.efficiency())
+                member.fix_errors(time)
 
     def test_tasks(self, time, tq):
         for member in self.staff:
             if not member.halted:
-                member.test_tasks(time, tq, team_efficiency=self.efficiency())
+                member.test_tasks(time)
     
     def calculate_integration_test_duration(self, n):
         return 1 if n < 300 else 2
 
-    def work(self, wp: WorkPackage, tq, integration_test=False):
+    def work(self, wp: WorkPackage, tq, integration_test=False, social=False):
         total_meeting_h = wp.meeting_hours
         total_training_h = wp.training_hours
-        integration_test_duration = 0
+        overhead_duration = 1 if social else 0
         if integration_test:
-            integration_test_duration = self.calculate_integration_test_duration(len(tq.get(done=True, unit_tested=True, integration_test=False)))
-        for day in range(wp.days-integration_test_duration):
+            overhead_duration += self.calculate_integration_test_duration(len(tq.get(done=True, unit_tested=True, integration_test=False)))
+        for day in range(wp.days-overhead_duration):
             if day % 5 == 0:  # Reduce stress on the weekends
                 self.increase_stress(STRESS_REDUCTION_PER_WEEKEND)
             day_hours = wp.day_hours
@@ -313,11 +326,11 @@ class Team:
                 total_training_h = 0
             if total_meeting_h > 0 and day_hours > 0:
                 if total_meeting_h > day_hours:
-                    self.meeting(day_hours, tq.total_tasks_done_or_tested)
+                    self.meeting(day_hours, tq.size(done=True))
                     total_meeting_h -= day_hours
                     day_hours = 0
                 else:
-                    self.meeting(total_meeting_h, tq.total_tasks_done_or_tested)
+                    self.meeting(total_meeting_h, tq.size(done=True))
                     day_hours -= total_meeting_h
                     total_meeting_h = 0
             if day_hours > 0 and wp.error_fixing and not wp.quality_check:
@@ -333,11 +346,11 @@ class Team:
             self.increase_stress((wp.day_hours-8)*STRESS_PER_OVERTIME)
         if integration_test:
             self.integration_test(tq)
+        if social:
+            self.social_event()
 
     def integration_test(self, tq: TaskQueue):
-        print("INTE")
         tasks = tq.get(done=True, unit_tested=True, integration_tested=False)
-        print(len(tasks))
         for task in tasks:
             if task.correct_specification:
                 task.integration_tested = True
@@ -354,6 +367,12 @@ class Team:
             new_familiar_tasks = min((TASKS_PER_MEETING * time), missing)
             member.familiar_tasks += new_familiar_tasks
             member.update_familiarity(total_tasks_done)
+
+    def social_event(self):
+        """Reduces stress of all members."""
+        for member in self.staff:
+            member.stress /= 2
+
 
     def get_member(self, _id: ObjectId) -> Member:
         for m in self.staff:
@@ -380,19 +399,20 @@ class Team:
                 w = m
         self.__isub__(w)
 
-    def adjust(self, staff_data):
+    def adjust(self, staff_data, s):
         for t in ['junior', 'senior', 'expert']:
             while self.count(t) > staff_data.get(t):
                 self.remove_weakest(t)
             while self.count(t) < staff_data.get(t):
-                self.staff.append(Member(t))
+                self.staff.append(Member(t, scenario=s))
 
     @property
     def num_communication_channels(self):
         """Returns number of communication channels."""
         n = len(self.staff)
         return (n * (n - 1)) / 2
-
+    
+    @property
     def efficiency(self):
         """Returns the team's efficiency. Which increases as the number of communication channels grows."""
         c = self.num_communication_channels
@@ -408,6 +428,9 @@ class Team:
     def increase_stress(self, amount):
         for member in self.staff:
             member.increase_stress(amount)
+    
+    def specification_p(self):
+        return min_max_scaling(self.efficiency, 0.5, 0.9)
 
 
 class ScrumTeam:
@@ -430,7 +453,7 @@ class ScrumTeam:
         y = YAMLReader.read('manager')
         sal += y.get('junior').get('salary') * self.junior_master
         sal += y.get('senior').get('salary') * self.senior_master
-        sal += y.get('po').get('salary') * self.po
+        sal += y.get('po').get('salary') * self.po  # ToDo: Only pay PO for actual hours.
         return sal
 
     @property
@@ -445,9 +468,11 @@ class ScrumTeam:
     def stress(self):
         return mean([t.stress for t in self.teams] or [0])
 
-    def work(self, wp: WorkPackage, tq):
+    def work(self, wp: WorkPackage, tq, **kwargs):
         for team in self.teams:
-            team.work(wp, tq)
+            team.work(wp, tq, integration_test=False)
+            if self.po:
+                team.integration_test(tq)
 
     def get_team(self, id):
         for t in self.teams:
@@ -455,16 +480,16 @@ class ScrumTeam:
                 return t
         return None
 
-    def adjust(self, data):
+    def adjust(self, data, s):
         for team_data in data:
             team = self.get_team(team_data.get('id'))
             if team:
-                team.adjust(team_data.get('values'))
+                team.adjust(team_data.get('values'), s)
             else:
                 id = str(ObjectId())
                 new_team = Team(id)
                 team_data['id'] = id
-                new_team.adjust(team_data.get('values'))
+                new_team.adjust(team_data.get('values'), s)
                 self.teams.append(new_team)
 
         for team in self.teams:

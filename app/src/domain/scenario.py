@@ -3,14 +3,12 @@ from random import random
 from typing import Optional
 
 from bson import ObjectId
-from scipy.stats._discrete_distns import poisson
 
-from app.src.domain.dataObjects import WorkPackage, WorkResult
+from app.src.domain.dataObjects import WorkPackage
 from app.src.domain.decision_tree import ActionList, Decision, SimulationDecision
-from app.src.domain.team import Team, ScrumTeam, Member
-from app.src.domain.task import Task, Difficulty
+from app.src.domain.team import Team, ScrumTeam
 from app.src.domain.task_queue import TaskQueue
-from utils import month_to_day, quality, YAMLReader
+from utils import month_to_day, YAMLReader
 
 # Config Variables
 STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
@@ -177,14 +175,16 @@ class UserScenario:
     def get_max_points(self) -> int:
         return sum([d.get_max_points() for d in self.decisions])
 
-    def work(self, days, meeting, training, overtime, integration_test=False):
+    def work(self, days, meeting, training, overtime, integration_test=False, social=False):
         wp = WorkPackage(days=days, meeting_hours=meeting, training_hours=training,
                          quality_check=self.perform_quality_check,
                          error_fixing=self.error_fixing , day_hours=8 + overtime)
-        wr = self.team.work(wp, self.task_queue, integration_test=integration_test)
+        wr = self.team.work(wp, self.task_queue, integration_test=integration_test, social=social)
         self.current_wr = wr
         self.actual_cost += month_to_day(self.team.salary, days)
         self.current_day += days
+        if social:
+            self.actual_cost += len(self.team)*1000
 
     def get_id(self) -> str:
         return str(self.id)

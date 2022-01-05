@@ -110,6 +110,13 @@ actions:
         model-pick:
           - Waterfall
           - Kanban
+    social:
+      title: Social Event
+      values:
+        - Not Scheduled
+        - Scheduled
+      active: 1
+      hover: A a social event is used to reduce stress within the team. It takes 1 full day and costs $1000 per team member.
   numeric-rows:
     staff-pick:
       title: Staff

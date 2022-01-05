@@ -17,7 +17,11 @@
         <p>Spent: {{ scenario.actual_cost }} / {{ scenario.template.budget }}</p>
         <p>Points: {{ scenario.budget_score }}</p>
         <h3>Quality</h3>
-        <p>Defective Tasks: {{ scenario.task_queue.total_tasks_with_faults }} / {{ scenario.task_queue.total_tasks }}</p>
+        <p>Total tasks: {{ scenario.task_queue.total }}</p>
+        <p>Buggy tasks: {{ scenario.task_queue.bugs }}</p>
+        <p>Deploy ready tasks: {{ scenario.task_queue.deploy }}</p>
+        <p>Undone tasks: {{ scenario.task_queue.not_done }}</p>
+        <p>Incorrectly implemented tasks: {{ scenario.task_queue.false_spec }}</p>
         <p>Points: {{ scenario.task_queue.quality_score }}</p>
         <h2>Total Score: {{ scenario.total_score }} </h2>
 

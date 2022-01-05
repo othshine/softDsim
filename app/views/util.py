@@ -26,7 +26,7 @@ def get_points(param, data):
 
 def apply_changes(s: UserScenario, data: dict):
     if staff := data_get(data['numeric_rows'], 'staff'):
-        s.team.adjust(staff.get('values'))
+        s.team.adjust(staff.get('values'), s)
     if staff := data_get(data['numeric_rows'], 'Scrum Management'):
         adjust_scrum_management(s, staff.get('values'))
         # Scrum teams always do error checking:
