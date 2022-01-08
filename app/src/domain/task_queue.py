@@ -53,7 +53,7 @@ class TaskQueue:
     @property
     def quality_score(self):
         k = 8
-        return int(((len(self.tasks) - (len(self.get(bug=True)) + len(self.get(done=False)))) * 1/len(self.tasks))**k * 100)
+        return int(((len(self.tasks) - (self.size(bug=True) + self.size(done=False) + self.size(correct_specification=False))) * 1/len(self.tasks))**k * 100)
     
     def reset_cascade(self, task: Task):
         tasks_to_reset = set()

@@ -72,7 +72,7 @@ def click_continue(request, sid):
                 "tasks_done": len(s.task_queue.get(done=True)),
                 "tasks_total": s.template.tasks_total,
                 "blocks": [],
-                "cost": s.team.salary,
+                "salaries": s.team.salary,
                 "budget": s.template.budget,
                 "scheduled_days": s.template.scheduled_days,
                 "current_day": s.current_day,
@@ -86,14 +86,13 @@ def click_continue(request, sid):
                 'done': False,
                 'scrum': s.model == 'scrum' and isinstance(s.get_decision(), SimulationDecision),
                 "tasks": {
-                    "todo": len(s.task_queue.get(done=False)),
-                    "done": len(s.task_queue.get(done=True)),
-                    
-                    "tested": len(s.task_queue.get(unit_tested=True)),
-                    "itested": len(s.task_queue.get(integration_tested=True)),
-                    "errors": len(s.task_queue.get(bug=True)),
-                    "done_week": len(s.task_queue.get(done=True)) - tasks_done_before,
-                    "tested_week": len(s.task_queue.get(unit_tested=True))- tasks_tested_before
+                    "todo": s.task_queue.size(done=False),
+                    "done": s.task_queue.size(done=True),
+                    "tested": s.task_queue.size(unit_tested=True),
+                    "itested": s.task_queue.size(integration_tested=True),
+                    "errors": s.task_queue.size(bug=True, unit_tested=True),
+                    "done_week": s.task_queue.size(done=True) - tasks_done_before,
+                    "tested_week": s.task_queue.size(unit_tested=True)- tasks_tested_before
                 }
             }
 

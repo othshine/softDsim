@@ -27,7 +27,7 @@ def format_time(unix_time):
 def format_currency(amount):
     """Returns a string that represents a number in a readable format.
     Input: 1920374
-    Output: 1,920,374
+    Output: 1.920.374
     """
     if amount is None:
         return "-"
@@ -36,7 +36,7 @@ def format_currency(amount):
 
 @register.filter('time')
 def format_seconds(seconds):
-    """Returns a String in the form of 'xxm yys' for a given integer that represents a time delta in seconds."""
+    """Returns a String in the form of '00h 00m 00s' for a given integer that represents a time delta in seconds."""
     if seconds is None:
         return "-"
     if seconds < 60:

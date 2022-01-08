@@ -33,7 +33,7 @@ def apply_changes(s: UserScenario, data: dict):
         s.perform_quality_check = True
         s.error_fixing = True
     if isinstance(s.team, ScrumTeam):
-        s.team.adjust([t for t in data['numeric_rows'] if "scrum team" in t.get('title').lower()])
+        s.team.adjust([t for t in data['numeric_rows'] if "scrum team" in t.get('title').lower()], s)
     if q := data_get(data['button_rows'], 'Testing'):
         if data_get(q['answers'], 'Perform', attr='label').get('active'):
             s.perform_quality_check = True

@@ -13,6 +13,8 @@ from utils import YAMLReader, probability, value_or_error, min_max_scaling
 
 from scipy.stats import poisson
 
+# Config Variables
+STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
 TASK_COMPLETION_COEF = YAMLReader.read('task-completion-coefficient')
 ERR_COMPLETION_COEF = YAMLReader.read('error-completion-coefficient')
 TASKS_PER_MEETING = YAMLReader.read('tasks-per-meeting-coefficient')
@@ -58,7 +60,7 @@ def order_tasks_for_member(tasks:set, skill_type)->list[Task]:
 
 class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
-                 familiarity: float = 0.1, stress: float = 0.3, familiar_tasks=0, id=None, scenario=None):
+                 familiarity: float = 0.1, stress: float = 0.3, familiar_tasks=0, id=None, scenario=None, team=None):
         self.skill_type = SkillType(skill_type)
         self.xp_factor = value_or_error(xp_factor, upper=float('inf'))
         self.motivation = value_or_error(motivation)
@@ -68,6 +70,7 @@ class Member:
         self.halted = False
         self.id = ObjectId() if id is None else ObjectId(id) if isinstance(id, str) else id
         self.scenario: sc.UserScenario = scenario
+        self.team: Team = team
 
     def __eq__(self, other):
         if isinstance(other, Member):
@@ -124,13 +127,15 @@ class Member:
         print(f"TQ was queried: {len(tqg)}")
         tasks_to_solve = order_tasks_for_member(tqg, self.skill_type)
         print(f"Solving {len(tasks_to_solve)} Tasks")
+        print(f"Stress before  {self.stress}")
 
+        print(f"Specification Probability: {self.team.specification_p()} because team eff is {self.team.efficiency}")
         for task in tasks_to_solve:
             task.done_by = self.id
             task.bug = bool(probability(self.skill_type.error_rate * (self.stress + self.e(task))))
 
             
-            task.correct_specification = bool(probability(self.scenario.team.specification_p())) or not task.correct_specification # VAR
+            task.correct_specification = bool(probability(self.scenario.team.specification_p())) or not task.correct_specification
 
             if probability(self.scenario.template.pred_c):
                 try:
@@ -142,6 +147,10 @@ class Member:
         m = number_tasks - len(tasks_to_solve)
         self.familiar_tasks += (number_tasks - m)
         self.update_familiarity(len(tq.get(done=True)))
+        print(f"Made {len([t for t in tasks_to_solve if t.bug])} bugs")
+        self.stress = min(1, self.stress + len([t for t in tasks_to_solve if t.bug]) * STRESS_ERROR_INCREASE)
+        print(f"Stress {self.stress}")
+
 
         # If there were less than n tasks in the queue to do the member will go over to testing and fixing
         if m > 0:
@@ -198,7 +207,7 @@ class Member:
         """Returns the number of tasks that a member can solve/test/fix for <time> hours."""
         if self.halted:
             raise MemberIsHalted()
-        mu = time * mean([self.efficiency, self.scenario.team.efficiency]) * (self.skill_type.throughput + self.xp_factor) * coeff
+        mu = time * mean([self.efficiency, self.team.efficiency]) * (self.skill_type.throughput + self.xp_factor) * coeff
         number_tasks = poisson.rvs(mu)
         return number_tasks
 
@@ -349,8 +358,9 @@ class Team:
         if social:
             self.social_event()
 
-    def integration_test(self, tq: TaskQueue):
-        tasks = tq.get(done=True, unit_tested=True, integration_tested=False)
+    def integration_test(self, tq: TaskQueue, n=None):
+        print(n)
+        tasks = list(tq.get(done=True, unit_tested=True, integration_tested=False))[:n]
         for task in tasks:
             if task.correct_specification:
                 task.integration_tested = True
@@ -404,7 +414,7 @@ class Team:
             while self.count(t) > staff_data.get(t):
                 self.remove_weakest(t)
             while self.count(t) < staff_data.get(t):
-                self.staff.append(Member(t, scenario=s))
+                self.staff.append(Member(t, scenario=s, team=self))
 
     @property
     def num_communication_channels(self):
@@ -425,11 +435,14 @@ class Team:
             if delta > 0:
                 member.train(total_training_h, delta)
 
-    def increase_stress(self, amount):
+    def increase_stress(self, amount: float):
+        """Increases the stress of all members by the given amount. The stress level of each member lies within the interval [0,1] with 1 being the highest stress level."""
         for member in self.staff:
             member.increase_stress(amount)
     
     def specification_p(self):
+        """Return the probability of which a task is correctly specified."""
+        #TODO: How should this be determined for waterfall? Should it be a fixed constant? Should it be set in the scenario template, should it depend on the team?
         return min_max_scaling(self.efficiency, 0.5, 0.9)
 
 
@@ -439,6 +452,7 @@ class ScrumTeam:
         self.junior_master = junior
         self.senior_master = senior
         self.po = po
+        self.po_hours = 0
 
     @property
     def json(self):
@@ -453,7 +467,7 @@ class ScrumTeam:
         y = YAMLReader.read('manager')
         sal += y.get('junior').get('salary') * self.junior_master
         sal += y.get('senior').get('salary') * self.senior_master
-        sal += y.get('po').get('salary') * self.po  # ToDo: Only pay PO for actual hours.
+        sal += y.get('po').get('salary') * self.po * self.po_hours  # ToDo: Only pay PO for actual hours.
         return sal
 
     @property
@@ -467,12 +481,25 @@ class ScrumTeam:
     @property
     def stress(self):
         return mean([t.stress for t in self.teams] or [0])
+    
+    @property
+    def efficiency(self):
+        effs = [t.efficiency for t in self.teams] or [0]
+        if self.junior_master or self.senior_master:
+            return mean(effs)
+        return min(effs)/2
+        
+
 
     def work(self, wp: WorkPackage, tq, **kwargs):
         for team in self.teams:
             team.work(wp, tq, integration_test=False)
             if self.po:
-                team.integration_test(tq)
+                tph = 50  # Task that the PO can interegtion test per hour.
+                nt = tq.size(done=True, unit_tested=True, integration_tested=False)
+                hours = min(8*3, nt/tph)
+                self.po_hours += hours
+                team.integration_test(tq, n=int(hours*tph))
 
     def get_team(self, id):
         for t in self.teams:
@@ -495,6 +522,13 @@ class ScrumTeam:
         for team in self.teams:
             if team.id not in [t.get('id') for t in data]:
                 self.teams.remove(team)
+    
+    def specification_p(self):
+        """Return the probability of which a task is correctly specified."""
+        #TODO: How should this be determined for scrum? Goof like this?
+        if self.po:
+            return 0.9
+        return 0.5
 
 
 class SkillType:

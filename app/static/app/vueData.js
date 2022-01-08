@@ -12,7 +12,7 @@ let x = new Vue({
         tasks_total: 0,
         tasks_done: 0,
         continue_text: "Start",
-        cost: 0,
+        salaries: 0,
         meetings: 0,
         button_rows: [],
         numeric_rows: [], // ToDo: Make sure values cant be below 0.

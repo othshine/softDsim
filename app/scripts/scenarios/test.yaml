@@ -1,10 +1,10 @@
-name: Social Event
-tasks_easy: 200
+name: High Predecessors
+tasks_easy: 500
 tasks_medium: 500
-tasks_hard: 300
-pred_coefficient: 0.2  # Specifies the chance of each task having a predecessor.
-budget: 50000
-scheduled_days: 50
+tasks_hard: 500
+pred_coefficient: 0.8  # Specifies the chance of each task having a predecessor.
+budget: 100000
+scheduled_days: 70
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
 
 decisions:
@@ -55,4 +55,4 @@ decisions:
       - header: Story
         content: You're ready to go. Start off the project by managing the team. Its all on you now.
     goal:
-      tasks: 1000
+      tasks: 1500

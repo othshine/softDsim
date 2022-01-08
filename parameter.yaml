@@ -21,11 +21,11 @@ manager:
   senior:
     salary: 5000
   po:
-    salary: 7000
+    salary: 50  # PO is paid hourly
 
 # Stress Settings
 stress:
-  weekend-reduction: -0.2 # The stress level of a member reduces by 20% over each weekend.
+  weekend-reduction: -0.15 # The stress level of a member reduces by 15% over each weekend.
   overtime: 0.05 # The stress level of a member increases by 5% for each hour of overtime, or decreases by 5% for each hour of leaving early. This number is applied every day.
   error: 0.02 # The stress level of a member increases by 2% for each error.
 
