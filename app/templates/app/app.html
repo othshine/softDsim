@@ -76,15 +76,7 @@
                 <p style="text-align: left"><strong>Motivation:</strong> [[ motivation | percentage ]]</p>
             </div>
 
-            <template v-if="current_workday">
-                <h3 class="element-header pointer none-select" onclick="toggleVisibility('work-container')">Quality<span
-                        class="smaller">&#x25bc;</span></h3>
-                <div id="work-container" style="text-align: left">
-                    <p style="text-align: left"><strong>Identified Errors:</strong> [[ current_workday.ident_errs ]]
-                        (Total: [[ current_workday.ident_total ]])</p>
-                    <p style="text-align: left"><strong>Fixed Errors:</strong> [[ current_workday.fixed_errs ]]</p>
-                </div>
-            </template>
+
             <div class="row"></div>
 
 

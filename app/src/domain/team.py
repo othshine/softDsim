@@ -23,7 +23,8 @@ TRAIN_SKILL_INCREASE_AMOUNT = YAMLReader.read('train-skill-increase-amount')
 
 STRESS_PER_OVERTIME = YAMLReader.read('stress', 'overtime')
 STRESS_REDUCTION_PER_WEEKEND = YAMLReader.read('stress', 'weekend-reduction')
-
+MOTIVATION_INCREASE_PER_WEEKEND = 0.25
+WORK_HOUR_MOTIVATION_REDUCTION = 0.0125
 
 
 
@@ -117,19 +118,13 @@ class Member:
         """
         Simulates a member solving tasks for <time> hours.
         """
-        print(f"{self.id} Solving Tasks for {time}")
         tq = self.scenario.task_queue
         if number_tasks == 0:
             number_tasks = self.get_number_of_tasks(coeff, time)
 
-        print(f"I can solve: {number_tasks} Tasks")
         tqg = tq.get(done=False, n=number_tasks)
-        print(f"TQ was queried: {len(tqg)}")
         tasks_to_solve = order_tasks_for_member(tqg, self.skill_type)
-        print(f"Solving {len(tasks_to_solve)} Tasks")
-        print(f"Stress before  {self.stress}")
 
-        print(f"Specification Probability: {self.team.specification_p()} because team eff is {self.team.efficiency}")
         for task in tasks_to_solve:
             task.done_by = self.id
             task.bug = bool(probability(self.skill_type.error_rate * (self.stress + self.e(task))))
@@ -147,9 +142,8 @@ class Member:
         m = number_tasks - len(tasks_to_solve)
         self.familiar_tasks += (number_tasks - m)
         self.update_familiarity(len(tq.get(done=True)))
-        print(f"Made {len([t for t in tasks_to_solve if t.bug])} bugs")
         self.stress = min(1, self.stress + len([t for t in tasks_to_solve if t.bug]) * STRESS_ERROR_INCREASE)
-        print(f"Stress {self.stress}")
+        self.motivation = max(0, self.motivation-(WORK_HOUR_MOTIVATION_REDUCTION*time))
 
 
         # If there were less than n tasks in the queue to do the member will go over to testing and fixing
@@ -174,6 +168,7 @@ class Member:
             task.bug = bool(probability(1-p))
     
         m = number_tasks - len(tasks_to_fix)
+        self.motivation = max(0, self.motivation-(WORK_HOUR_MOTIVATION_DECREASE*time))
 
         # If there were less than n tasks in the queue to fix the member will go over to solving and testing
         if m > 0:
@@ -196,12 +191,15 @@ class Member:
             task.unit_tested = True
 
         m = number_tasks - len(tasks_to_test)
+        self.motivation = max(0, self.motivation-(WORK_HOUR_MOTIVATION_DECREASE*time))
+
         # If there were less than n tasks in the queue to test the member will go over to solving and fixing
         if m > 0:
             if len(tq.get(done=False)):
                 self.solve_tasks(time=None, number_tasks=m)
             elif len(tq.get(done=True, bug=True, unit_tested=True)):
                 self.fix_errors(time=None, number_tasks=m)
+
 
     def get_number_of_tasks(self, coeff, time):
         """Returns the number of tasks that a member can solve/test/fix for <time> hours."""
@@ -217,6 +215,7 @@ class Member:
         :return: float - new xp factor value
         """
         self.xp_factor += (hours * delta * TRAIN_SKILL_INCREASE_AMOUNT)/((1+self.xp_factor)**2)  # Divide by xp_factor^2 to make it grow less with increasing xp factor
+        self.motivation = min(1, self.motivation+0.1*hours)
         return self.xp_factor
 
     def halt(self):
@@ -328,6 +327,7 @@ class Team:
         for day in range(wp.days-overhead_duration):
             if day % 5 == 0:  # Reduce stress on the weekends
                 self.increase_stress(STRESS_REDUCTION_PER_WEEKEND)
+                self.increase_motivation(MOTIVATION_INCREASE_PER_WEEKEND)
             day_hours = wp.day_hours
             if total_training_h > 0:
                 self.train(total_training_h)
@@ -382,6 +382,7 @@ class Team:
         """Reduces stress of all members."""
         for member in self.staff:
             member.stress /= 2
+            member.motivation = min(1, member.motivation+0.5)
 
 
     def get_member(self, _id: ObjectId) -> Member:
@@ -414,7 +415,7 @@ class Team:
             while self.count(t) > staff_data.get(t):
                 self.remove_weakest(t)
             while self.count(t) < staff_data.get(t):
-                self.staff.append(Member(t, scenario=s, team=self))
+                self.staff.append(Member(t, scenario=s, team=self, motivation=0.9))
 
     @property
     def num_communication_channels(self):
@@ -439,6 +440,11 @@ class Team:
         """Increases the stress of all members by the given amount. The stress level of each member lies within the interval [0,1] with 1 being the highest stress level."""
         for member in self.staff:
             member.increase_stress(amount)
+    
+    def increase_motivation(self, amount: float):
+        """Increases the motivation of all members by the given amount. The motivation level of each member lies within the interval [0,1] with 1 being the highest motivation level."""
+        for member in self.staff:
+            member.motivation = min(1, member.motivation + amount)
     
     def specification_p(self):
         """Return the probability of which a task is correctly specified."""
