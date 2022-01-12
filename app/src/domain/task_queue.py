@@ -7,6 +7,7 @@ class TaskQueue:
         self.tasks = set([Task(**t) for t in tasks])
     
     def __str__(self):
+        """String representation of the Task Queue."""
         txt =   "=== Task Queue ===\n"
         txt += f"Size:        {len(self.tasks)}\n"
         txt += f"Done:        {len(self.get(done=True))}\n"
@@ -16,14 +17,36 @@ class TaskQueue:
         txt += f"Spec. T/F:   {len(self.get(correct_specification=True))}/{len(self.get(correct_specification=False))}\n"
         return txt 
     
-    def get(self, n=None, **kwargs) -> set[Task]:
+    def get(self, n:int=None, **kwargs) -> set[Task]:
+        """Get is used go get a set of tasks from the task queue. If no arguments are passed, all tasks are returned. 
+        As keyword-arguments, any fields of the task class can be passed to filter only for tasks with the given value for the given field.
+        Attention: all filters are AND combined.
+
+        Args:
+            n (int, optional): The maximum number of tasks to return. Defaults to None, meaning no upper boundary.
+        
+        Examples: 
+            To get all tasks that are still todo:
+                tq.get(done=False)
+            To get 21 tasks that are done but not yet unit tested:
+                tq.get(done=True, unit_tested=False, n=21)
+            To get all tasks that are either hard or have a bug, two queries are required, since all kwargs are AND combined:
+                hard_or_bug = tq.get(difficulty=Difficulty.HARD) | tq.get(bug=True)
+        
+
+        Returns:
+            set[Task]: The set of tasks where the given filters apply.
+        """
         filtered =  {t for t in self.tasks if t.filter(**kwargs)}
         if not n is None and n < len(filtered):
             filtered = set(list(filtered)[:n])
         return filtered
     
     def size(self, **kwargs) -> int:
-        """Returns the len of the TQ with all given filters applied."""
+        """Returns the number of tasks with the given properties.
+        As keyword-arguments, any fields of the task class can be passed to filter only for tasks with the given value for the given field.
+        Attention: all filters are AND combined.
+        """
         return len({t for t in self.tasks if t.filter(**kwargs)})
 
 
@@ -48,14 +71,17 @@ class TaskQueue:
     
     @property
     def json(self):
+        """Returns a json (dict) representation of the task queue."""
         return {'tasks': [t.json for t in self.tasks]}
     
     @property
     def quality_score(self):
+        """Returns the quality score [0, 100]."""
         k = 8
         return int(((len(self.tasks) - (self.size(bug=True) + self.size(done=False) + self.size(correct_specification=False))) * 1/len(self.tasks))**k * 100)
     
     def reset_cascade(self, task: Task):
+        """Performs a reset cascade on the given task. The given task, as well as all tasks that depend on this task, will be rested."""
         tasks_to_reset = set()
         tasks_to_reset.add(task)
 
@@ -69,6 +95,8 @@ class TaskQueue:
         for task in tasks_to_reset:
             task.reset()
 
+
+    # Methods to get stats without calling the get function, because you can't pass arguments from django-html.
     def false_spec(self) -> int:
         return (len(self.get(correct_specification=False)))
     

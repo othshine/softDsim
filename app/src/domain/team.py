@@ -168,7 +168,7 @@ class Member:
             task.bug = bool(probability(1-p))
     
         m = number_tasks - len(tasks_to_fix)
-        self.motivation = max(0, self.motivation-(WORK_HOUR_MOTIVATION_DECREASE*time))
+        self.motivation = max(0, self.motivation-(WORK_HOUR_MOTIVATION_REDUCTION*time))
 
         # If there were less than n tasks in the queue to fix the member will go over to solving and testing
         if m > 0:
@@ -191,7 +191,7 @@ class Member:
             task.unit_tested = True
 
         m = number_tasks - len(tasks_to_test)
-        self.motivation = max(0, self.motivation-(WORK_HOUR_MOTIVATION_DECREASE*time))
+        self.motivation = max(0, self.motivation-(WORK_HOUR_MOTIVATION_REDUCTION*time))
 
         # If there were less than n tasks in the queue to test the member will go over to solving and fixing
         if m > 0:
