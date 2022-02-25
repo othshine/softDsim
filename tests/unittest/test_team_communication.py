@@ -1,7 +1,8 @@
 import pytest
 
 from app.src.domain.dataObjects import WorkPackage
-from app.src.domain.scenario import TaskQueue
+from app.src.domain.task_queue import TaskQueue
+from app.src.domain.task import Task
 from app.src.domain.team import Team, Member, ScrumTeam
 
 
@@ -20,7 +21,11 @@ def teams():
 def tqs():
     tqs = []
     for _ in range(3):
-        tqs.append(TaskQueue(easy=10000, medium=10000, hard=10000))
+        tq = TaskQueue()
+        for i in range(1, 4):
+            t = Task(difficulty=i)
+            tq.add(t)
+        tqs.append(tq)
     return tqs
 
 

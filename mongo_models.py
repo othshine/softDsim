@@ -3,6 +3,7 @@ from typing import List
 from bson import ObjectId
 from deprecated.classic import deprecated
 from pymongo import MongoClient
+from pymongo.errors import ServerSelectionTimeoutError
 from time import time
 
 from app.src.domain.factories import Factory
@@ -15,11 +16,21 @@ class NoObjectWithIdException(Exception):
 
 class MongoConnection(object):
     def __init__(self):
-        client = MongoClient('localhost', 2717)  # ToDo: Use env var.
+        self.host = 'localhost'
+        self.port = 2717
+        client = MongoClient(self.host, self.port)  # ToDo: Use env var.
         self.db = client['v5']
 
     def get_collection(self, name):
         self.collection = self.db[name]
+    
+    def is_connected(self, t):
+        test_client = MongoClient(self.host, self.port, serverSelectionTimeoutMS=t)
+        try:
+            test_client.server_info()
+        except ServerSelectionTimeoutError:
+            return False
+        return True
 
 
 class ScenarioMongoModel(MongoConnection):

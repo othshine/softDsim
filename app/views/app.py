@@ -1,7 +1,12 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
-from mongo_models import ScenarioMongoModel, UserMongoModel, ClickHistoryModel
+from mongo_models import MongoConnection, ScenarioMongoModel, UserMongoModel, ClickHistoryModel, MongoConnection
+
+def connected(t):
+    c = MongoConnection()
+    return c.is_connected(t)
+
 
 
 @login_required
@@ -11,6 +16,8 @@ def app(request, sid):
 
 @login_required
 def index(request):
+    if not connected(500):
+        return render(request, "app/dbfail.html")
     scenario_model = ScenarioMongoModel()
     user_model = UserMongoModel()
     sc = scenario_model.find_all_templates()

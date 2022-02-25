@@ -1,7 +1,9 @@
 import pytest
+from app.src.domain.task_queue import TaskQueue
 
 from app.src.domain.team import Member, order_tasks_for_member
 from app.src.domain.task import Task, Difficulty
+from app.src.domain.scenario import Scenario, UserScenario
 
 
 
@@ -59,4 +61,13 @@ def test_order_tasks_for_senior():
     
     for i in range(medium, easy+medium+hard):
         assert tasks[i].difficulty == Difficulty.HARD or tasks[i].difficulty == Difficulty.EASY
-    
+
+def test_work():
+    easy = 23
+    medium = 15
+    hard = 39
+    tasks = {Task(difficulty=t) for t in [*[1]*easy, *[2]*medium, *[3]*hard]}
+    tq = TaskQueue()
+    tq.add(tasks)
+    s = UserScenario(tq=tq)
+    m = Member(scenario=s)

@@ -42,6 +42,15 @@ const taskChart = new Chart(ctxTasks, {
             text: 'Cost'
         },
         maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    boxWidth: 3,
+                    boxHeight: 3,
+                }
+            }
+        }
+    
 
     }
 });
@@ -67,6 +76,14 @@ const costChart = new Chart(ctxCost, {
             text: 'Cost'
         },
         maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    boxWidth: 3,
+                    boxHeight: 3
+                }
+            }
+        }
     }
 });
 
