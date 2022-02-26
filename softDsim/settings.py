@@ -77,10 +77,15 @@ WSGI_APPLICATION = 'softDsim.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'simulation',
+        'USER': 'demo',
+        'PASSWORD': 'demo',
+        'HOST': 'localhost',
+        'PORT': '27017',
     }
 }
 
