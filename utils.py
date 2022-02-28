@@ -55,6 +55,7 @@ def weighted(*args):
             data.append(arg[0])
     return statistics.mean(data)
 
+
 def dots(n: int):
     """
     Returns a string with n dots: •
@@ -94,9 +95,11 @@ def get_active_label(data):
     """
     return data_get(data, True, attr='active').get('label') or None
 
+
 def read_button(data, title):
     """Returns the value of the button in data with the given title."""
     return get_active_label(data_get(data['button_rows'], title).get('answers', []))
+
 
 def min_max_scaling(value, s_min, s_max, v_min=0, v_max=1.0) -> float:
     """Returns the min max scaled value of the given value. 
