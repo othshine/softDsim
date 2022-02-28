@@ -122,6 +122,7 @@ def min_max_scaling(value, s_min, s_max, v_min=0, v_max=1.0) -> float:
     """
     return s_min + (((value - v_min)*(s_max-s_min)) / (v_max - v_min))
 
+
 class _YAMLReader:
     def __init__(self, path):
         self.path = path
