@@ -120,26 +120,15 @@ class Member:
     def work(self, time: float, activity:Activity=Activity.SOLVE):
         tq = self.scenario.task_queue
         if number_tasks == 0:
-            number_tasks = self.get_number_of_tasks(coeff, time)
+            number_tasks = self.get_number_of_tasks(time)
 
-
-
-
-
-
-
-
-
-
-
-
-    def solve_tasks(self, time: float, number_tasks=0, coeff=TASK_COMPLETION_COEF):
+    def solve_tasks(self, time: float, number_tasks=0):
         """
         Simulates a member solving tasks for <time> hours.
         """
         tq = self.scenario.task_queue
         if number_tasks == 0:
-            number_tasks = self.get_number_of_tasks(coeff, time)
+            number_tasks = self.get_number_of_tasks(time)
 
         tqg = tq.get(done=False, n=number_tasks)
         tasks_to_solve = order_tasks_for_member(tqg, self.skill_type)
@@ -153,7 +142,7 @@ class Member:
 
             if probability(self.scenario.template.pred_c):
                 try:
-                    self.pred = random.sample(tq.get(done=True), 1)[0].id
+                    self.pred = random.sample(list(tq.get(done=True)), 1)[0].id
                 except:
                     pass
             task.done = True
@@ -173,13 +162,13 @@ class Member:
                 self.fix_errors(time=0, number_tasks=m)
     
 
-    def fix_errors(self, time: float, coeff=TASK_COMPLETION_COEF, number_tasks=0):
+    def fix_errors(self, time: float, number_tasks=0):
         """
         Simulates a member fixing errors for <time> hours.
         """
         tq = self.scenario.task_queue
         if number_tasks == 0:
-            number_tasks = self.get_number_of_tasks(coeff, time)
+            number_tasks = self.get_number_of_tasks(time)
         tasks_to_fix = order_tasks_for_member(tq.get(done=True, bug=True, unit_tested=True, n=number_tasks), self.skill_type)
 
         for task in tasks_to_fix:
@@ -196,13 +185,13 @@ class Member:
             elif len(tq.get(done=True, unit_tested=False)):
                 self.test_tasks(time=0, number_tasks=m)
 
-    def test_tasks(self, time: float, coeff=TASK_COMPLETION_COEF, number_tasks=0):
+    def test_tasks(self, time: float, number_tasks=0):
         """
         Simulates a member testing tasks for <time> hours.
         """
         tq = self.scenario.task_queue
         if number_tasks == 0:
-            number_tasks = self.get_number_of_tasks(coeff, time)
+            number_tasks = self.get_number_of_tasks(time)
         tasks_to_test = order_tasks_for_member(tq.get(done=True,unit_tested=False, n=number_tasks), self.skill_type)
 
         for task in tasks_to_test:
@@ -219,7 +208,7 @@ class Member:
                 self.fix_errors(time=0, number_tasks=m)
 
 
-    def get_number_of_tasks(self, coeff, time):
+    def get_number_of_tasks(self, time, coeff=TASK_COMPLETION_COEF):
         """Returns the number of tasks that a member can solve/test/fix for <time> hours."""
         if self.halted:
             raise MemberIsHalted()
