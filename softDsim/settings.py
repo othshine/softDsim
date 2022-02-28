@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import environ
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,8 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-94(w(k_)m8=xz5fbd^=8_xqh1vb4w%y-k)b@e8!n!dbfpn1ibp'
+
+
+
+# Take environment variables from .env file
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+
+
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -77,15 +88,12 @@ WSGI_APPLICATION = 'softDsim.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'simulation',
-        'USER': 'demo',
-        'PASSWORD': 'demo',
-        'HOST': 'localhost',
-        'PORT': '27017',
+        'NAME': env('DATABASE_NAME'),
+        'ENFORCE_SCHEMA': False,
+        'HOST': env("DATABASE_HOST"),
     }
 }
 

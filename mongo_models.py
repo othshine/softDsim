@@ -9,6 +9,14 @@ from time import time
 from app.src.domain.factories import Factory
 from app.src.domain.scenario import Scenario, UserScenario
 
+import environ
+
+# Take environment variables from .env file
+env = environ.Env()
+environ.Env.read_env('.env')
+
+
+
 
 class NoObjectWithIdException(Exception):
     pass
@@ -16,16 +24,15 @@ class NoObjectWithIdException(Exception):
 
 class MongoConnection(object):
     def __init__(self):
-        self.host = 'localhost'
-        self.port = 27017
-        client = MongoClient(self.host, self.port)  # ToDo: Use env var.
-        self.db = client['simulation']
+        self.host = env('DATABASE_HOST')
+        client = MongoClient(self.host)  # ToDo: Use env var.
+        self.db = client[env('DATABASE_NAME')]
 
     def get_collection(self, name):
         self.collection = self.db[name]
     
     def is_connected(self, t):
-        test_client = MongoClient(self.host, self.port, serverSelectionTimeoutMS=t)
+        test_client = MongoClient(self.host, serverSelectionTimeoutMS=t)
         try:
             test_client.server_info()
         except ServerSelectionTimeoutError:
