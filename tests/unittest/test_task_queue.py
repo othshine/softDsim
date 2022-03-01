@@ -4,8 +4,6 @@ from bson import ObjectId
 
 import pytest
 
-from app.src.domain.team import Member
-
 
 def test_instantiate_task_queue():
     tq = TaskQueue()
