@@ -1,4 +1,5 @@
-from utils import get_active_label, weighted
+from utils import get_active_label, weighted, generate_object_id
+from bson.objectid import ObjectId
 
 
 def test_get_active_label():
@@ -19,3 +20,17 @@ def test_get_active_label():
 
 def test_weighted():
     assert 0.36 < weighted((0.5, 2), (0.1, 1)) < 0.37
+
+
+
+def test_generate_object_id_returns_object_id():
+    assert isinstance(generate_object_id(), ObjectId) is True
+
+def test_generate_object_id_returns_different_ids():
+    id1 = generate_object_id()
+    id2 = generate_object_id()
+    id1a = id1
+    assert id1a == id1
+    assert id1 != id2
+    id3 = generate_object_id()
+    assert id3 != id1

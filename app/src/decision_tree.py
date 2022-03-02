@@ -2,9 +2,9 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import List, Optional, Dict
 
-from bson import ObjectId
+from bson.objectid import ObjectId
 
-from app.src.domain.dataObjects import SimulationGoal
+from app.src.dataObjects import SimulationGoal
 from utils import YAMLReader
 
 
@@ -66,7 +66,7 @@ class Decision(ABC):
 class AnsweredDecision(Decision):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.actions: List[Action] = [Action(**a) for a in kwargs.get('actions', []) or []]
+        self.actions: List[Action] = [a if isinstance(a, Action) else Action(**a) for a in kwargs.get('actions', []) or []]
 
     def add_button_action(self, title, answers, id=None, required=False, hover="", restrictions=None):
         if id is None:
@@ -101,7 +101,7 @@ class SimulationDecision(Decision):
 
     @property
     def json(self):
-        return {**super().json, 'goal': self.goal.json}
+        return {**super().json, 'goal': self.goal.json, 'max_points': self.max_points}
 
     def set_goal(self, goal: SimulationGoal):
         self.goal = goal
@@ -123,7 +123,10 @@ class Action:
         self.restrictions: Dict[str:List[str]] = restrictions
         if answers:
             for answer in answers:
-                self.answers.append(Answer(**answer))
+                if isinstance(answer, Answer):
+                    self.answers.append(answer)
+                else:
+                    self.answers.append(Answer(**answer))
 
     @property
     def json(self):

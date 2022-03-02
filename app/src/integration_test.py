@@ -1,4 +1,4 @@
-from app.src.domain.scenario import TaskQueue
+from app.src.scenario import TaskQueue
 
 def integration_test(tq: TaskQueue):
     n = 0

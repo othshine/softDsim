@@ -10,10 +10,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 
 from app.forms import DecisionEditForm, ScenarioEditForm, ScenarioNameForm, UserAutomationForm
-from app.src.domain.ScenarioOverview import ScenarioOverview
-from app.src.domain.decision_tree import Decision
-from app.src.domain.history import History
-from app.src.domain.scenario import Scenario
+from app.src.ScenarioOverview import ScenarioOverview
+from app.src.decision_tree import Decision
+from app.src.history import History
+from app.src.scenario import Scenario
 from mongo_models import ClickHistoryModel, ScenarioMongoModel, NoObjectWithIdException, UserMongoModel
 
 PREFIX = "sose_"

@@ -2,30 +2,45 @@ from dataclasses import dataclass, field
 from random import random
 from typing import Optional
 
-from bson import ObjectId
+from bson.objectid import ObjectId
 
-from app.src.domain.dataObjects import WorkPackage
-from app.src.domain.decision_tree import ActionList, Decision, SimulationDecision
-from app.src.domain.team import Team, ScrumTeam
-from app.src.domain.task_queue import TaskQueue
-from utils import month_to_day, YAMLReader
+from app.src.dataObjects import WorkPackage
+from app.src.decision_tree import ActionList, Decision, SimulationDecision
+from app.src.team import Team, ScrumTeam
+from app.src.task_queue import TaskQueue
+from utils import month_to_day, remove_none_values, YAMLReader
 
 # Config Variables
 STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
 
 
-@dataclass
+
 class Scenario:
-    name: str
-    budget: int
-    scheduled_days: int
-    decisions: list = field(default_factory=list)
-    id: ObjectId = ObjectId()
-    desc: str = ""
-    tasks_easy: int = 0
-    tasks_medium: int = 0
-    tasks_hard: int = 0
-    pred_c: float = 0.1
+    def __init__(self, name: str = "Unnamed Sceanrio",
+                budget: int = 0,
+                scheduled_days: int = 0,
+                decisions: list = [],
+                desc: str = "",
+                tasks_easy: int = 0,
+                tasks_medium: int = 0,
+                tasks_hard: int = 0,
+                pred_c: float = 0.1, 
+                _id: ObjectId = None,
+                id: ObjectId = None, 
+                **kwargs) -> None:
+        if id and not _id:
+            _id = id
+        self.name = name
+        self.budget= budget
+        self.scheduled_days=scheduled_days
+        self.decisions=decisions
+        self.desc=desc
+        self.tasks_easy=tasks_easy
+        self.tasks_medium=tasks_medium
+        self.tasks_hard=tasks_hard
+        self.pred_c=pred_c
+        self.id = ObjectId() if _id is None else ObjectId(_id)
+
 
     @property
     def tasks_total(self):
@@ -44,10 +59,11 @@ class Scenario:
                 'tasks_hard': self.tasks_hard,
                 'budget': self.budget,
                 'scheduled_days': self.scheduled_days,
-                '_id': str(self.id),
-                'id': str(self.id),
+                '_id': self.id,
                 'desc': self.desc,
-                'pred_c': self.pred_c
+                'pred_c': self.pred_c,
+                'is_template': True,
+                'OID': self.id
                 }
 
 
@@ -72,9 +88,9 @@ class UserScenario:
         self.errors = int(kwargs.get('errors', 0) or 0)
         self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
         self.current_day = int(kwargs.get('current_day', 0) or 0)
-        self.counter = int(kwargs.get('counter', -1))
+        self.counter = int(kwargs.get('counter', -1) or -1)
         self.decisions = kwargs.get('decisions', []) or []
-        self.id = ObjectId(kwargs.get('id')) or ObjectId()
+        self.id = ObjectId(kwargs.get('_id')) or ObjectId()
         self.actions = kwargs.get('actions') or ActionList()
         self.user = kwargs.get('user')
         self.template: Scenario = kwargs.get('scenario')
@@ -119,15 +135,25 @@ class UserScenario:
              'counter': self.counter,
              'current_day': self.current_day,
              'team': self.team.json,
-             '_id': str(self.id),
-             'id': str(self.id),
+             '_id': self.id,
              'user': self.user,
              'actions': self.actions.json,
-             'template_id': str(self.template.id),
+             'template_id': self.get_template_id(),
              'model': self.model,
-             'history': self.history_id
+             'history': self.history_id,
+             'is_template': False,
+             'OID': self.id
              }
+        # Remove all items whose value is 'None'
+        d = remove_none_values(d)
         return d
+    
+
+    def get_template_id(self):
+        if self.template:
+            return self.template.id
+        return None
+
 
     def add(self, decision: Decision):
         self.decisions.append(decision)
@@ -186,8 +212,6 @@ class UserScenario:
         if social:
             self.actual_cost += len(self.team)*1000
 
-    def get_id(self) -> str:
-        return str(self.id)
 
     def _eval_counter(self):
         """

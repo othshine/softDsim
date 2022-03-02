@@ -1,9 +1,12 @@
-from app.src.domain.task import Task
+from app.src.task import Task
 
 
 class TaskQueue:
     
     def __init__(self, tasks=[]) -> None:
+        tasks = [] if tasks is None else tasks
+        print("TASKS")
+        print(tasks)
         self.tasks = set([Task(**t) for t in tasks])
     
     def __str__(self):

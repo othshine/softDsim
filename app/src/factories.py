@@ -1,15 +1,17 @@
-from bson import ObjectId
+from bson.objectid import ObjectId
 
-from app.src.domain.dataObjects import SimulationGoal
-from app.src.domain.decision_tree import SimulationDecision, AnsweredDecision, ActionList
-from app.src.domain.scenario import Scenario, UserScenario
-from app.src.domain.task_queue import TaskQueue
-from app.src.domain.task import Task
-from app.src.domain.team import Member, Team
+from app.src.dataObjects import SimulationGoal
+from app.src.decision_tree import SimulationDecision, AnsweredDecision, ActionList
+from app.src.scenario import Scenario, UserScenario
+from app.src.task_queue import TaskQueue
+from app.src.task import Task
+from app.src.team import Member, Team
+
+from utils import remove_none_values
 
 
 def parse_team(t, s):
-    i = t.get('id') or str(ObjectId())
+    i = t.get('_id') or str(ObjectId())
     team = Team(i)
     for m in t.get('staff'):
         member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
@@ -43,31 +45,15 @@ class _Factory:
         return us
 
     def _create_scenario(self, data):
-        s = Scenario(name=data.get('name', "DefaultName"),
-                     tasks_easy=data.get('tasks_easy', 0),
-                     tasks_medium=data.get('tasks_medium', 0),
-                     tasks_hard=data.get('tasks_hard', 0),
-                     budget=data.get('budget', 10000),
-                     desc=data.get('desc', ''),
-                     scheduled_days=data.get('scheduled_days', 100),
-                     id=data.get('_id') or ObjectId()
-                     )
-        self._add_decisions(data.get('decisions', []), s)
+        d = data.pop('decisions', [])
+        s = Scenario(**data)
+        self._add_decisions(d, s)
         return s
 
     def _create_user_scenario(self, json) -> UserScenario:
-        us = UserScenario(task_queue=json.get('task_queue'),
-                          actual_cost=json.get('actual_cost'),
-                          current_day=json.get('current_day'),
-                          id=json.get('_id'),
-                          counter=json.get('counter'),
-                          actions=ActionList(json=json.get('actions')),
-                          user=json.get('user'),
-                          scenario=json.get('template'),
-                          errors=json.get('errors'),
-                          identified_errors=json.get('identified_errors'),
-                          model=json.get('model'),
-                          history=json.get('history'))
+        json['actions'] = ActionList(json=json.get('actions'))
+        json = remove_none_values(json)
+        us = UserScenario(**json)
         if us.model.lower() == "scrum":
             if t := json.get('team'):
                 if t := t.get('teams'):
@@ -82,7 +68,7 @@ class _Factory:
 
     def _add_decisions(self, data, s):
         """
-        Adds als decisions that are included in the list data in json (dict) format to the scenario typ object s.
+        Adds all decisions that are included in the list data in json (dict) format to the scenario typ object s.
         :param data: A list with decisions in json format (as python dicts).
         :param s: A Scenario or UserScenario typ of object.
         """
@@ -97,12 +83,12 @@ class _Factory:
             if p := decision.get('points'):
                 kwargs['points'] = p
             if g := decision.get('goal'):
-                d = SimulationDecision(**kwargs, goal=SimulationGoal(tasks=g.get('tasks')))
+                d = SimulationDecision(**kwargs, goal=SimulationGoal(tasks=g.get('tasks')), max_points=decision.get('max_points'))
             else:
                 d = AnsweredDecision(**kwargs)
                 for action in decision.get('actions'):
                     d.add_button_action(title=action.get('title', ''), id=action.get('id', ObjectId()),
-                                        answers=[{'label': a['label'], 'points': a['points']} for a in
+                                        answers=[{'label': a['label'], 'active': a['active'], 'points': a['points']} for a in
                                                  action['answers']], required=action.get('required'),
                                         hover=action.get('hover', ""))
             for tb in decision.get('text', []):

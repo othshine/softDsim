@@ -1,9 +1,9 @@
 import pytest
 
-from bson import ObjectId
+from bson.objectid import ObjectId
 
-from app.src.domain.task import Task, Difficulty
-from app.src.domain.team import TASK_COMPLETION_COEF, Member
+from app.src.task import Task, Difficulty
+from app.src.team import TASK_COMPLETION_COEF, Member
 
 
 def test_instantiate_task():

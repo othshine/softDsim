@@ -1,11 +1,11 @@
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "softDsim.settings")
 
-from bson import ObjectId
+from bson.objectid import ObjectId
 
-from app.src.domain.dataObjects import SimulationGoal
-from app.src.domain.decision_tree import AnsweredDecision, SimulationDecision
-from app.src.domain.scenario import Scenario
+from app.src.dataObjects import SimulationGoal
+from app.src.decision_tree import AnsweredDecision, SimulationDecision
+from app.src.scenario import Scenario
 from mongo_models import ScenarioMongoModel
 from utils import _YAMLReader
 

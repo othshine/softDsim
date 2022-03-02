@@ -1,13 +1,13 @@
 from typing import List
 
-from bson import ObjectId
+from bson.objectid import ObjectId
 from deprecated.classic import deprecated
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from time import time
 
-from app.src.domain.factories import Factory
-from app.src.domain.scenario import Scenario, UserScenario
+from app.src.factories import Factory
+from app.src.scenario import Scenario, UserScenario
 
 import environ
 
@@ -25,7 +25,7 @@ class NoObjectWithIdException(Exception):
 class MongoConnection(object):
     def __init__(self):
         self.host = env('DATABASE_HOST')
-        client = MongoClient(self.host)  # ToDo: Use env var.
+        client = MongoClient(self.host)
         self.db = client[env('DATABASE_NAME')]
 
     def get_collection(self, name):
@@ -45,17 +45,19 @@ class ScenarioMongoModel(MongoConnection):
         super(ScenarioMongoModel, self).__init__()
         self.get_collection('scenarios')
 
-    def get(self, _id):
+    def get(self, _id:ObjectId):
         typ = 'scenario'
-        if json := self.collection.find_one({'_id': _id}):
-            if json.get('template') is None:
+        if json := self.collection.find_one({"_id": _id}):
+            if json.get('is_template') is False:
                 typ = 'userscenario'
-                json['template'] = self.get(json.get('template_id'))
+                if json.get('template'):
+                    json['template'] = self.get(json.get('template_id'))
             return Factory.deserialize(json, typ)
         raise NoObjectWithIdException()
 
+
     def save(self, obj) -> ObjectId:
-        if isinstance(obj, Scenario):
+        if isinstance(obj, Scenario) or isinstance(obj, UserScenario):
             obj = obj.json
         return self.collection.insert_one(obj).inserted_id
 
@@ -64,7 +66,10 @@ class ScenarioMongoModel(MongoConnection):
 
     def update(self, obj):  # ToDo: Tests for updating Scenarios.
         # ToDo: Do not allow to update templates.
-        return self.collection.find_one_and_update({'_id': obj.get_id()}, {"$set": obj.json})['_id']
+        if isinstance(obj, Scenario) or isinstance(obj, UserScenario):
+            obj = obj.json
+        
+        return self.collection.find_one_and_update({'_id': obj.get('_id')}, {"$set": obj})['_id']
 
     def remove(self, obj=None, mid=None):
         if obj:
@@ -85,7 +90,7 @@ class ScenarioMongoModel(MongoConnection):
     @deprecated
     def copy(self, sid, user: str):
         if json := self.collection.find_one({'_id': sid}):
-            i = str(ObjectId())
+            i = ObjectId()
             json['id'] = i
             json['_id'] = i
             json['user'] = user

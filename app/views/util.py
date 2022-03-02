@@ -1,5 +1,5 @@
-from app.src.domain.scenario import UserScenario
-from app.src.domain.team import ScrumTeam
+from app.src.scenario import UserScenario
+from app.src.team import ScrumTeam
 from utils import data_get, get_active_label
 
 
@@ -50,3 +50,7 @@ def set_model(s: UserScenario, model):
     s.model = model.lower()
     if not isinstance(s.team, ScrumTeam) and s.model == 'scrum':
         s.team = ScrumTeam()
+
+
+def generate_object_id():
+    pass

@@ -1,12 +1,12 @@
 import pytest
-from app.src.domain.task_queue import TaskQueue
+from app.src.task_queue import TaskQueue
 
-from app.src.domain.team import Team, Member, SkillType, order_tasks_for_member, NotAValidSkillTypeException
-from app.src.domain.task import Task, Difficulty
-from app.src.domain.scenario import Scenario, UserScenario
+from app.src.team import Team, Member, SkillType, order_tasks_for_member, NotAValidSkillTypeException
+from app.src.task import Task, Difficulty
+from app.src.scenario import Scenario, UserScenario
 from utils import YAMLReader
 
-from bson import ObjectId
+from bson.objectid import ObjectId
 
 def test_skill_type_reads_parameter_from_yaml():
     t = 'senior'

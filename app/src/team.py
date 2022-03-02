@@ -4,12 +4,11 @@ from statistics import mean
 from typing import List
 from enum import Enum
 
-from bson import ObjectId
+from bson.objectid import ObjectId
 
-from app.src.domain.dataObjects import WorkPackage
-# import app.src.domain.scenario as sc
-from app.src.domain.task_queue import TaskQueue
-from app.src.domain.task import Task
+from app.src.dataObjects import WorkPackage
+from app.src.task_queue import TaskQueue
+from app.src.task import Task
 from utils import YAMLReader, probability, value_or_error, min_max_scaling
 
 from scipy.stats import poisson
@@ -73,7 +72,7 @@ class Member:
         self.familiarity = value_or_error(familiarity)
         self.familiar_tasks = int(value_or_error(familiar_tasks, upper=float('inf')))
         self.halted = False
-        self.id = ObjectId() if id is None else ObjectId(id) if isinstance(id, str) else id
+        self.id = ObjectId() if id is None else ObjectId(id)
         self.scenario = scenario #: sc.UserScenario = scenario
         #self.team: Team = team
 

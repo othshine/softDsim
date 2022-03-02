@@ -1,5 +1,6 @@
 import statistics
 from random import random
+from bson.objectid import ObjectId
 
 from pymongo import MongoClient
 from yaml import load, FullLoader
@@ -136,3 +137,13 @@ class _YAMLReader:
 
 
 YAMLReader = _YAMLReader(path=os.path.join(settings.BASE_DIR, 'parameter.yaml'))
+
+
+
+def generate_object_id():
+    return ObjectId()
+
+
+def remove_none_values(d):
+    """Removes all pairs in dict d that have none as their value."""
+    return {k: v for k, v in d.items() if v is not None}

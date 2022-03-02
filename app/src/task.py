@@ -1,5 +1,5 @@
 from enum import Enum
-from bson import ObjectId
+from bson.objectid import ObjectId
 
 
 class Task:

@@ -1,10 +1,10 @@
 import pytest
 
-from app.src.domain.dataObjects import WorkPackage
-from app.src.domain.scenario import Scenario, UserScenario
-from app.src.domain.task_queue import TaskQueue
-from app.src.domain.task import Task
-from app.src.domain.team import Team, Member, ScrumTeam
+from app.src.dataObjects import WorkPackage
+from app.src.scenario import Scenario, UserScenario
+from app.src.task_queue import TaskQueue
+from app.src.task import Task
+from app.src.team import Team, Member, ScrumTeam
 
 
 @pytest.fixture

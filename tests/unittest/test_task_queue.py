@@ -1,6 +1,6 @@
-from app.src.domain.task_queue import TaskQueue
-from app.src.domain.task import Task, Difficulty
-from bson import ObjectId
+from app.src.task_queue import TaskQueue
+from app.src.task import Task, Difficulty
+from bson.objectid import ObjectId
 
 import pytest
 

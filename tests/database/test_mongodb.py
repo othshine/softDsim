@@ -1,35 +1,153 @@
-""" import pytest
+from cProfile import label
+from turtle import title
+import pytest
 
-from app.src.domain.dataObjects import SimulationGoal
-from app.src.domain.decision_tree import Decision, Answer, AnsweredDecision, SimulationDecision
-from app.src.domain.scenario import UserScenario, Scenario
-from app.src.domain.team import Member, SkillType
+from app.src.dataObjects import SimulationGoal
+from app.src.decision_tree import Action, Decision, Answer, AnsweredDecision, SimulationDecision, TextBlock
+from app.src.scenario import UserScenario, Scenario
+from app.src.team import Member, SkillType
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException, ClickHistoryModel
+
+from bson.objectid import ObjectId
+
+
+def test_save_empty_scenario():
+    mongo = ScenarioMongoModel()
+    s = Scenario()
+    mid = mongo.save(s)
+    
+    s2 = mongo.get(mid)
+
+    assert s2.id == s.id
+    assert s2.id == mid
+
+    assert isinstance(s, Scenario) is True
+    assert isinstance(s, UserScenario) is False
+    assert isinstance(s2, Scenario) is True
+    assert isinstance(s2, UserScenario) is False
+
+def test_save_user_scenario():
+    mongo = ScenarioMongoModel()
+    s = UserScenario()
+    mid = mongo.save(s)
+    
+    s2 = mongo.get(mid)
+
+    assert s2.id == s.id
+    assert s2.id == mid
+
+    assert isinstance(s, Scenario) is False
+    assert isinstance(s, UserScenario) is True
+    assert isinstance(s2, Scenario) is False
+    assert isinstance(s2, UserScenario) is True
+
+
+def test_two_stored_scenarios_are_not_equal():
+    mongo = ScenarioMongoModel()
+    s1 = Scenario()
+    s2 = Scenario()
+    mid1 = mongo.save(s1)
+    mid2 = mongo.save(s2)
+    assert mid1 != mid2
+
+    r1 = mongo.get(mid1)
+    r2 = mongo.get(mid2)
+
+    assert s1.id == r1.id
+    assert s2.id == r2.id
+    assert r1 != r2
+    assert r1 != s2
+    assert r2 != s1
+    assert mid1 == r1.id
+    assert mid1 != r2.id
+
+
+@pytest.fixture
+def decisions():
+    d1 = AnsweredDecision(text = [TextBlock("Header1", "Content1")], points=200, active_actions=["A", "B"], name="D1",
+        actions=[Action(id=ObjectId(), title="A", typ="button", active=True,required=False,hover="ABC", restrictions={'a':['b', 'c']}, answers=[Answer(label="L", active=True, points=3)])])
+    d2 = SimulationDecision(text = [TextBlock("Header2", "Content2"), TextBlock("Header3", "Content3")], points=21, name="D2", goal=SimulationGoal(300), max_points=200)
+    return [d1, d2]
+
+
+def test_save_scenario_with_attributes(decisions):
+    name = "Some"
+    budget = 234
+    scheduled_days = 12
+    desc = "Text"
+    tasks_easy = 1000
+    tasks_medium = 1
+    tasks_hard = 100
+    pred_c = 0.3
+    id = ObjectId()
+    s = Scenario(name=name, budget=budget, scheduled_days=scheduled_days, desc=desc, 
+            tasks_easy=tasks_easy, tasks_medium=tasks_medium, tasks_hard=tasks_hard, 
+            pred_c=pred_c, decisions=decisions, id=id)
+    
+    
+    mongo = ScenarioMongoModel()
+    mongo.save(s)
+
+    r = mongo.get(id)
+    
+    assert r.id == s.id
+    assert r.name == s.name
+    assert r.budget == s.budget
+    assert r.scheduled_days == s.scheduled_days
+    assert r.desc == s.desc
+    assert r.tasks_easy == s.tasks_easy
+    assert r.tasks_hard == s.tasks_hard
+    assert r.tasks_medium == s.tasks_medium
+    assert r.pred_c == s.pred_c
+    a = 1
+    b = 0
+    if isinstance(r.decisions[0], AnsweredDecision):
+        a = 0
+        b = 1
+    assert isinstance(r.decisions[a], AnsweredDecision)
+    assert isinstance(r.decisions[b], SimulationDecision)
+    assert r.decisions[a].text == s.decisions[0].text
+    assert r.decisions[a].name == s.decisions[0].name
+    assert r.decisions[a].points == s.decisions[0].points
+    assert r.decisions[a].active_actions[1] == s.decisions[0].active_actions[1]
+    assert r.decisions[a].actions[0].title == s.decisions[0].actions[0].title
+    assert r.decisions[a].actions[0].typ == s.decisions[0].actions[0].typ
+    assert r.decisions[a].actions[0].active == s.decisions[0].actions[0].active
+    assert r.decisions[a].actions[0].required == s.decisions[0].actions[0].required
+    assert r.decisions[a].actions[0].hover == s.decisions[0].actions[0].hover
+    assert r.decisions[a].actions[0].answers[0] == s.decisions[0].actions[0].answers[0]
+    assert r.decisions[b].text == s.decisions[1].text
+    assert r.decisions[b].name == s.decisions[1].name
+    assert r.decisions[b].points == s.decisions[1].points
+    assert r.decisions[b].max_points == s.decisions[1].max_points
+    assert r.decisions[b].goal == s.decisions[1].goal 
+
+
 
 
 def test_mongo_scenario_update():
     mongo = ScenarioMongoModel()
-    s = Scenario(budget=300)
+    s = Scenario(budget=300, name="Old", scheduled_days=3)
+    
     mid = mongo.save(s)
     result = mongo.get(mid)
-    assert result == s
-    assert result.budget == s.budget
-    assert result.get_id() == s.get_id()
-    assert len(result.team) == 0
+    assert result.id == s.id
 
-    result.team += Member()
-    result.current_day = 7
-
+    result.budget = 301
+    result.name = "New Name"
+    result.scheduled_days = 2
+    print(f"use: {s.id}")
+    print(f"use: {mid}")
     mongo.update(result)
 
-    result = mongo.get(mid)
+    result2 = mongo.get(mid)
 
-    assert len(result.team) == 1
-    assert result.current_day == 7
-    assert result.budget == 300
-    assert result.get_id() == s.get_id()
+    assert result2.budget == 301
+    assert result2.scheduled_days == 2
+    assert result2.name == "New Name"
+    assert result2.id == s.id
 
-
+"""
 def test_mongo_scenario_can_be_saved_loaded_and_deleted():
     mongo = ScenarioMongoModel()
     s = Scenario(budget=100000, scheduled_days=40, tasks_done=300)
@@ -333,7 +451,6 @@ def test_save_click_history():
     json = model.get(id)
 
     assert json == {"_id": id}
-
 
 def test_save_click_history_add_event():
     model = ClickHistoryModel()
