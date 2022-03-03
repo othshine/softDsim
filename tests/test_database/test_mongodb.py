@@ -89,6 +89,9 @@ def test_save_scenario_with_attributes(decisions):
     mongo.save(s)
 
     r = mongo.get(id)
+
+    print(r.id)
+    print(r.json)
     
     assert r.id == s.id
     assert r.name == s.name

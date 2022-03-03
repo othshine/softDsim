@@ -16,7 +16,10 @@ STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
 
 
 class Scenario:
-    def __init__(self, name: str = "Unnamed Sceanrio",
+    """
+    A Scenario is a predefined 'Story' that users go through. When a user starts a scenario, a UserScenario is created.
+    """
+    def __init__(self, name: str = "Unnamed Scenario",
                 budget: int = 0,
                 scheduled_days: int = 0,
                 decisions: list = [],
@@ -93,7 +96,8 @@ class UserScenario:
         self.id = ObjectId(kwargs.get('_id')) or ObjectId()
         self.actions = kwargs.get('actions') or ActionList()
         self.user = kwargs.get('user')
-        self.template: Scenario = kwargs.get('scenario')
+        self.template: Scenario = kwargs.get('template')
+        self.template_id: ObjectId = kwargs.get('template_id')
         self.perform_quality_check = False
         self.error_fixing = False
         self.model = kwargs.get('model', 'waterfall') or ""
@@ -142,7 +146,6 @@ class UserScenario:
              'model': self.model,
              'history': self.history_id,
              'is_template': False,
-             'OID': self.id
              }
         # Remove all items whose value is 'None'
         d = remove_none_values(d)
@@ -152,7 +155,12 @@ class UserScenario:
     def get_template_id(self):
         if self.template:
             return self.template.id
+        elif self.template_id:
+            return self.template_id
         return None
+    
+    def set_template_id(self, id):
+        self.template_id = id
 
 
     def add(self, decision: Decision):
