@@ -133,7 +133,7 @@ def get_scenario(request, sid):
     model = ScenarioMongoModel()
     if request.method == 'DELETE':
         try:
-            x = model.remove(mid=sid)
+            x = model.remove(sid)
             return HttpResponse(status=200)
         except NoObjectWithIdException:
             return HttpResponse(status=404)

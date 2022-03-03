@@ -22,7 +22,7 @@ class Scenario:
     def __init__(self, name: str = "Unnamed Scenario",
                 budget: int = 0,
                 scheduled_days: int = 0,
-                decisions: list = [],
+                decisions: list = None,
                 desc: str = "",
                 tasks_easy: int = 0,
                 tasks_medium: int = 0,
@@ -33,6 +33,8 @@ class Scenario:
                 **kwargs) -> None:
         if id and not _id:
             _id = id
+        if decisions is None:
+            decisions = []
         self.name = name
         self.budget= budget
         self.scheduled_days=scheduled_days
@@ -86,12 +88,10 @@ def create_staff_row(team: Team, title: str = 'staff'):
 
 class UserScenario:
     def __init__(self, **kwargs):
-        self.identified_errors = int(kwargs.get('identified_errors', 0) or 0)
         self.task_queue = kwargs.get('tq') or TaskQueue(**kwargs.get('task_queue', {}))
-        self.errors = int(kwargs.get('errors', 0) or 0)
         self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
         self.current_day = int(kwargs.get('current_day', 0) or 0)
-        self.counter = int(kwargs.get('counter', -1) or -1)
+        self.counter = int(kwargs.get('counter', -1)) # Dont use or -1
         self.decisions = kwargs.get('decisions', []) or []
         self.id = ObjectId(kwargs.get('_id')) or ObjectId()
         self.actions = kwargs.get('actions') or ActionList()
@@ -132,8 +132,6 @@ class UserScenario:
     @property
     def json(self):
         d = {'task_queue': self.task_queue.json,
-             'errors': self.errors,
-             'identified_errors': self.identified_errors,
              'decisions': [dec.json for dec in self.decisions],
              'actual_cost': self.actual_cost,
              'counter': self.counter,

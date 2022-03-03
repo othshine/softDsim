@@ -74,11 +74,13 @@ class ScenarioMongoModel(MongoConnection):
         
         return self.collection.find_one_and_update({'_id': ObjectId(obj.get('_id'))}, {"$set": obj})['_id']
 
-    def remove(self, obj=None, mid=None):
-        if obj:
-            mid = obj.get_id
-        if self.collection.find({'_id': ObjectId(mid)}).count():
-            return self.collection.delete_many({"_id": mid})
+    def remove(self, a):
+        """Removes Scenario or UserScenario from the Database. 
+        param 'a' can either be of type ObjectId, Scenario oder UserScenario."""
+        if not isinstance(a, ObjectId):
+            a = a.id
+        if self.collection.find({'_id': ObjectId(a)}).count():
+            return self.collection.delete_many({"_id": a})
         raise NoObjectWithIdException()
 
     def find_all_templates(self):
