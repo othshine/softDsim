@@ -1,10 +1,13 @@
 from cProfile import label
+from copy import deepcopy
 from turtle import title
 import pytest
 
 from app.src.dataObjects import SimulationGoal
-from app.src.decision_tree import Action, Decision, Answer, AnsweredDecision, SimulationDecision, TextBlock
+from app.src.decision_tree import Action, ActionList, Decision, Answer, AnsweredDecision, SimulationDecision, TextBlock
 from app.src.scenario import UserScenario, Scenario
+from app.src.task import Difficulty, Task
+from app.src.task_queue import TaskQueue
 from app.src.team import Member, SkillType
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException, ClickHistoryModel
 
@@ -25,6 +28,7 @@ def test_save_empty_scenario():
     assert isinstance(s, UserScenario) is False
     assert isinstance(s2, Scenario) is True
     assert isinstance(s2, UserScenario) is False
+    mongo.remove(mid)
 
 def test_save_user_scenario():
     mongo = ScenarioMongoModel()
@@ -40,6 +44,7 @@ def test_save_user_scenario():
     assert isinstance(s, UserScenario) is True
     assert isinstance(s2, Scenario) is False
     assert isinstance(s2, UserScenario) is True
+    mongo.remove(s)
 
 
 def test_two_stored_scenarios_are_not_equal():
@@ -60,6 +65,8 @@ def test_two_stored_scenarios_are_not_equal():
     assert r2 != s1
     assert mid1 == r1.id
     assert mid1 != r2.id
+    mongo.remove(s1)
+    mongo.remove(s2)
 
 
 @pytest.fixture
@@ -89,6 +96,7 @@ def test_save_scenario_with_attributes(decisions):
     mongo.save(s)
 
     r = mongo.get(id)
+    mongo.remove(s)
     
     assert r.id == s.id
     assert r.name == s.name
@@ -123,7 +131,74 @@ def test_save_scenario_with_attributes(decisions):
     assert r.decisions[b].goal == s.decisions[1].goal 
 
 
+def test_save_userscenario_with_attributes(decisions):
+    mongo = ScenarioMongoModel()
+    name = "Some"
+    budget = 234
+    scheduled_days = 12
+    desc = "Text"
+    tasks_easy = 1000
+    tasks_medium = 1
+    tasks_hard = 100
+    pred_c = 0.3
+    id = ObjectId()
+    s = Scenario(name=name, budget=budget, scheduled_days=scheduled_days, desc=desc, 
+            tasks_easy=tasks_easy, tasks_medium=tasks_medium, tasks_hard=tasks_hard, 
+            pred_c=pred_c, decisions=decisions, id=id)
+    mongo.save(s)
+    task_queue = TaskQueue()
+    actual_cost = 499
+    current_day = 19
+    counter = 123
+    task_queue.add([
+        Task(difficulty=Difficulty.EASY, done=True, bug=True),
+        Task(difficulty=Difficulty.EASY, done= True, unit_tested=True),
+        Task(difficulty=Difficulty.HARD)
+    ])
+    template = s
+    model = "kanban"
 
+    
+    us = UserScenario(tq=task_queue, actual_cost=actual_cost, current_day=current_day, 
+        counter=counter, decisions=deepcopy(decisions), template=template, model=model,
+        user="PETER")
+    
+    sid = mongo.save(us)
+
+    r = mongo.get(sid)
+
+    assert r.model == model
+    assert r.actual_cost  == actual_cost
+    assert r.current_day == current_day
+    assert r.counter == counter
+    assert r.template.name == name
+    assert r.template.tasks_easy == tasks_easy
+    assert r.user == "PETER"
+    
+    a = 1
+    b = 0
+    if isinstance(r.decisions[0], AnsweredDecision):
+        a = 0
+        b = 1
+    assert isinstance(r.decisions[a], AnsweredDecision)
+    assert isinstance(r.decisions[b], SimulationDecision)
+    assert r.decisions[a].text == s.decisions[0].text
+    assert r.decisions[a].name == s.decisions[0].name
+    assert r.decisions[a].points == s.decisions[0].points
+    assert r.decisions[a].active_actions[1] == s.decisions[0].active_actions[1]
+    assert r.decisions[a].actions[0].title == s.decisions[0].actions[0].title
+    assert r.decisions[a].actions[0].typ == s.decisions[0].actions[0].typ
+    assert r.decisions[a].actions[0].active == s.decisions[0].actions[0].active
+    assert r.decisions[a].actions[0].required == s.decisions[0].actions[0].required
+    assert r.decisions[a].actions[0].hover == s.decisions[0].actions[0].hover
+    assert r.decisions[a].actions[0].answers[0] == s.decisions[0].actions[0].answers[0]
+    assert r.decisions[b].text == s.decisions[1].text
+    assert r.decisions[b].name == s.decisions[1].name
+    assert r.decisions[b].points == s.decisions[1].points
+    assert r.decisions[b].max_points == s.decisions[1].max_points
+    assert r.decisions[b].goal == s.decisions[1].goal 
+    mongo.remove(s)
+    mongo.remove(sid)
 
 def test_mongo_scenario_update():
     mongo = ScenarioMongoModel()
@@ -146,42 +221,51 @@ def test_mongo_scenario_update():
     assert result2.scheduled_days == 2
     assert result2.name == "New Name"
     assert result2.id == s.id
+    mongo.remove(s)
 
-"""
+
 def test_mongo_scenario_can_be_saved_loaded_and_deleted():
     mongo = ScenarioMongoModel()
-    s = Scenario(budget=100000, scheduled_days=40, tasks_done=300)
-    s2 = Scenario(budget=215, scheduled_days=677, tasks_total=2, tasks_done=30, current_day=30, actual_cost=300000,
-                  counter=4)
+    s = Scenario(budget=100000, scheduled_days=40, tasks_easy=300)
+    s2 = UserScenario(user='alice', current_day=12)
 
     mid = mongo.save(s)
     result = mongo.get(mid)
     assert result.budget == s.budget
-    assert result.tasks_done == s.tasks_done
-    assert result.counter == s.counter
-    assert result == s
+    assert result.tasks_easy == s.tasks_easy
+    assert result.id == s.id
 
     mid2 = mongo.save(s2)
     result2 = mongo.get(mid2)
-    assert result2.budget == s2.budget
+    assert result2.user == s2.user
     assert result2.current_day == s2.current_day
-    assert result2 == s2
+    assert result2.id == s2.id
 
-    mongo.remove(mid=mid)
+    mongo.remove(mid)
     with pytest.raises(NoObjectWithIdException):
         mongo.get(mid)
-
-    mid2 = mongo.update(result2)
+    
     result3 = mongo.get(mid2)
-    assert result2.get_id() == result3.get_id()
-    assert result2.budget == s2.budget == result3.budget
-    assert result2 == result3 == s2
+    assert result2.id == result3.id == s2.id
 
-    mongo.remove(mid=mid2)
+    mongo.remove(mid2)
     with pytest.raises(NoObjectWithIdException):
         mongo.get(mid2)
 
 
+
+def test_number_of_total_templates():
+    mongo = ScenarioMongoModel()
+    n = len(mongo.find_all_templates())
+
+    s = Scenario()
+    id = mongo.save(s)
+
+    assert n+1 == len(mongo.find_all_templates())
+    mongo.remove(id)
+    assert n == len(mongo.find_all_templates())
+
+"""
 def test_mongo_scenario_saves_text_blocks():
     mongo = ScenarioMongoModel()
     s = Scenario()

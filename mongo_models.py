@@ -2,6 +2,7 @@ from typing import List
 
 from bson.objectid import ObjectId
 from deprecated.classic import deprecated
+from numpy import save
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from time import time
@@ -47,19 +48,21 @@ class ScenarioMongoModel(MongoConnection):
 
     def get(self, _id:ObjectId):
         typ = 'scenario'
-        if json := self.collection.find_one({"_id": _id}):
+        if json := self.collection.find_one({"_id": ObjectId(_id)}):
             if json.get('is_template') is False:
                 typ = 'userscenario'
-                if json.get('template'):
+                if json.get('template_id'):
                     json['template'] = self.get(json.get('template_id'))
             return Factory.deserialize(json, typ)
         raise NoObjectWithIdException()
 
 
     def save(self, obj) -> ObjectId:
-        if isinstance(obj, Scenario) or isinstance(obj, UserScenario):
-            obj = obj.json
-        return self.collection.insert_one(obj).inserted_id
+        if isinstance(obj, Scenario):
+            return self.save_template(obj)
+        elif isinstance(obj, UserScenario):
+            return self.collection.insert_one(obj.json).inserted_id
+        raise ValueError(f"Must be of type Scenario or UserScenario but was {type(obj)}.")
 
     def save_template(self, obj) -> ObjectId:
         return self.collection.insert_one({**obj.json, 'template': True}).inserted_id
@@ -69,23 +72,25 @@ class ScenarioMongoModel(MongoConnection):
         if isinstance(obj, Scenario) or isinstance(obj, UserScenario):
             obj = obj.json
         
-        return self.collection.find_one_and_update({'_id': obj.get('_id')}, {"$set": obj})['_id']
+        return self.collection.find_one_and_update({'_id': ObjectId(obj.get('_id'))}, {"$set": obj})['_id']
 
-    def remove(self, obj=None, mid=None):
-        if obj:
-            mid = obj.get_id
-        if self.collection.find({'_id': mid}).count():
-            return self.collection.delete_many({"_id": mid})
+    def remove(self, a):
+        """Removes Scenario or UserScenario from the Database. 
+        param 'a' can either be of type ObjectId, Scenario oder UserScenario."""
+        if not isinstance(a, ObjectId):
+            a = a.id
+        if self.collection.find({'_id': ObjectId(a)}).count():
+            return self.collection.delete_many({"_id": a})
         raise NoObjectWithIdException()
 
     def find_all_templates(self):
         col = []
-        for s in self.collection.find({'template': True}):
+        for s in self.collection.find({'is_template': True}):
             col.append(Factory.deserialize(json=s, typ="scenario"))
         return col
 
     def get_name(self, sid):
-        return self.collection.find_one({'_id': sid})['name']
+        return self.collection.find_one({'_id': ObjectId(sid)})['name']
 
     @deprecated
     def copy(self, sid, user: str):
@@ -99,8 +104,8 @@ class ScenarioMongoModel(MongoConnection):
         raise NoObjectWithIdException()
 
     def create(self, sid, user, history_id):
-        if template := self.collection.find_one({'_id': sid}):
-            return self.save(Factory.create_user_scenario(user, template, history_id).json)
+        if template := self.collection.find_one({'_id': ObjectId(sid)}):
+            return self.save(Factory.create_user_scenario(user, template, history_id))
         raise NoObjectWithIdException("No template scenario with id: " + str(sid))
 
 

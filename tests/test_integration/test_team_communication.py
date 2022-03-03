@@ -44,7 +44,7 @@ def test_team_efficieny(teams):
 def test_more_members_less_efficient_per_member(teams, tqs):
     tpms = []  # Tasks per Member
     for t, tq in zip(teams, tqs):
-        scenario = UserScenario(tq=tq, scenario=Scenario(name="", scheduled_days=1, budget=0,pred_c=0.5))
+        scenario = UserScenario(tq=tq, template=Scenario(name="", scheduled_days=1, budget=0,pred_c=0.5))
         for m in t.staff:
             m.scenario = scenario 
         t.work(wp=WorkPackage(meeting_hours=10, training_hours=0, day_hours=8, days=20, error_fixing=False,

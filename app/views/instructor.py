@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 
 from app.forms import DecisionEditForm, ScenarioEditForm, ScenarioNameForm, UserAutomationForm
-from app.src.ScenarioOverview import ScenarioOverview
+from app.src.scenario_overview import ScenarioOverview
 from app.src.decision_tree import Decision
 from app.src.history import History
 from app.src.scenario import Scenario
@@ -115,7 +115,7 @@ def scenarios(request):
     if request.method == 'POST':
         x = json.loads(request.body.decode('utf-8'))
         s = Scenario(json=x)
-        model.save(s.json)
+        model.save(s)
         return HttpResponse(status=201)
     else:
         x = model.find_all_templates()
@@ -133,7 +133,7 @@ def get_scenario(request, sid):
     model = ScenarioMongoModel()
     if request.method == 'DELETE':
         try:
-            x = model.remove(mid=sid)
+            x = model.remove(sid)
             return HttpResponse(status=200)
         except NoObjectWithIdException:
             return HttpResponse(status=404)
@@ -147,7 +147,7 @@ def add_scenario(request):
         if form.is_valid():
             s = Scenario(name=form.cleaned_data['name'])
             mongo = ScenarioMongoModel()
-            mid = mongo.save(s.json)
+            mid = mongo.save(s)
             return HttpResponseRedirect("/instructor/edit/" + s.get_id(), )  # ToDo: use reverse.
     context = {
         'form': ScenarioNameForm(),

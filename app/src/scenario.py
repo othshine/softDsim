@@ -16,10 +16,13 @@ STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
 
 
 class Scenario:
-    def __init__(self, name: str = "Unnamed Sceanrio",
+    """
+    A Scenario is a predefined 'Story' that users go through. When a user starts a scenario, a UserScenario is created.
+    """
+    def __init__(self, name: str = "Unnamed Scenario",
                 budget: int = 0,
                 scheduled_days: int = 0,
-                decisions: list = [],
+                decisions: list = None,
                 desc: str = "",
                 tasks_easy: int = 0,
                 tasks_medium: int = 0,
@@ -30,6 +33,8 @@ class Scenario:
                 **kwargs) -> None:
         if id and not _id:
             _id = id
+        if decisions is None:
+            decisions = []
         self.name = name
         self.budget= budget
         self.scheduled_days=scheduled_days
@@ -83,17 +88,16 @@ def create_staff_row(team: Team, title: str = 'staff'):
 
 class UserScenario:
     def __init__(self, **kwargs):
-        self.identified_errors = int(kwargs.get('identified_errors', 0) or 0)
         self.task_queue = kwargs.get('tq') or TaskQueue(**kwargs.get('task_queue', {}))
-        self.errors = int(kwargs.get('errors', 0) or 0)
         self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
         self.current_day = int(kwargs.get('current_day', 0) or 0)
-        self.counter = int(kwargs.get('counter', -1) or -1)
+        self.counter = int(kwargs.get('counter', -1)) # Dont use or -1
         self.decisions = kwargs.get('decisions', []) or []
         self.id = ObjectId(kwargs.get('_id')) or ObjectId()
         self.actions = kwargs.get('actions') or ActionList()
         self.user = kwargs.get('user')
-        self.template: Scenario = kwargs.get('scenario')
+        self.template: Scenario = kwargs.get('template')
+        self.template_id: ObjectId = kwargs.get('template_id')
         self.perform_quality_check = False
         self.error_fixing = False
         self.model = kwargs.get('model', 'waterfall') or ""
@@ -128,8 +132,6 @@ class UserScenario:
     @property
     def json(self):
         d = {'task_queue': self.task_queue.json,
-             'errors': self.errors,
-             'identified_errors': self.identified_errors,
              'decisions': [dec.json for dec in self.decisions],
              'actual_cost': self.actual_cost,
              'counter': self.counter,
@@ -142,7 +144,6 @@ class UserScenario:
              'model': self.model,
              'history': self.history_id,
              'is_template': False,
-             'OID': self.id
              }
         # Remove all items whose value is 'None'
         d = remove_none_values(d)
@@ -152,7 +153,12 @@ class UserScenario:
     def get_template_id(self):
         if self.template:
             return self.template.id
+        elif self.template_id:
+            return self.template_id
         return None
+    
+    def set_template_id(self, id):
+        self.template_id = id
 
 
     def add(self, decision: Decision):

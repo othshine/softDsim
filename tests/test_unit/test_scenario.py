@@ -2,7 +2,7 @@ from app.src.scenario import UserScenario, Scenario
 
 def test_scenario_get_template_id():
     s = Scenario()
-    us = UserScenario(scenario=s)
+    us = UserScenario(template=s)
 
     assert us.template == s
 

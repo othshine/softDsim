@@ -9,6 +9,8 @@ from app.src.team import Member, Team
 
 from utils import remove_none_values
 
+from copy import deepcopy
+
 
 def parse_team(t, s):
     i = t.get('_id') or str(ObjectId())
@@ -38,19 +40,20 @@ class _Factory:
 
     def create_user_scenario(self, user: str, template: dict, history_id: ObjectId) -> UserScenario:
         template = self.deserialize(template, 'scenario')
-        us = UserScenario(user=user, id=ObjectId(), scenario=template, decisions=template.decisions, history=history_id,
+        us = UserScenario(user=user, id=ObjectId(), template=template, decisions=deepcopy(template.decisions), history=history_id,
                           tq=create_task_queue(easy=template.tasks_easy, medium=template.tasks_medium,
                                                hard=template.tasks_hard))
         us.actions.scrap_actions()
         return us
 
     def _create_scenario(self, data):
-        d = data.pop('decisions', [])
+        d = deepcopy(data.pop('decisions', []))
         s = Scenario(**data)
         self._add_decisions(d, s)
         return s
 
     def _create_user_scenario(self, json) -> UserScenario:
+        d = deepcopy(json.pop('decisions', []))
         json['actions'] = ActionList(json=json.get('actions'))
         json = remove_none_values(json)
         us = UserScenario(**json)
@@ -61,8 +64,9 @@ class _Factory:
                         us.team.teams.append(parse_team(team, us))
         else:
             if t := json.get('team'):
-                us.team = parse_team(t, us)
-        self._add_decisions(json.get('decisions', []), us)
+                if t is not None: 
+                    us.team = parse_team(t, us)
+        self._add_decisions(d, us)
 
         return us
 
