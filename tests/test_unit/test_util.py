@@ -1,4 +1,5 @@
-from utils import get_active_label, weighted, generate_object_id
+from app.src.scorecard import ScoreCard
+from utils import _YAMLReader, get_active_label, weighted, generate_object_id, yaml_to_scorecard
 from bson.objectid import ObjectId
 
 
@@ -34,3 +35,24 @@ def test_generate_object_id_returns_different_ids():
     assert id1 != id2
     id3 = generate_object_id()
     assert id3 != id1
+
+def test_scorecard_reader_all_values():
+    YAMLReader = _YAMLReader('tests/test_unit/test_scorecard1.yaml')
+    data = YAMLReader.read()
+    scorecard = yaml_to_scorecard(data.get('scores'))
+
+    assert scorecard == ScoreCard(200, 50, 150, 1.2, 1.01, 4)
+
+def test_scorecard_reader_some_values():
+    YAMLReader = _YAMLReader('tests/test_unit/test_scorecard2.yaml')
+    data = YAMLReader.read()
+    scorecard = yaml_to_scorecard(data.get('scores'))
+
+    assert scorecard == ScoreCard(budget_limit=223, time_limit=1, budget_p=14, quality_k=1)
+
+def test_scorecard_reader_no_values():
+    YAMLReader = _YAMLReader('tests/test_unit/test_scorecard3.yaml')
+    data = YAMLReader.read()
+    scorecard = yaml_to_scorecard(data.get('scores'))
+
+    assert scorecard == ScoreCard()

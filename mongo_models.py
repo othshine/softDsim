@@ -1,16 +1,16 @@
-from typing import List
+from time import time
+
+import environ
 
 from bson.objectid import ObjectId
 from deprecated.classic import deprecated
-from numpy import save
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
-from time import time
 
 from app.src.factories import Factory
 from app.src.scenario import Scenario, UserScenario
 
-import environ
+
 
 # Take environment variables from .env file
 env = environ.Env()
@@ -20,19 +20,34 @@ environ.Env.read_env('.env')
 
 
 class NoObjectWithIdException(Exception):
-    pass
+    """Idicates that there was no Object found with a given ID"""
 
 
-class MongoConnection(object):
+class MongoConnection():
+    """Base class for mongoDB Connectors."""
     def __init__(self):
         self.host = env('DATABASE_HOST')
         client = MongoClient(self.host)
         self.db = client[env('DATABASE_NAME')]
+        self.collection = None
 
     def get_collection(self, name):
+        """Sets the collection to which the connector should connect to.
+
+        Args:
+            name (str): Name of the collection
+        """
         self.collection = self.db[name]
-    
-    def is_connected(self, t):
+
+    def is_connected(self, t=3000):
+        """Checks if database is available.
+
+        Args:
+            t (int): timeout in ms 
+
+        Returns:
+            bool: True if database is connected
+        """
         test_client = MongoClient(self.host, serverSelectionTimeoutMS=t)
         try:
             test_client.server_info()
@@ -42,11 +57,23 @@ class MongoConnection(object):
 
 
 class ScenarioMongoModel(MongoConnection):
+    """Mongo connector used to handle Scenarios and UserScenarios."""
     def __init__(self):
         super(ScenarioMongoModel, self).__init__()
         self.get_collection('scenarios')
 
     def get(self, _id:ObjectId):
+        """Finds an object in the Database
+
+        Args:
+            _id (ObjectId): The ID of the object to be found
+
+        Raises:
+            NoObjectWithIdException: If there is no object with given ID
+
+        Returns:
+            Scenario | UserScenario: The scenario object
+        """
         typ = 'scenario'
         if json := self.collection.find_one({"_id": ObjectId(_id)}):
             if json.get('is_template') is False:
@@ -58,21 +85,41 @@ class ScenarioMongoModel(MongoConnection):
 
 
     def save(self, obj) -> ObjectId:
+        """Saves a given Object in the database.
+
+        Args:
+            obj (Scenario | UserScenario): Object to be saved in database
+
+        Raises:
+            ValueError: if arg is not of type Scenario or UserScenario
+
+        Returns:
+            ObjectId: The ID under which the Object was stored in the db,
+                      it is identical to the id of the object itself.
+        """
         if isinstance(obj, Scenario):
-            return self.save_template(obj)
-        elif isinstance(obj, UserScenario):
+            return self._save_template(obj)
+        if isinstance(obj, UserScenario):
             return self.collection.insert_one(obj.json).inserted_id
         raise ValueError(f"Must be of type Scenario or UserScenario but was {type(obj)}.")
 
-    def save_template(self, obj) -> ObjectId:
+    def _save_template(self, obj) -> ObjectId:
         return self.collection.insert_one({**obj.json, 'template': True}).inserted_id
 
     def update(self, obj):  # ToDo: Tests for updating Scenarios.
-        # ToDo: Do not allow to update templates.
-        if isinstance(obj, Scenario) or isinstance(obj, UserScenario):
+        """Updates an UserScenario in the database
+
+        Args:
+            obj (UserScenario): The scenario object to be updated
+
+        Returns:
+            ObjectId: Id of the Object that was updated
+        """
+        if isinstance(obj, UserScenario):
             obj = obj.json
-        
-        return self.collection.find_one_and_update({'_id': ObjectId(obj.get('_id'))}, {"$set": obj})['_id']
+            return self.collection.find_one_and_update({'_id': ObjectId(obj.get('_id'))},
+                                                       {"$set": obj})['_id']
+        raise ValueError(f"arg must be of type UserScenario but was {type(obj)}")
 
     def remove(self, a):
         """Removes Scenario or UserScenario from the Database. 
@@ -84,24 +131,27 @@ class ScenarioMongoModel(MongoConnection):
         raise NoObjectWithIdException()
 
     def find_all_templates(self):
+        """Finds all scenarios (templates) in the database
+
+        Returns:
+            list(Scenario): List of all scenario objects (not UserScenarios, only [template] Scenarios)
+        """
         col = []
         for s in self.collection.find({'is_template': True}):
             col.append(Factory.deserialize(json=s, typ="scenario"))
         return col
 
     def get_name(self, sid):
+        """Finds name for an object with given ID.
+
+        Args:
+            sid (ObjectId): ID of the scenario
+
+        Returns:
+            str: Name of the scenario object
+        """
         return self.collection.find_one({'_id': ObjectId(sid)})['name']
 
-    @deprecated
-    def copy(self, sid, user: str):
-        if json := self.collection.find_one({'_id': sid}):
-            i = ObjectId()
-            json['id'] = i
-            json['_id'] = i
-            json['user'] = user
-            json['template'] = False
-            return self.save(json)
-        raise NoObjectWithIdException()
 
     def create(self, sid, user, history_id):
         if template := self.collection.find_one({'_id': ObjectId(sid)}):

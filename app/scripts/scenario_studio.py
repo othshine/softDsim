@@ -1,4 +1,6 @@
 import os
+
+from app.src.scorecard import ScoreCard
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "softDsim.settings")
 
 from bson.objectid import ObjectId
@@ -21,7 +23,7 @@ def run():
                  tasks_easy=data.get('tasks_easy', 0),
                  tasks_medium=data.get('tasks_medium', 0),
                  tasks_hard=data.get('tasks_hard', 0),
-                 pred_c = data.get('pred_coefficient', 0.1),
+                 pred_c = data.get('pred_coefficient', 0.1)
                  )
     for decision in data.get('decisions', []):
         kwargs = {}
@@ -44,7 +46,7 @@ def run():
             d.add_text_block(tb.get('header', ''), tb.get('content', ''))
         s.add(d)
     mongo = ScenarioMongoModel()
-    print(mongo.save_template(s))
+    print(mongo.save(s))
 
 
 if __name__ == "__main__":

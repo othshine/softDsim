@@ -7,6 +7,8 @@ from yaml import load, FullLoader
 import os
 from django.conf import settings
 
+from app.src.scorecard import ScoreCard
+
 
 def get_db_handle(db_name, host, port):
     client = MongoClient(host=host,
@@ -147,3 +149,24 @@ def generate_object_id():
 def remove_none_values(d):
     """Removes all pairs in dict d that have none as their value."""
     return {k: v for k, v in d.items() if v is not None}
+
+
+def yaml_to_scorecard(data):
+    s = ScoreCard()
+    if data is not None:
+        if limits := data.get('limits'):
+            if d := limits.get('budget'):
+                s.budget_limit = int(d)
+            if d := limits.get('time'):
+                s.time_limit = int(d)
+            if d := limits.get('quality'):
+                s.quality_limit = int(d)
+        if params := data.get('params'):
+            if d := params.get('budget_p'):
+                s.budget_p = float(d)
+            if d := params.get('time_p'):
+                s.time_p = float(d)
+            if d := params.get('quality_k'):
+                s.quality_k = int(d)
+    return s
+

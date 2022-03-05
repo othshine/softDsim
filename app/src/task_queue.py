@@ -18,6 +18,9 @@ class TaskQueue:
         txt += f"Spec. T/F:   {len(self.get(correct_specification=True))}/{len(self.get(correct_specification=False))}\n"
         return txt 
     
+    def __len__(self):
+        return len(self.tasks)
+    
     def get(self, n:int=None, **kwargs) -> set[Task]:
         """Get is used go get a set of tasks from the task queue. If no arguments are passed, all tasks are returned. 
         As keyword-arguments, any fields of the task class can be passed to filter only for tasks with the given value for the given field.
@@ -74,12 +77,6 @@ class TaskQueue:
     def json(self):
         """Returns a json (dict) representation of the task queue."""
         return {'tasks': [t.json for t in self.tasks]}
-    
-    @property
-    def quality_score(self):
-        """Returns the quality score [0, 100]."""
-        k = 8
-        return int(((len(self.tasks) - (self.size(bug=True) + self.size(done=False) + self.size(correct_specification=False))) * 1/len(self.tasks))**k * 100)
     
     def reset_cascade(self, task: Task):
         """Performs a reset cascade on the given task. The given task, as well as all tasks that depend on this task, will be rested."""

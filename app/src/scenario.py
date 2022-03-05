@@ -1,5 +1,3 @@
-from dataclasses import dataclass, field
-from random import random
 from typing import Optional
 
 from bson.objectid import ObjectId
@@ -8,6 +6,7 @@ from app.src.dataObjects import WorkPackage
 from app.src.decision_tree import ActionList, Decision, SimulationDecision
 from app.src.team import Team, ScrumTeam
 from app.src.task_queue import TaskQueue
+from app.src.scorecard import ScoreCard
 from utils import month_to_day, remove_none_values, YAMLReader
 
 # Config Variables
@@ -29,7 +28,8 @@ class Scenario:
                 tasks_hard: int = 0,
                 pred_c: float = 0.1, 
                 _id: ObjectId = None,
-                id: ObjectId = None, 
+                id: ObjectId = None,
+                scorecard: ScoreCard = None,
                 **kwargs) -> None:
         if id and not _id:
             _id = id
@@ -45,6 +45,7 @@ class Scenario:
         self.tasks_hard=tasks_hard
         self.pred_c=pred_c
         self.id = ObjectId() if _id is None else ObjectId(_id)
+        self.scorecard = scorecard if isinstance(scorecard, ScoreCard) else ScoreCard(**scorecard) if scorecard else ScoreCard()
 
 
     @property
@@ -68,7 +69,7 @@ class Scenario:
                 'desc': self.desc,
                 'pred_c': self.pred_c,
                 'is_template': True,
-                'OID': self.id
+                'scorecard': self.scorecard.json
                 }
 
 
@@ -247,18 +248,38 @@ class UserScenario:
             p += d.points
         p += self.time_score()
         p += self.budget_score()
-        p += self.task_queue.quality_score
-        return p
+        p += self.quality_score()
+        return int(p)
 
     def time_score(self) -> int:
-        # ToDo: use a defined factor instead of 100.
-        # ToDo: the factor should have a weight that can be defined when create the scenario.
-        return round((self.template.scheduled_days / self.current_day) * 100)
+        actual_time = self.current_day
+        scheduled_time = self.template.scheduled_days
+        factor = self.template.scorecard.time_limit
+        p = self.template.scorecard.time_p
+
+        if actual_time <= scheduled_time:
+            return 1*factor
+        exceed_ratio = ((actual_time/scheduled_time)-1)*100
+        return max(0, int(100-exceed_ratio**p))*factor/100
 
     def budget_score(self) -> int:
-        if self.actual_cost == 0:
-            return 0  # If no money was spent, something is wrong and the score is 0.
-        return round((self.template.budget / self.actual_cost) * 100)
+        cost = self.actual_cost
+        budget = self.template.budget
+        factor = self.template.scorecard.budget_limit
+        p = self.template.scorecard.budget_p
+
+        if cost <= budget:
+            return 1*factor
+        exceed_ratio = ((cost/budget)-1)*100
+        return max(0, int(100-exceed_ratio**p))*factor/100
+
+    def quality_score(self) -> int:
+        tasks = len(self.task_queue)
+        err = len({*self.task_queue.get(bug=True), *self.task_queue.get(done=False), *self.task_queue.get(correct_specification=False)})
+        factor = self.template.scorecard.quality_limit
+        k = self.template.scorecard.quality_k
+
+        return int((1-(err/tasks))**k * factor)
 
     def action_is_applicable(self, action):
         """Returns True if an action is applicable. Actions can have restrictions, e.g. model must be scrum or kanban.

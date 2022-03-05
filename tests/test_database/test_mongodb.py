@@ -211,16 +211,29 @@ def test_mongo_scenario_update():
     result.budget = 301
     result.name = "New Name"
     result.scheduled_days = 2
-    print(f"use: {s.id}")
-    print(f"use: {mid}")
+    with pytest.raises(ValueError):
+        mongo.update(result)
+    mongo.remove(s)
+
+def test_mongo_userscenario_update():
+    mongo = ScenarioMongoModel()
+    s = UserScenario(current_day = 12)
+    
+    mid = mongo.save(s)
+    result = mongo.get(mid)
+
+    assert result.id == s.id
+    assert len(result.task_queue) == 0
+
+    result.current_day = 301
+    result.task_queue.add(Task())
+
     mongo.update(result)
 
     result2 = mongo.get(mid)
 
-    assert result2.budget == 301
-    assert result2.scheduled_days == 2
-    assert result2.name == "New Name"
-    assert result2.id == s.id
+    assert result2.current_day == 301
+    assert len(result2.task_queue) == 1
     mongo.remove(s)
 
 

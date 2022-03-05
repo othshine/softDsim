@@ -7,6 +7,15 @@ budget: 100000
 scheduled_days: 70
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
 
+scores: 
+  limits: 
+    budget: 200
+    time: 50
+    quality: 150
+  params:
+    budget_p: 1.2  # Parameter p for the budget score calculation
+    quality_k: 8   # Parameter k for the quality score calculation
+
 decisions:
   - name: Model and Life Cycle
     text:
