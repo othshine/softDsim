@@ -13,12 +13,12 @@ from copy import deepcopy
 
 
 def parse_team(t, s):
-    i = t.get('_id') or str(ObjectId())
+    i = t.get('id') or str(ObjectId())
     team = Team(i)
     for m in t.get('staff'):
         member = Member(m.get('skill-type'), xp_factor=m.get('xp'), motivation=m.get('motivation'),
                         stress=m.get('stress'), familiarity=m.get('familiarity'),
-                        familiar_tasks=m.get('familiar-tasks', 0), id=m.get('_id'), scenario=s, team=team)
+                        familiar_tasks=m.get('familiar-tasks', 0), id=m.get('_id'), scenario=s)
         if m.get('halted'):
             member.halt()
         team += member
