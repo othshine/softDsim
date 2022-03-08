@@ -23,11 +23,11 @@ def extract_overtime(param):
     }.get(param, 0)
 
 
-def end_scenario(s, username):
+def end_scenario(s: UserScenario, username):
     context = {'done': True}
     user_model = UserMongoModel()
     user_model.save_score(user=username, scenario_template_id=s.template.id, score=s.total_score(),
-                          scenario_id=s.id)
+                          scenario_id=str(s.id))
     return HttpResponse(json.dumps(context), content_type="application/json")
 
 
@@ -107,5 +107,4 @@ def click_continue(request, sid):
 def play(request, sid):
     model = UserMongoModel()
     r = model.get_user_ranking(sid)
-    print(r)
     return HttpResponse(json.dumps(r), content_type="application/json")

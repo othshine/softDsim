@@ -178,7 +178,7 @@ class UserMongoModel(MongoConnection):
             for entry in json:
                 if ObjectId(entry['scenario_id']) ==  ObjectId(scenario_id):
                     entry['score'] = score
-                    self.collection.find_one_and_update({'username': user}, {"$set":  {scenario_template_id: json}})
+                    self.collection.find_one_and_update({'username': user}, {"$set":  {str(scenario_template_id): json}})
 
     def _save_score(self, user: str, scenario_template_id: str, score: int, history_id: str, scenario_id: str):
         """Saves a score for a given user and a given template id to the database."""
@@ -191,7 +191,7 @@ class UserMongoModel(MongoConnection):
         if self.collection.count({'username': user}) == 0:
             self.save_user(user)
         json = self.collection.find_one({'username': user})
-        scores = json.get(scenario_template_id, [])
+        scores = json.get(str(scenario_template_id), [])
         return scores
 
     def _remove_score(self, user: str, scenario_template_id: str, scenario_id: str):

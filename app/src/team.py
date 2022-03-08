@@ -64,7 +64,7 @@ def order_tasks_for_member(tasks:set, skill_type)->list[Task]:
 
 class Member:
     def __init__(self, skill_type: str = 'junior', xp_factor: float = 0., motivation: float = 0.,
-                 familiarity: float = 0.1, stress: float = 0.3, familiar_tasks=0, id=None, scenario=None, team=None):
+                 familiarity: float = 0.1, stress: float = 0.3, familiar_tasks=0, id=None, scenario=None):
         self.skill_type = SkillType(skill_type)
         self.xp_factor = value_or_error(xp_factor, upper=float('inf'))
         self.motivation = value_or_error(motivation)
@@ -73,8 +73,7 @@ class Member:
         self.familiar_tasks = int(value_or_error(familiar_tasks, upper=float('inf')))
         self.halted = False
         self.id = ObjectId() if id is None else ObjectId(id)
-        self.scenario = scenario #: sc.UserScenario = scenario
-        #self.team: Team = team
+        self.scenario = scenario
 
     def __eq__(self, other):
         if isinstance(other, Member):
@@ -117,7 +116,6 @@ class Member:
         return 0
     
     def work(self, time: float, activity:Activity=Activity.SOLVE):
-        tq = self.scenario.task_queue
         if number_tasks == 0:
             number_tasks = self.get_number_of_tasks(time)
 
@@ -135,8 +133,6 @@ class Member:
         for task in tasks_to_solve:
             task.done_by = self.id
             task.bug = bool(probability(self.skill_type.error_rate * (self.stress + self.e(task))))
-
-            
             task.correct_specification = bool(probability(self.scenario.team.specification_p())) or not task.correct_specification
 
             if probability(self.scenario.template.pred_c):
@@ -423,7 +419,7 @@ class Team:
             while self.count(t) > staff_data.get(t):
                 self.remove_weakest(t)
             while self.count(t) < staff_data.get(t):
-                self.staff.append(Member(t, scenario=s, team=self, motivation=0.9))
+                self.staff.append(Member(t, scenario=s, motivation=0.9))
 
     @property
     def num_communication_channels(self):
@@ -520,7 +516,7 @@ class ScrumTeam:
 
             # If the team has a PO, the PO will do in integration test
             if self.po:
-                tph = 50  # Task that the PO can interegtion test per hour.
+                tph = 50  # Task that the PO can integration test per hour.
                 nt = tq.size(done=True, unit_tested=True, integration_tested=False)
                 hours = min(8*3, nt/tph)
                 self.po_hours += hours
@@ -551,7 +547,7 @@ class ScrumTeam:
     
     def specification_p(self):
         """Return the probability of which a task is correctly specified."""
-        #TODO: How should this be determined for scrum? Goof like this?
+        #TODO: How should this be determined for scrum? Good like this?
         if self.po:
             return 0.9
         return 0.5

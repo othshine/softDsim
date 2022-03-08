@@ -1,10 +1,10 @@
-name: Scenario A
-tasks_easy: 500
-tasks_medium: 500
-tasks_hard: 500
-pred_coefficient: 0.1  # Specifies the chance of each task having a predecessor.
-budget: 100000
-scheduled_days: 70
+name: Banking App
+tasks_easy: 50
+tasks_medium: 50
+tasks_hard: 0
+pred_coefficient: 0.8  # Specifies the chance of each task having a predecessor.
+budget: 1000
+scheduled_days: 10
 desc: 'This is the scenario description, it might be an idea to show it when hovering on the name on the index page.'
 
 scores: 
@@ -19,14 +19,14 @@ scores:
 decisions:
   - name: The first decision
     text:
-      - header: Welcome Project Manager
-        content: Your tasks is it to manage a team to develop a new App
-      - header: Some important infos
-        content: Here some text that gives helpful infos
-      - header: The Customer
-        content: The customer is a company that is looking for a new interactive website for their business. The customer doesn't have a lot of time to spend on the project, so you need to make sure that the project is executed in a timely manner. There are no tight restrictions on how exatly the website should be designed. It just needs to have a modern appearance and be easy to use. The customer wants to be included in the design process to make final decisons.
-      - header: Model and Product Life Cycle
-        content: While choosing the PM model it is also a good idea to also think about the product life cycle.
+    - header: Welcome Project Manager
+      content: Your tasks is it to manage a team to develop a new App
+    - header: Some important infos
+      content: Here some text that gives helpful infos
+    - header: The Customer
+      content: The customer is a company that is looking for a new interactive website for their business. The customer doesn't have a lot of time to spend on the project, so you need to make sure that the project is executed in a timely manner. There are no tight restrictions on how exatly the website should be designed. It just needs to have a modern appearance and be easy to use. The customer wants to be included in the design process to make final decisons.
+    - header: Model and Product Life Cycle
+      content: While choosing the PM model it is also a good idea to also think about the product life cycle.
     actions:
       - title: Model
         answers:
@@ -64,4 +64,22 @@ decisions:
       - header: Story
         content: You're ready to go. Start off the project by managing the team. Its all on you now.
     goal:
-      tasks: 1500
+      tasks: 100
+  - name: Simulation
+    continue_text: Advance 1 Week
+    active_actions:
+      - scrum-management
+      - staff-pick
+      - meeting-planner
+      - quality-check
+      - error-fixing
+      - training
+      - overtime
+      - integration
+      - social
+    text:
+      - header: D2
+        content: Text
+    goal:
+      tasks: 300
+

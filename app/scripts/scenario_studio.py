@@ -12,8 +12,22 @@ from mongo_models import ScenarioMongoModel
 from utils import _YAMLReader
 
 
-def run():
-    YAMLReader = _YAMLReader('app/scripts/scenarios/test.yaml')
+def run(*args):
+    path = 'app/scripts/scenarios/'
+    yaml_file = None
+    if args:
+        file = args[0]
+        if os.path.isfile(file):
+            yaml_file = file
+        elif os.path.isfile(path+file):
+            yaml_file = path+file
+        else:
+            print(f"{file} not found")
+            return
+    else: 
+        print("Use --script-args <path-of-scenario.yaml> to create a scenario.")
+        return
+    YAMLReader = _YAMLReader(yaml_file)
     data = YAMLReader.read()
     s = Scenario(name=data.get('name', "DefaultName"),
                  budget=data.get('budget', 10000),
@@ -46,7 +60,10 @@ def run():
             d.add_text_block(tb.get('header', ''), tb.get('content', ''))
         s.add(d)
     mongo = ScenarioMongoModel()
-    print(mongo.save(s))
+    mid = mongo.save(s)
+    if mid:
+        print(f"Scenario {data.get('name', 'DefaultName')} created\nID: {mid}")
+
 
 
 if __name__ == "__main__":
