@@ -6,9 +6,15 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  DATABASE_NAME: github-test
+  DATABASE_HOST: mongodb://127.0.0.1:27017
+  DATABASE_USER: demo
+  DATABASE_PASS: demo
+  SECRET_KEY: 01h59f3xkpm!7%^=l)&)ti%#dq(t^986ax9md%zl27v9_!*dpp7
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -25,6 +31,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Spin up MongoDB
+      run: |
+          run:  sudo docker run --name mongo -d -p 27017:27017 mongo
     - name: Run Tests
       run: |
         pytest
+
