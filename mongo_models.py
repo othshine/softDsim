@@ -126,7 +126,7 @@ class ScenarioMongoModel(MongoConnection):
         param 'a' can either be of type ObjectId, Scenario oder UserScenario."""
         if not isinstance(a, ObjectId):
             a = a.id
-        if self.collection.find({'_id': ObjectId(a)}).count():
+        if self.collection.count_documents({'_id': ObjectId(a)}):
             return self.collection.delete_many({"_id": a})
         raise NoObjectWithIdException()
 
@@ -188,7 +188,7 @@ class UserMongoModel(MongoConnection):
 
     def _get_scores(self, scenario_template_id, user):
         """Returns a list of scores of a user for a given scenario template id that are stored in the database."""
-        if self.collection.count({'username': user}) == 0:
+        if self.collection.count_documents({'username': user}) == 0:
             self.save_user(user)
         json = self.collection.find_one({'username': user})
         scores = json.get(str(scenario_template_id), [])
@@ -209,7 +209,7 @@ class UserMongoModel(MongoConnection):
 
     def save_user(self, user: str):
         """Creates a document in the database that represents a user."""
-        if self.collection.find({'username': user}).count():
+        if self.collection.count_documents({'username': user}):
             raise ValueError("User " + user + " already exists!")
         self.collection.save({'username': user})
         return
