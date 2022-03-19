@@ -27,3 +27,4 @@ tomli
 typing_extensions
 wheel
 wrapt
+djangorestframework
