@@ -13,7 +13,7 @@ pip
 pluggy
 py
 pycodestyle
-pymongo
+pymongo==3.12.3
 pyparsing
 pytest
 pytest-django
@@ -27,3 +27,4 @@ tomli
 typing_extensions
 wheel
 wrapt
+djangorestframework
