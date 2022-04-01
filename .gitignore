@@ -7,3 +7,4 @@ env
 .vscode/settings.json
 .env
 app/migrations/*
+database/mongo*
