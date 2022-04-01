@@ -27,7 +27,7 @@ class MongoConnection():
     """Base class for mongoDB Connectors."""
     def __init__(self):
         self.host = env('DATABASE_HOST')
-        client = MongoClient(self.host)
+        client = MongoClient(self.host, username=env('DATABASE_USER'), password=env('DATABASE_PASS'))
         self.db = client[env('DATABASE_NAME')]
         self.collection = None
 

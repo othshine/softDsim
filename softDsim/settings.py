@@ -93,7 +93,9 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': env('DATABASE_NAME'),
         'ENFORCE_SCHEMA': False,
-        'HOST': env("DATABASE_HOST"),
+        'CLIENT': {
+                'host': 'mongodb://demo:passdemo@127.0.0.1:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false'
+            }  
     }
 }
 
