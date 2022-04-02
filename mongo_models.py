@@ -1,7 +1,5 @@
 from time import time
 
-import environ
-
 from bson.objectid import ObjectId
 from deprecated.classic import deprecated
 from pymongo import MongoClient
@@ -11,10 +9,10 @@ from app.src.factories import Factory
 from app.src.scenario import Scenario, UserScenario
 
 
+from config import get_config
 
-# Take environment variables from .env file
-env = environ.Env()
-environ.Env.read_env('.env')
+configuration = get_config()
+
 
 
 
@@ -26,9 +24,9 @@ class NoObjectWithIdException(Exception):
 class MongoConnection():
     """Base class for mongoDB Connectors."""
     def __init__(self):
-        self.host = env('DATABASE_HOST')
-        client = MongoClient(self.host, username=env('DATABASE_USER'), password=env('DATABASE_PASS'))
-        self.db = client[env('DATABASE_NAME')]
+        self.host = configuration.database_host
+        client = MongoClient(self.host, username=configuration.database_user, password=configuration.database_pass)
+        self.db = client[configuration.database_name]
         self.collection = None
 
     def get_collection(self, name):
