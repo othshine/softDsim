@@ -8,7 +8,8 @@ on:
 
 env:
   DATABASE_NAME: github-test
-  DATABASE_HOST: mongodb://127.0.0.1:27017
+  DATABASE_HOST: 127.0.0.1
+  DATABASE_PORT: 27017
   DATABASE_USER: demo
   DATABASE_PASS: demo
   SECRET_KEY: 01h59f3xkpm!7%^=l)&)ti%#dq(t^986ax9md%zl27v9_!*dpp7
