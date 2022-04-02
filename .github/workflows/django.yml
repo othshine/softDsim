@@ -34,7 +34,7 @@ jobs:
         pip install -r requirements.txt
     - name: Spin up MongoDB
       run: |
-          docker-compose -f database/docker-compose.yml up -d
+          docker-compose -f database/docker-compose-gh.yml up -d
     - name: Run Tests
       run: |
         pytest
