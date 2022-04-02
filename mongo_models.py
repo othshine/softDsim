@@ -25,7 +25,7 @@ class MongoConnection():
     """Base class for mongoDB Connectors."""
     def __init__(self):
         self.host = configuration.database_host
-        client = MongoClient(self.host, username=configuration.database_user, password=configuration.database_pass)
+        client = MongoClient(configuration.mongo_client)
         self.db = client[configuration.database_name]
         self.collection = None
 
@@ -37,7 +37,7 @@ class MongoConnection():
         """
         self.collection = self.db[name]
 
-    def is_connected(self, t=3000):
+    def is_connected(self, t=1000):
         """Checks if database is available.
 
         Args:
@@ -46,7 +46,7 @@ class MongoConnection():
         Returns:
             bool: True if database is connected
         """
-        test_client = MongoClient(self.host, serverSelectionTimeoutMS=t)
+        test_client = MongoClient(configuration.mongo_client, serverSelectionTimeoutMS=t)
         try:
             test_client.server_info()
         except ServerSelectionTimeoutError:
