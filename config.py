@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseSettings
 from dotenv import load_dotenv
 
@@ -15,9 +16,10 @@ class Configuration(BaseSettings):
     """
     database_name: str
     database_host: str
-    database_port: str
+    database_port: Optional[str]
     database_user: str
     database_pass: str
+    cloud_db: Optional[bool]
 
     @property
     def mongo_client(self) -> str:
@@ -27,7 +29,13 @@ class Configuration(BaseSettings):
             str: MongoDB client connection str 
                  (mongodb://user:pass@host:port/.....)
         """
-        return f"mongodb://{self.database_user}:{self.database_pass}@{self.database_host}:{self.database_port}/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false"
+        protocol = "mongodb"
+        if self.cloud_db:
+            protocol += "+srv"
+        host = self.database_host
+        if self.database_port is not None:
+            host += f":{self.database_port}"
+        return f"{protocol}://{self.database_user}:{self.database_pass}@{host}/?retryWrites=true&w=majority"
 
 
 def get_config() -> Configuration:

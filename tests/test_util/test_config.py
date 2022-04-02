@@ -17,7 +17,9 @@ def test_config_vars_are_read_from_env():
 
 
 def test_get_mongo_connection():
-    expected = f'mongodb://{os.environ.get("DATABASE_USER")}:{os.environ.get("DATABASE_PASS")}@{os.environ.get("DATABASE_HOST")}:{os.environ.get("DATABASE_PORT")}/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false'
+    if os.environ.get("CLOUD_DB") == "True":
+        expected = f'mongodb+srv://{os.environ.get("DATABASE_USER")}:{os.environ.get("DATABASE_PASS")}@{os.environ.get("DATABASE_HOST")}/?retryWrites=true&w=majority'    
+    expected = f'mongodb://{os.environ.get("DATABASE_USER")}:{os.environ.get("DATABASE_PASS")}@{os.environ.get("DATABASE_HOST")}:{os.environ.get("DATABASE_PORT")}/?retryWrites=true&w=majority'
     config = Configuration()
     assert config.mongo_client == expected
 
@@ -34,3 +36,12 @@ def test_get_config():
     config = get_config()
     assert config.database_user == "Peter"
     
+
+
+def test_no_port():
+    del os.environ['DATABASE_PORT']
+    os.environ['Cloud_DB'] = "True"
+    config = get_config()
+    expected = f'mongodb+srv://{os.environ.get("DATABASE_USER")}:{os.environ.get("DATABASE_PASS")}@{os.environ.get("DATABASE_HOST")}/?retryWrites=true&w=majority'
+    
+    assert config.mongo_client == expected
