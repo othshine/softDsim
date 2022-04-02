@@ -1,4 +1,3 @@
-from cmath import exp
 from config import Configuration, get_config
 from dotenv import load_dotenv
 import os
