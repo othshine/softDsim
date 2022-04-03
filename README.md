@@ -8,7 +8,7 @@ Die SoftDSim ist eine Django-basierte Web-Anwendung zur Simulation von Projektma
 
 ## Wie werde ich Collaborator
 
-Die Weiterentwiccklung des SofDsim Projekts ist Bestandteil des Mouduls Projekt im 7. Semster der Studiengänge EBIS und IBIS im Sommersemster 2022. Wenn du in diesem Modul eingeschreiben bist und in der SofDsim Projektgruppe (Trost) bist, dann benötigst du Collaborator Zugang zum Projekt. Dazu benötigst du einen GitHub-Account. Sende dann deinen Usernamen an [anton.roesler@stud.fra-uas.de](anton.roesler@stud.fra-uas.de) um als Collaborator zum Projekt hinzugefügt zu werden.
+Die Weiterentwiccklung des SofDsim Projekts ist Bestandteil des Mouduls Projekt im 7. Semster der Studiengänge EBIS und IBIS im Sommersemster 2022. Wenn du in diesem Modul eingeschreiben bist und in der SofDsim Projektgruppe (Trost) bist, dann benötigst du Collaborator Zugang zum Projekt. Dazu benötigst du einen GitHub-Account. Sende dann deinen Usernamen an [anton.roesler@stud.fra-uas.de](mailto:anton.roesler@stud.fra-uas.de) um als Collaborator zum Projekt hinzugefügt zu werden.
 
 ## Aufsetzen des Projekts
 
