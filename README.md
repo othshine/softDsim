@@ -8,13 +8,13 @@ Die SoftDSim ist eine Django-basierte Web-Anwendung zur Simulation von Projektma
 
 ## Wie werde ich Collaborator
 
-Die Weiterentwiccklung des SofDsim Projekts ist Bestandteil des Mouduls Projekt im 7. Semster der Studiengänge EBIS und IBIS im Sommersemster 2022. Wenn du in diesem Modul eingeschreiben bist und in der SofDsim Projektgruppe (Trost) bist, dann benötigst du Collaborator Zugang zum Projekt. Dazu benötigst du einen GitHub-Account. Sende dann deinen Usernamen an [anton.roesler@stud.fra-uas.de](mailto:anton.roesler@stud.fra-uas.de) um als Collaborator zum Projekt hinzugefügt zu werden.
+Die Weiterentwicklung des SofDsim Projekts ist Bestandteil des Moudls *Projekt* im 7. Semester der Studiengänge EBIS und IBIS im Sommersemester 2022. Wenn du in diesem Modul eingeschrieben bist und in der SofDsim Projektgruppe (Trost) bist, dann benötigst du Collaborator Zugang zum Projekt. Dazu benötigst du einen GitHub-Account. Sende dann deinen Usernamen an [anton.roeser@stud.fra-uas.de](anton.roeser@stud.fra-uas.de) um als Collaborator zum Projekt hinzugefügt zu werden.
 
 ## Aufsetzen des Projekts
 
 ### Projekt clonen
 
-[Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) das Projekt. Dazu muss [git](https://git-scm.com/downloads) auf deiem System installiert sein.
+[Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) das Projekt. Dazu muss [git](https://git-scm.com/downloads) auf deinem System installiert sein.
 
 ### Python installieren
 
@@ -43,18 +43,19 @@ Eine Möglichkeit ist es, die Datenbank lokal über Docker zu hosten. Um eine lo
 docker-compose up
 ```
 
-wird die Datenbank gestartet. Um die Datenbank im Hintergrund zu startet, kann das Flag `-d` gesetzt werden, und um vom *root* aus zu startet kann mit `-f` ein Pfad zur Datei angegeben werden. Der Befehl zum starten der Datenbank mit docker-compose im Hingtergrund vom *root* des Projekts lautet demnach:
+wird die Datenbank gestartet. Um die Datenbank im Hintergrund zu startet, kann das Flag `-d` gesetzt werden, und um vom *root* aus zu startet kann mit `-f` ein Pfad zur Datei angegeben werden. Der Befehl zum Starten der Datenbank mit docker-compose im Hintergrund vom *root* des Projekts lautet demnach:
 
 ```bash
 docker-compose -f database/docker-compose.yml up -d
 ```
 
-#### Weiter Möglichkeiten
+#### Weitere Möglichkeiten
 
 Die Dokumentation enthält weiter Möglichkeiten eine MongoDB zu hosten, z.B. die [Community-Edition](https://docs.mongodb.com/manual/administration/install-community/) von *mongoDB* direkt auf dem lokalen System zu installieren oder über [MongoDB Atlas](https://www.mongodb.com/de-de/cloud/atlas/register) eine Cloud Datenbank zu hosten.
 
 ### Projekt Konfiguration
-Die Environment Variablen enthalten wichtige Informationen über die lokale Konfiguration. Sie werden in der Datei `.env` im *root* Verzeichnis des Projekts definiert. Zu setzen sind: 
+
+Die Environment Variablen enthalten wichtige Informationen über die lokale Konfiguration. Sie werden in der Datei `.env` im *root* Verzeichnis des Projekts definiert. Zu setzen sind:
 
 - `SECRET_KEY` Dies ist der Schlüssel, den Django zu Verschlüsselung nutzt. Dieser kann frei definiert werden und kann z. B. mit [djecrety.ir](https://djecrety.ir/) generiert werden.
 - `DATABASE_NAME` Der Name der Datenbank, die Django in der mongoDB erstellt (beliebig).
@@ -64,7 +65,7 @@ Die Environment Variablen enthalten wichtige Informationen über die lokale Konf
 - `DATABASE_PASS` Das Passwort des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MONGO_INITDB_ROOT_PASSWORD` angegebene Passwort (deafult ist `passdemo`)`
 - `CLOUD_DB` Diese Variable ist auf `True` zu setzten, wenn eine Cloud-Datenbank genutzt wird, wird eine lokale Datenbank genutzt, kann die Variable weggelassen werden.
 
-Dies Wäre eine beispeilhafte `env.` Datei wenn die MongoDB mit docker-compose erzeugt wurde.
+Dies wäre eine beispielhafte `env.` Datei, wenn die MongoDB mit docker-compose erzeugt wurde.
 ```env
 DATABASE_NAME=softdsim
 DATABASE_HOST=127.0.0.1
@@ -74,7 +75,7 @@ DATABASE_PASS=mypassword
 SECRET_KEY=ea2n+r$^@4px1c4gqim+l^m=@ew04hc-lupx^c&p(fy48)ma=0
 ```
 
-Dies Wäre eine beispeilhafte `env.` Datei wenn die MongoDB auf mongo Atlas gehostet wird.
+Dies wäre eine beispielhafte `env.` Datei, wenn die MongoDB auf mongo Atlas gehostet wird.
 ```env
 DATABASE_NAME=softdsim
 DATABASE_HOST=cluster0.wfz0m.mongodb.net
@@ -92,7 +93,7 @@ Zum Starten der Anwendung wird der Befehl
 python manage.py runserver
 ```
 
-> Achtung: In dieser Readme werden alle python Aufrufe mit dem Befehl `python` beschreiben. Ja nach der Python Konfiguration auf deinem System muss dies nicht so sein, häufig verwenden MacOS oder Linux Systeme den Alias `python3`
+> Achtung: In dieser Readme werden alle python Aufrufe mit dem Befehl `python` beschreiben. Je nach der Python Konfiguration auf deinem System muss dies nicht so sein, häufig verwenden MacOS oder Linux Systeme den Alias `python3`
 
 Dann wird die Webanwendung lokal gehostet und ist unter http://127.0.0.1:8000/ zu erreichen.
 
@@ -111,6 +112,46 @@ python manage.py createsuperuser
 
 erstellt werden. Der definierten Username und das Passwort können zur Anmeldung auf der Loginseite der Webapplikation genutzt werden.
 
-Sollte es zu Problemen kommen kann dies mehrere Gründe haben: Datenbank läuft nicht richtig, Requirements nicht installiert bzw. falsches Python Environemt zur Ausführung genutzt oder die Konfiguration stimmt nicht. Bei Problemen einfach nachfragen. Fragen werden idealerweise direkt in unserem [GitHub Disskussionsforum](https://github.com/antonroesler/softDsim/discussions) gestellt.
+Sollte es zu Problemen kommen, kann dies mehrere Gründe haben: Datenbank läuft nicht richtig, Requirements nicht installiert bzw. falsches Python Environment zur Ausführung genutzt oder die Konfiguration stimmt nicht. Bei Problemen einfach nachfragen. Fragen werden idealerweise direkt in unserem [GitHub Diskussionsforum](https://github.com/antonroesler/softDsim/discussions) gestellt.
 
+## Entwicklungsworkflow
 
+Für jedes geplante Feature, für jeden Bug, jede Idee etc. wird ein Issue angelegt und idealerweise direkt dem zugehörigen Projekt-Board zugewiesen. Die Liste der Issues ist das Backlog. Issues sollten möglichst kleinteilig geplant werden, sodass ein Issue in kurzer Zeit (wenige Stunden bis 2 Tage) erledigbar ist. Sobald mit der Bearbeitung eines Issues begonnen wird, muss dieser im Projekt Board in die Spalte *In Progress* verschoben werden und diejenige Person als Assignee eingetragen werden.
+
+### Branches
+
+Jedes Feature wird in einem eigenen Branch bearbeitet. Das Namensschema ist wie folgt:
+
+```
+type/issuenr-kurze-beschreibung
+```
+
+wobei ```issuenr``` die Ticketnummer des Issues ist und ```type``` eines von ```feature``` (Implementierung eines neuen Features), ```fix``` (Beheben eines Bugs/Fehlers), ```refactor``` (Umschreiben des Codes ohne neue Funktionalität) oder ```task``` (Alle anderen Arbeiten) ist.  Beispiel:
+
+```
+feature/127-Adding-api-delete-endpoint
+```
+
+Wäre der passende Branchname für die Implementierung eines Features, dessen Issue die Ticketnummer 127 hat und dessen Inhalt das Hinzufügen eines API Endpoints zum Löschen von Elementen ist.
+
+### Commits
+
+Die Commit-Messages in einen Branch müssen ebenfalls die Issue-Nummer enthalten und haben folgendes Schema:
+
+```
+type: #issuenr Kurze Beschreibung
+
+Und optional eine längere Erklärung nach einer Leerzeile.
+```
+
+Wichtig ist das Symbol ```#```, da dann der Commit automatisch durch GitHub zum Issue zugeteilt wird.
+
+### Pull Requests
+
+Sobald ein Issue gelöst wurde, wird ein Pull Request zum Mergen des Branches in den *develop* Branch erstellt. Der PR muss dann mindestens ein Approval bekommen und die Tests bestehen, um dann gemergt zu werden.
+
+### Weitere Infos
+
+Die Dokumentation enthält eine ausführlichere Beschreibung über den Workflow.
+
+Außerdem gilt auch hier: Bei Fragen gerne unser [GitHub Diskussionsforum](https://github.com/antonroesler/softDsim/discussions) nutzen.  

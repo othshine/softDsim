@@ -13,8 +13,6 @@ skill-levels:
     error-rate: 0.05
     throughput: 7
 
-stress-error-optimum: 0.4  # At this stress-level (40%) the member works most efficiently.
-
 manager:
   junior:
     salary: 3000
@@ -22,6 +20,9 @@ manager:
     salary: 5000
   po:
     salary: 50  # PO is paid hourly
+
+stress-error-optimum: 0.4  # At this stress-level (40%) the member works most efficiently.
+
 
 # Stress Settings
 stress:
