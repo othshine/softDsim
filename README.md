@@ -14,7 +14,7 @@ Die Weiterentwiccklung des SofDsim Projekts ist Bestandteil des Mouduls Projekt 
 
 ### Projekt clonen
 
-[Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) das Projekt. Dazu muss [git](https://git-scm.com/downloads) auf deiem System installiert sein.
+[Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) das Projekt. Dazu muss [git](https://git-scm.com/downloads) auf deinem System installiert sein.
 
 ### Python installieren
 
@@ -43,7 +43,7 @@ Eine Möglichkeit ist es, die Datenbank lokal über Docker zu hosten. Um eine lo
 docker-compose up
 ```
 
-wird die Datenbank gestartet. Um die Datenbank im Hintergrund zu startet, kann das Flag `-d` gesetzt werden, und um vom *root* aus zu startet kann mit `-f` ein Pfad zur Datei angegeben werden. Der Befehl zum starten der Datenbank mit docker-compose im Hingtergrund vom *root* des Projekts lautet demnach:
+wird die Datenbank gestartet. Um die Datenbank im Hintergrund zu startet, kann das Flag `-d` gesetzt werden, und um vom *root* aus zu startet kann mit `-f` ein Pfad zur Datei angegeben werden. Der Befehl zum Starten der Datenbank mit docker-compose im Hintergrund vom *root* des Projekts lautet demnach:
 
 ```bash
 docker-compose -f database/docker-compose.yml up -d
@@ -65,7 +65,7 @@ Die Environment Variablen enthalten wichtige Informationen über die lokale Konf
 - `DATABASE_PASS` Das Passwort des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MONGO_INITDB_ROOT_PASSWORD` angegebene Passwort (deafult ist `passdemo`)`
 - `CLOUD_DB` Diese Variable ist auf `True` zu setzten, wenn eine Cloud-Datenbank genutzt wird, wird eine lokale Datenbank genutzt, kann die Variable weggelassen werden.
 
-Dies Wäre eine beispeilhafte `env.` Datei wenn die MongoDB mit docker-compose erzeugt wurde.
+Dies wäre eine beispielhafte `env.` Datei, wenn die MongoDB mit docker-compose erzeugt wurde.
 ```env
 DATABASE_NAME=softdsim
 DATABASE_HOST=127.0.0.1
@@ -75,7 +75,7 @@ DATABASE_PASS=mypassword
 SECRET_KEY=ea2n+r$^@4px1c4gqim+l^m=@ew04hc-lupx^c&p(fy48)ma=0
 ```
 
-Dies Wäre eine beispeilhafte `env.` Datei wenn die MongoDB auf mongo Atlas gehostet wird.
+Dies wäre eine beispielhafte `env.` Datei, wenn die MongoDB auf mongo Atlas gehostet wird.
 ```env
 DATABASE_NAME=softdsim
 DATABASE_HOST=cluster0.wfz0m.mongodb.net
@@ -93,7 +93,7 @@ Zum Starten der Anwendung wird der Befehl
 python manage.py runserver
 ```
 
-> Achtung: In dieser Readme werden alle python Aufrufe mit dem Befehl `python` beschreiben. Ja nach der Python Konfiguration auf deinem System muss dies nicht so sein, häufig verwenden MacOS oder Linux Systeme den Alias `python3`
+> Achtung: In dieser Readme werden alle python Aufrufe mit dem Befehl `python` beschreiben. Je nach der Python Konfiguration auf deinem System muss dies nicht so sein, häufig verwenden MacOS oder Linux Systeme den Alias `python3`
 
 Dann wird die Webanwendung lokal gehostet und ist unter http://127.0.0.1:8000/ zu erreichen.
 
@@ -112,11 +112,11 @@ python manage.py createsuperuser
 
 erstellt werden. Der definierten Username und das Passwort können zur Anmeldung auf der Loginseite der Webapplikation genutzt werden.
 
-Sollte es zu Problemen kommen kann dies mehrere Gründe haben: Datenbank läuft nicht richtig, Requirements nicht installiert bzw. falsches Python Environemt zur Ausführung genutzt oder die Konfiguration stimmt nicht. Bei Problemen einfach nachfragen. Fragen werden idealerweise direkt in unserem [GitHub Disskussionsforum](https://github.com/antonroesler/softDsim/discussions) gestellt.
+Sollte es zu Problemen kommen, kann dies mehrere Gründe haben: Datenbank läuft nicht richtig, Requirements nicht installiert bzw. falsches Python Environment zur Ausführung genutzt oder die Konfiguration stimmt nicht. Bei Problemen einfach nachfragen. Fragen werden idealerweise direkt in unserem [GitHub Diskussionsforum](https://github.com/antonroesler/softDsim/discussions) gestellt.
 
 ## Entwicklungsworkflow
 
-Für jedes geplante Feature, für jeden Bug, jede Idee etc. wird ein Issue angelegt und idealerweise direkt dem zugehörigen Projekt-Board zugwiesen. Die Liste der Issues ist das Backlog. Issues sollten möglichst kleinteilig geplant werden sodass ein Issue in kurzer Zeit (wenige Stunden bis 2 Tage) erledigbar ist. Sobald mit der Bearbeitung eines Issues begonnen wird, muss dieser im Projekt Board in die Spalte *In Progress* verschoben werden und diejenige Person als Assignee eingetragen werden.
+Für jedes geplante Feature, für jeden Bug, jede Idee etc. wird ein Issue angelegt und idealerweise direkt dem zugehörigen Projekt-Board zugewiesen. Die Liste der Issues ist das Backlog. Issues sollten möglichst kleinteilig geplant werden, sodass ein Issue in kurzer Zeit (wenige Stunden bis 2 Tage) erledigbar ist. Sobald mit der Bearbeitung eines Issues begonnen wird, muss dieser im Projekt Board in die Spalte *In Progress* verschoben werden und diejenige Person als Assignee eingetragen werden.
 
 ### Branches
 
@@ -154,4 +154,4 @@ Sobald ein Issue gelöst wurde, wird ein Pull Request zum Mergen des Branches in
 
 Die Dokumentation enthält eine ausführlichere Beschreibung über den Workflow.
 
-Außerdem gilt auch hier: Bei Fragen gerne unser [GitHub Disskussionsforum](https://github.com/antonroesler/softDsim/discussions) nutzen.  
+Außerdem gilt auch hier: Bei Fragen gerne unser [GitHub Diskussionsforum](https://github.com/antonroesler/softDsim/discussions) nutzen.  
