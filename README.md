@@ -49,12 +49,13 @@ wird die Datenbank gestartet. Um die Datenbank im Hintergrund zu startet, kann d
 docker-compose -f database/docker-compose.yml up -d
 ```
 
-#### Weiter Möglichkeiten
+#### Weitere Möglichkeiten
 
 Die Dokumentation enthält weiter Möglichkeiten eine MongoDB zu hosten, z.B. die [Community-Edition](https://docs.mongodb.com/manual/administration/install-community/) von *mongoDB* direkt auf dem lokalen System zu installieren oder über [MongoDB Atlas](https://www.mongodb.com/de-de/cloud/atlas/register) eine Cloud Datenbank zu hosten.
 
 ### Projekt Konfiguration
-Die Environment Variablen enthalten wichtige Informationen über die lokale Konfiguration. Sie werden in der Datei `.env` im *root* Verzeichnis des Projekts definiert. Zu setzen sind: 
+
+Die Environment Variablen enthalten wichtige Informationen über die lokale Konfiguration. Sie werden in der Datei `.env` im *root* Verzeichnis des Projekts definiert. Zu setzen sind:
 
 - `SECRET_KEY` Dies ist der Schlüssel, den Django zu Verschlüsselung nutzt. Dieser kann frei definiert werden und kann z. B. mit [djecrety.ir](https://djecrety.ir/) generiert werden.
 - `DATABASE_NAME` Der Name der Datenbank, die Django in der mongoDB erstellt (beliebig).
@@ -113,4 +114,44 @@ erstellt werden. Der definierten Username und das Passwort können zur Anmeldung
 
 Sollte es zu Problemen kommen kann dies mehrere Gründe haben: Datenbank läuft nicht richtig, Requirements nicht installiert bzw. falsches Python Environemt zur Ausführung genutzt oder die Konfiguration stimmt nicht. Bei Problemen einfach nachfragen. Fragen werden idealerweise direkt in unserem [GitHub Disskussionsforum](https://github.com/antonroesler/softDsim/discussions) gestellt.
 
+## Entwicklungsworkflow
 
+Für jedes geplante Feature, für jeden Bug, jede Idee etc. wird ein Issue angelegt und idealerweise direkt dem zugehörigen Projekt-Board zugwiesen. Die Liste der Issues ist das Backlog. Issues sollten möglichst kleinteilig geplant werden sodass ein Issue in kurzer Zeit (wenige Stunden bis 2 Tage) erledigbar ist. Sobald mit der Bearbeitung eines Issues begonnen wird, muss dieser im Projekt Board in die Spalte *In Progress* verschoben werden und diejenige Person als Assignee eingetragen werden.
+
+### Branches
+
+Jedes Feature wird in einem eigenen Branch bearbeitet. Das Namensschema ist wie folgt:
+
+```
+type/issuenr-kurze-beschreibung
+```
+
+wobei ```issuenr``` die Ticketnummer des Issues ist und ```type``` eines von ```feature``` (Implementierung eines neuen Features), ```fix``` (Beheben eines Bugs/Fehlers), ```refactor``` (Umschreiben des Codes ohne neue Funktionalität) oder ```task``` (Alle anderen Arbeiten) ist.  Beispiel:
+
+```
+feature/127-Adding-api-delete-endpoint
+```
+
+Wäre der passende Branchname für die Implementierung eines Features, dessen Issue die Ticketnummer 127 hat und dessen Inhalt das Hinzufügen eines API Endpoints zum Löschen von Elementen ist.
+
+### Commits
+
+Die Commit-Messages in einen Branch müssen ebenfalls die Issue-Nummer enthalten und haben folgendes Schema:
+
+```
+type: #issuenr Kurze Beschreibung
+
+Und optional eine längere Erklärung nach einer Leerzeile.
+```
+
+Wichtig ist das Symbol ```#```, da dann der Commit automatisch durch GitHub zum Issue zugeteilt wird.
+
+### Pull Requests
+
+Sobald ein Issue gelöst wurde, wird ein Pull Request zum Mergen des Branches in den *develop* Branch erstellt. Der PR muss dann mindestens ein Approval bekommen und die Tests bestehen, um dann gemergt zu werden.
+
+### Weitere Infos
+
+Die Dokumentation enthält eine ausführlichere Beschreibung über den Workflow.
+
+Außerdem gilt auch hier: Bei Fragen gerne unser [GitHub Disskussionsforum](https://github.com/antonroesler/softDsim/discussions) nutzen.  

@@ -16,11 +16,8 @@ from scipy.stats import poisson
 # Config Variables
 STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
 TASK_COMPLETION_COEF = YAMLReader.read('task-completion-coefficient')
-ERR_COMPLETION_COEF = YAMLReader.read('error-completion-coefficient')
 TASKS_PER_MEETING = YAMLReader.read('tasks-per-meeting-coefficient')
-DONE_TASKS_FAMILIARITY_IMPACT_FACTOR = YAMLReader.read('done-tasks-familiarity-impact-factor')
 TRAIN_SKILL_INCREASE_AMOUNT = YAMLReader.read('train-skill-increase-amount')
-
 STRESS_PER_OVERTIME = YAMLReader.read('stress', 'overtime')
 STRESS_REDUCTION_PER_WEEKEND = YAMLReader.read('stress', 'weekend-reduction')
 MOTIVATION_INCREASE_PER_WEEKEND = 0.25
