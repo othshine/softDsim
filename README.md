@@ -144,7 +144,11 @@ type: #issuenr Kurze Beschreibung
 Und optional eine längere Erklärung nach einer Leerzeile.
 ```
 
-Wichtig ist das Symbol ```#```, da dann der Commit automatisch durch GitHub zum Issue zugeteilt wird.
+Wichtig ist das Symbol ```#```, da dann der Commit automatisch durch GitHub zum Issue zugeteilt wird. Beispiel commit message: 
+
+```
+fix: #71 Removed python path from config
+```
 
 ### Pull Requests
 
