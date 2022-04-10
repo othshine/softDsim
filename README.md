@@ -65,7 +65,7 @@ Die Environment Variablen enthalten wichtige Informationen über die lokale Konf
 - `DATABASE_PASS` Das Passwort des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MONGO_INITDB_ROOT_PASSWORD` angegebene Passwort (deafult ist `passdemo`)`
 - `CLOUD_DB` Diese Variable ist auf `True` zu setzten, wenn eine Cloud-Datenbank genutzt wird, wird eine lokale Datenbank genutzt, kann die Variable weggelassen werden.
 
-Dies wäre eine beispielhafte `env.` Datei, wenn die MongoDB mit docker-compose erzeugt wurde.
+Dies wäre eine beispielhafte `.env` Datei, wenn die MongoDB mit docker-compose erzeugt wurde.
 ```env
 DATABASE_NAME=softdsim
 DATABASE_HOST=127.0.0.1
@@ -75,7 +75,7 @@ DATABASE_PASS=mypassword
 SECRET_KEY=ea2n+r$^@4px1c4gqim+l^m=@ew04hc-lupx^c&p(fy48)ma=0
 ```
 
-Dies wäre eine beispielhafte `env.` Datei, wenn die MongoDB auf mongo Atlas gehostet wird.
+Dies wäre eine beispielhafte `.env` Datei, wenn die MongoDB auf mongo Atlas gehostet wird.
 ```env
 DATABASE_NAME=softdsim
 DATABASE_HOST=cluster0.wfz0m.mongodb.net
