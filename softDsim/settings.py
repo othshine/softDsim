@@ -13,7 +13,10 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 import environ
+from config import get_config
 
+
+configuration = get_config()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -91,9 +94,11 @@ WSGI_APPLICATION = 'softDsim.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': env('DATABASE_NAME'),
+        'NAME': configuration.database_name,
         'ENFORCE_SCHEMA': False,
-        'HOST': env("DATABASE_HOST"),
+        'CLIENT': {
+                'host': configuration.mongo_client
+            }  
     }
 }
 

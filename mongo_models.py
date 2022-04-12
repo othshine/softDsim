@@ -1,7 +1,5 @@
 from time import time
 
-import environ
-
 from bson.objectid import ObjectId
 from deprecated.classic import deprecated
 from pymongo import MongoClient
@@ -11,10 +9,10 @@ from app.src.factories import Factory
 from app.src.scenario import Scenario, UserScenario
 
 
+from config import get_config
 
-# Take environment variables from .env file
-env = environ.Env()
-environ.Env.read_env('.env')
+configuration = get_config()
+
 
 
 
@@ -26,9 +24,9 @@ class NoObjectWithIdException(Exception):
 class MongoConnection():
     """Base class for mongoDB Connectors."""
     def __init__(self):
-        self.host = env('DATABASE_HOST')
-        client = MongoClient(self.host)
-        self.db = client[env('DATABASE_NAME')]
+        self.host = configuration.database_host
+        client = MongoClient(configuration.mongo_client)
+        self.db = client[configuration.database_name]
         self.collection = None
 
     def get_collection(self, name):
@@ -39,7 +37,7 @@ class MongoConnection():
         """
         self.collection = self.db[name]
 
-    def is_connected(self, t=3000):
+    def is_connected(self, t=1000):
         """Checks if database is available.
 
         Args:
@@ -48,7 +46,7 @@ class MongoConnection():
         Returns:
             bool: True if database is connected
         """
-        test_client = MongoClient(self.host, serverSelectionTimeoutMS=t)
+        test_client = MongoClient(configuration.mongo_client, serverSelectionTimeoutMS=t)
         try:
             test_client.server_info()
         except ServerSelectionTimeoutError:

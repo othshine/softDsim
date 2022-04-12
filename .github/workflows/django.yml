@@ -2,15 +2,16 @@ name: Django CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, develop ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, develop ]
 
 env:
-  DATABASE_NAME: github-test
-  DATABASE_HOST: mongodb://127.0.0.1:27017
+  DATABASE_NAME: test
+  DATABASE_HOST: 127.0.0.1
+  DATABASE_PORT: 27017
   DATABASE_USER: demo
-  DATABASE_PASS: demo
+  DATABASE_PASS: passdemo
   SECRET_KEY: 01h59f3xkpm!7%^=l)&)ti%#dq(t^986ax9md%zl27v9_!*dpp7
 
 jobs:
@@ -33,7 +34,7 @@ jobs:
         pip install -r requirements.txt
     - name: Spin up MongoDB
       run: |
-          sudo docker run --name mongo -d -p 27017:27017 mongo
+          docker-compose -f database/docker-compose-gh.yml up -d
     - name: Run Tests
       run: |
         pytest

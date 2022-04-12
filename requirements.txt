@@ -13,10 +13,12 @@ pip
 pluggy
 py
 pycodestyle
+pydantic
 pymongo==3.12.3
 pyparsing
 pytest
 pytest-django
+python-dotenv
 pytz
 PyYAML
 scipy

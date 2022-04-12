@@ -92,7 +92,7 @@ class UserScenario:
         self.task_queue = kwargs.get('tq') or TaskQueue(**kwargs.get('task_queue', {}))
         self.actual_cost = int(kwargs.get('actual_cost', 0) or 0)
         self.current_day = int(kwargs.get('current_day', 0) or 0)
-        self.counter = int(kwargs.get('counter', -1)) # Dont use or -1
+        self.counter = int(kwargs.get('counter', -1)) # Don't use or -1
         self.decisions = kwargs.get('decisions', []) or []
         self.id = ObjectId(kwargs.get('_id')) or ObjectId()
         self.actions = kwargs.get('actions') or ActionList()
