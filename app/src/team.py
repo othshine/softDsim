@@ -11,7 +11,7 @@ from app.src.task_queue import TaskQueue
 from app.src.task import Task
 from utils import YAMLReader, probability, value_or_error, min_max_scaling
 
-from numpy.random import poisson¶
+from numpy.random import poisson
 
 # Config Variables
 STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
