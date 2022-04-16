@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
@@ -11,6 +12,7 @@ def connected(t):
 
 @login_required
 def app(request, sid):
+    logging.info(f"Served app.html for user {request.user.username}")
     return render(request, "app/app.html")
 
 
@@ -24,7 +26,6 @@ def index(request):
     s_list = []
     for scenario in sc:
         user_score_rank = user_model.get_user_ranking(str(scenario.id)).get(request.user.username, {})
-        print(user_score_rank)
         best_score = user_score_rank.get('score', "-")
         rank = user_score_rank.get('rank', "-")
         tries = user_model.get_num_tries(user=request.user.username, template_id=str(scenario.id))
