@@ -1,6 +1,7 @@
 import logging
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from app.views.util import serving_log
 
 from mongo_models import MongoConnection, ScenarioMongoModel, UserMongoModel, ClickHistoryModel, MongoConnection
 
@@ -12,12 +13,13 @@ def connected(t):
 
 @login_required
 def app(request, sid):
-    logging.info(f"Served app.html for user {request.user.username}")
+    serving_log('app', request)
     return render(request, "app/app.html")
 
 
 @login_required
 def index(request):
+    serving_log('index', request)
     if not connected(500):
         return render(request, "app/dbfail.html")
     scenario_model = ScenarioMongoModel()

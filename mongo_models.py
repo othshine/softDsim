@@ -199,7 +199,7 @@ class UserMongoModel(MongoConnection):
         output = None
         for i, score in enumerate(scores):
             if score['scenario_id'] == scenario_id:
-                logging.info(f"Deleteted {scenario_id} from user {user}'s scores.")
+                logging.debug(f"Deleteted {scenario_id} from user {user}'s scores.")
                 output = score
                 del scores[i]
                 break
