@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .api import test_endpoint
+from .api import endpoint_test
 
 urlpatterns = [
-    path('test', test_endpoint.api_test, name='api_test'),
+    path('test', endpoint_test.api_test, name='api_test'),
 ]
