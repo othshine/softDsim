@@ -8,3 +8,6 @@ env
 .env
 app/migrations/*
 database/mongo*
+.empty
+.vscode
+.pytest_cache
