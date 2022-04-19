@@ -1,3 +1,4 @@
+import logging
 from time import time
 
 from bson.objectid import ObjectId
@@ -198,7 +199,7 @@ class UserMongoModel(MongoConnection):
         output = None
         for i, score in enumerate(scores):
             if score['scenario_id'] == scenario_id:
-                print("DELETED")
+                logging.debug(f"Deleteted {scenario_id} from user {user}'s scores.")
                 output = score
                 del scores[i]
                 break

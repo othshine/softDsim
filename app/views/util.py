@@ -1,3 +1,4 @@
+import logging
 from app.src.scenario import UserScenario
 from app.src.team import ScrumTeam
 from utils import data_get, get_active_label
@@ -54,3 +55,7 @@ def set_model(s: UserScenario, model):
 
 def generate_object_id():
     pass
+
+
+def serving_log(page: str, request):
+    logging.info(f"Serving {page}.html for user {request.user.username}")

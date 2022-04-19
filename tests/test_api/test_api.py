@@ -58,10 +58,8 @@ def test_load_scenario(api_client: APIClient, user, decisions):
     assert response.url == f'/s/{usid}'
 
     response = api_client.get(f'/continue/{usid}')
-    print(response.json)
     assert response.status_code == 200
     response = api_client.get(f'/continue/{usid}')
-    print(response.json)
     assert response.status_code == 200
 
     us = mongo.get(usid)

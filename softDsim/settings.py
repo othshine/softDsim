@@ -27,12 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 
-
-
 # Take environment variables from .env file
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
 
 
 SECRET_KEY = env('SECRET_KEY')
@@ -71,8 +68,7 @@ ROOT_URLCONF = 'softDsim.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,8 +93,8 @@ DATABASES = {
         'NAME': configuration.database_name,
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-                'host': configuration.mongo_client
-            }  
+            'host': configuration.mongo_client
+        }
     }
 }
 
@@ -150,3 +146,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #STATICFILES_DIRS = [BASE_DIR / "static"]
 
 LOGIN_URL = '/login'
+
+# Logging
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'stdlog': {
+            'format': '[{levelname} {asctime:s}] {message} ({filename}:{lineno})',
+            'style': '{',
+            'datefmt' : "%d.%m %H:%M:%S"
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'stdlog'
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
