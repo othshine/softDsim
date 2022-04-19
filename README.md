@@ -119,10 +119,10 @@ Sollte es zu Problemen kommen, kann dies mehrere Gründe haben: Datenbank läuft
 Um ein Scenario zu erstellen, muss dieses in `app/scripts/scenarios/` als eine `.yml` Datei definiert sein. Dann kann mit dem Befehl:
 
 ```bash
-python manage.py runscript scenario_studio -v2 --script-args <name>.yml
+python manage.py runscript scenario_studio -v2 --script-args <name-der-datei>.yml
 ```
 
-das Sceanrio erstellt werden. Würde also die Datei `app/scripts/scenarios/test_sc.yml`, eine Scenario defnieition enthählten (siehe Doku), könnte mit dem Befehl:
+das Sceanrio erstellt werden. Würde also die Datei `app/scripts/scenarios/test_sc.yml`, eine Scenario-Definition enthählten (siehe Doku), könnte mit dem Befehl:
 
 ```bash
 python manage.py runscript scenario_studio -v2 --script-args test_sc.yml
