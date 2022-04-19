@@ -114,21 +114,21 @@ erstellt werden. Der definierten Username und das Passwort können zur Anmeldung
 
 Sollte es zu Problemen kommen, kann dies mehrere Gründe haben: Datenbank läuft nicht richtig, Requirements nicht installiert bzw. falsches Python Environment zur Ausführung genutzt oder die Konfiguration stimmt nicht. Bei Problemen einfach nachfragen. Fragen werden idealerweise direkt in unserem [GitHub Diskussionsforum](https://github.com/antonroesler/softDsim/discussions) gestellt.
 
-### Ertsllen eines Scenarios
+### Erstellen eines Scenarios
 
-Um ein Scenario zu erstellen muss dieses in `app/scripts/scenarios/` als eine `.yml` datei defineirt sein. Dann kan mit dem Befehl:
+Um ein Scenario zu erstellen, muss dieses in `app/scripts/scenarios/` als eine `.yml` Datei definiert sein. Dann kann mit dem Befehl:
 
 ```bash
 python manage.py runscript scenario_studio -v2 --script-args <name>.yml
 ```
 
-das Sceanrio erstellt werden. Also würde die Datei `app/scripts/scenarios/test_sc.yml`, die eine Scenario defnieition enthähöt (siehe Doku) mit dem Befehl:
+das Sceanrio erstellt werden. Würde also die Datei `app/scripts/scenarios/test_sc.yml`, eine Scenario defnieition enthählten (siehe Doku), könnte mit dem Befehl:
 
 ```bash
 python manage.py runscript scenario_studio -v2 --script-args test_sc.yml
 ```
 
-erstellt werden können.
+dieses erstellt werden.
 
 ## Entwicklungsworkflow
 
