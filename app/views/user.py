@@ -1,3 +1,4 @@
+import logging
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
@@ -26,16 +27,17 @@ def login_request(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                messages.info(request, f"You are now logged in as {username}.")
+                logging.info(f"Successful login user {username}.")
                 return redirect("/")
             else:
-                messages.error(request, "Invalid username or password.")
+                logging.error(f"Rejected login user {username}. Authentication failed.")
         else:
-            messages.error(request, "Invalid username or password.")
+            logging.error(f"Invalid login form.")
     form = AuthenticationForm()
     return render(request=request, template_name="app/login.html", context={"login_form": form})
 
 
 def logout_request(request):
     logout(request)
+    logging.info(f"Successful logout user {request.user.username}")
     return redirect('/')

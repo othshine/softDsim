@@ -1,3 +1,4 @@
+import logging
 import random
 
 from statistics import mean
@@ -11,7 +12,7 @@ from app.src.task_queue import TaskQueue
 from app.src.task import Task
 from utils import YAMLReader, probability, value_or_error, min_max_scaling
 
-from scipy.stats import poisson
+from numpy.random import poisson
 
 # Config Variables
 STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
@@ -205,7 +206,7 @@ class Member:
         if self.halted:
             raise MemberIsHalted()
         mu = time * mean([self.efficiency, self.efficiency, self.scenario.team.efficiency]) * (self.skill_type.throughput + self.xp_factor) * coeff
-        number_tasks = poisson.rvs(mu)
+        number_tasks = poisson(mu)
         return number_tasks
 
     def train(self, hours=1, delta=0):
@@ -360,7 +361,8 @@ class Team:
             self.social_event()
 
     def integration_test(self, tq: TaskQueue, n=None):
-        print(n)
+        
+        logging.debug("Start integration test.")
         tasks = list(tq.get(done=True, unit_tested=True, integration_tested=False))[:n]
         for task in tasks:
             if task.correct_specification:
@@ -501,9 +503,9 @@ class ScrumTeam:
         
     def daily(self):
         if self.junior_master: 
-            print("Daily with junior")
+            pass
         elif self.senior_master:
-            print("Daily with senior")
+            pass
 
 
 

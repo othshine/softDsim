@@ -138,7 +138,7 @@ class _YAMLReader:
         return data
 
 
-YAMLReader = _YAMLReader(path=os.path.join(settings.BASE_DIR, 'parameter.yaml'))
+YAMLReader = _YAMLReader(path=os.path.join(settings.BASE_DIR, 'parameter.yml'))
 
 
 

@@ -114,6 +114,22 @@ erstellt werden. Der definierten Username und das Passwort können zur Anmeldung
 
 Sollte es zu Problemen kommen, kann dies mehrere Gründe haben: Datenbank läuft nicht richtig, Requirements nicht installiert bzw. falsches Python Environment zur Ausführung genutzt oder die Konfiguration stimmt nicht. Bei Problemen einfach nachfragen. Fragen werden idealerweise direkt in unserem [GitHub Diskussionsforum](https://github.com/antonroesler/softDsim/discussions) gestellt.
 
+### Erstellen eines Scenarios
+
+Um ein Scenario zu erstellen, muss dieses in `app/scripts/scenarios/` als eine `.yml` Datei definiert sein. Dann kann mit dem Befehl:
+
+```bash
+python manage.py runscript scenario_studio -v2 --script-args <name-der-datei>.yml
+```
+
+das Sceanrio erstellt werden. Würde also die Datei `app/scripts/scenarios/test_sc.yml`, eine Scenario-Definition enthählten (siehe Doku), könnte mit dem Befehl:
+
+```bash
+python manage.py runscript scenario_studio -v2 --script-args test_sc.yml
+```
+
+dieses erstellt werden.
+
 ## Entwicklungsworkflow
 
 Für jedes geplante Feature, für jeden Bug, jede Idee etc. wird ein Issue angelegt und idealerweise direkt dem zugehörigen Projekt-Board zugewiesen. Die Liste der Issues ist das Backlog. Issues sollten möglichst kleinteilig geplant werden, sodass ein Issue in kurzer Zeit (wenige Stunden bis 2 Tage) erledigbar ist. Sobald mit der Bearbeitung eines Issues begonnen wird, muss dieser im Projekt Board in die Spalte *In Progress* verschoben werden und diejenige Person als Assignee eingetragen werden.

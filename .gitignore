@@ -9,6 +9,10 @@ env
 app/migrations/*
 database/mongo*
 
+.empty
+.vscode
+.pytest_cache
+
 # frontend
 # dependencies
 frontend/node_modules

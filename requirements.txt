@@ -21,7 +21,6 @@ pytest-django
 python-dotenv
 pytz
 PyYAML
-scipy
 setuptools
 sqlparse
 toml
