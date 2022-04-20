@@ -1,4 +1,5 @@
 import json
+import logging
 from os import read
 
 from django.contrib.auth.decorators import login_required
@@ -34,6 +35,7 @@ def end_scenario(s: UserScenario, username):
 @login_required
 @csrf_exempt
 def click_continue(request, sid):
+    logging.info(f"Continue simulation for user {request.user.username}")
     model = ScenarioMongoModel()
     s = model.get(sid)
     tasks_done_before = len(s.task_queue.get(done=True))
@@ -62,7 +64,7 @@ def click_continue(request, sid):
                 overtime = 0
 
             s.work(5, int(data['meetings']), training_hours, overtime, integration_test=integration_test, social=social_event)
-            print(s.task_queue)
+            logging.debug(f"Task Queue: {s.task_queue}")
         if s.counter >= 0:
             s.get_decision().eval(data)
         try:
