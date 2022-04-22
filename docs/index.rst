@@ -7,8 +7,6 @@ Welcome to softDsim's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
    hello.md
    documentation/how_to.md
 
