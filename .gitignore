@@ -33,3 +33,6 @@ frontend/.env.test.local
 frontend/.env.production.local
 
 frontend/npm-debug.log*
+
+# Docs 
+docs/_*
