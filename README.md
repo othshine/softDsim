@@ -2,6 +2,8 @@
 
 IT Project Management Simulation Web Application
 
+[Dokumentation](https://softdsim.readthedocs.io/en/latest/)
+
 ## Abstract
 
 Die SoftDSim ist eine Django-basierte Web-Anwendung zur Simulation von Projektmanagement-Szenarios für den Einsatz im Modul Project Management an der [Frankfurt University of Applied Sciences](https://www.frankfurt-university.de/). Dozenten  können innerhalb der Web-Anwendung Szenarios mit belieben Inhalten definieren, welche dann von Studierenden simuliert werden. Die Studierenden nehmen dabei die Rolle eines Projektmanagers ein und müssen verschiedene Entscheidungen treffen. Beispielhaft genannte Entscheidungen sind *Projektmanagementmethode*, *Anzahl und Erfahrungsniveau der Teammitglieder* oder *Anzahl der Meetings*. Alle Simulationen werden in einer gemeinsamen Datenbank gespeichert. Diese kann vom Dozenten eingesehen werden, sodass die Leistungen der Studierenden evaluiert werden kann.
