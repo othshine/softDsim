@@ -10,11 +10,16 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../'))
 
-
+os.environ['DJANGO_SETTINGS_MODULE'] = 'softDsim.settings'
+os.environ['DATABASE_NAME']="sim"
+os.environ['DATABASE_HOST']="127.0.0.1"
+os.environ['DATABASE_PORT']="27017"
+os.environ['DATABASE_USER']="demo"
+os.environ['DATABASE_PASS']="passdemo"
 # -- Project information -----------------------------------------------------
 
 project = 'softDsim'
@@ -31,7 +36,8 @@ release = '0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'myst_parser'
+    'myst_parser',
+    'sphinx.ext.autodoc'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -62,3 +68,4 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+autoclass_content = 'both'

@@ -4,16 +4,12 @@
    contain the root `toctree` directive.
 
 Welcome to softDsim's documentation!
-Hi from here
 ====================================
 
 .. toctree::
-   hello.md
+   :maxdepth: 1
+
    documentation/how_to.md
-
-
-   
-
 
 
 Indices and tables
