@@ -20,6 +20,7 @@ os.environ['DATABASE_HOST']="127.0.0.1"
 os.environ['DATABASE_PORT']="27017"
 os.environ['DATABASE_USER']="demo"
 os.environ['DATABASE_PASS']="passdemo"
+os.environ['SECRET_KEY']="&&qm1*u1uw163an_jvaqnv)9$i@^7=f)y$%8ad*b2w_^lkozpx"
 # -- Project information -----------------------------------------------------
 
 project = 'softDsim'
