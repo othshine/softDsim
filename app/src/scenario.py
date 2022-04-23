@@ -212,7 +212,8 @@ class UserScenario:
         d = self.decisions[self.counter]
         if isinstance(d, SimulationDecision):
             for a in d.active_actions or []:
-                if (action := self.actions.get(a)) is not None and self.action_is_applicable(action):
+                action = self.actions.get(a)
+                if (action) is not None and self.action_is_applicable(action):
                     json.append(action.json)
         else:
             for action in d.actions or []:
