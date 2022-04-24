@@ -38,7 +38,8 @@ release = '0.1'
 # ones.
 extensions = [
     'myst_parser',
-    'sphinx.ext.autodoc'
+    'sphinx.ext.autodoc',
+    'sphinxcontrib.httpdomain'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

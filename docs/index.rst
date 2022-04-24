@@ -10,7 +10,7 @@ Welcome to softDsim's documentation!
    :maxdepth: 1
 
    documentation/how_to.md
-
+   api/rest.md
 
 Indices and tables
 ==================
