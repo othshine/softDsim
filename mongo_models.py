@@ -1,5 +1,6 @@
 import logging
 from time import time
+from typing import List
 
 from bson.objectid import ObjectId
 from deprecated.classic import deprecated
@@ -129,7 +130,7 @@ class ScenarioMongoModel(MongoConnection):
             return self.collection.delete_many({"_id": a})
         raise NoObjectWithIdException()
 
-    def find_all_templates(self):
+    def find_all_templates(self) -> List[Scenario]:
         """Finds all scenarios (templates) in the database
 
         Returns:
