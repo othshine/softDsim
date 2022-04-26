@@ -1,3 +1,4 @@
+from abc import ABC
 import logging
 from time import time
 from typing import List
@@ -23,7 +24,7 @@ class NoObjectWithIdException(Exception):
     """Idicates that there was no Object found with a given ID"""
 
 
-class MongoConnection():
+class MongoConnection(ABC):
     """Base class for mongoDB Connectors."""
     def __init__(self):
         self.host = configuration.database_host
