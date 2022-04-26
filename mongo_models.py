@@ -16,15 +16,13 @@ from config import get_config
 configuration = get_config()
 
 
-
-
-
 class NoObjectWithIdException(Exception):
     """Idicates that there was no Object found with a given ID"""
 
 
 class MongoConnection():
     """Base class for mongoDB Connectors."""
+
     def __init__(self):
         self.host = configuration.database_host
         client = MongoClient(configuration.mongo_client)
@@ -48,7 +46,8 @@ class MongoConnection():
         Returns:
             bool: True if database is connected
         """
-        test_client = MongoClient(configuration.mongo_client, serverSelectionTimeoutMS=t)
+        test_client = MongoClient(
+            configuration.mongo_client, serverSelectionTimeoutMS=t)
         try:
             test_client.server_info()
         except ServerSelectionTimeoutError:
@@ -58,11 +57,12 @@ class MongoConnection():
 
 class ScenarioMongoModel(MongoConnection):
     """Mongo connector used to handle Scenarios and UserScenarios."""
+
     def __init__(self):
         super(ScenarioMongoModel, self).__init__()
         self.get_collection('scenarios')
 
-    def get(self, _id:ObjectId):
+    def get(self, _id: ObjectId):
         """Finds an object in the Database
 
         Args:
@@ -83,7 +83,6 @@ class ScenarioMongoModel(MongoConnection):
             return Factory.deserialize(json, typ)
         raise NoObjectWithIdException()
 
-
     def save(self, obj) -> ObjectId:
         """Saves a given Object in the database.
 
@@ -101,7 +100,8 @@ class ScenarioMongoModel(MongoConnection):
             return self._save_template(obj)
         if isinstance(obj, UserScenario):
             return self.collection.insert_one(obj.json).inserted_id
-        raise ValueError(f"Must be of type Scenario or UserScenario but was {type(obj)}.")
+        raise ValueError(
+            f"Must be of type Scenario or UserScenario but was {type(obj)}.")
 
     def _save_template(self, obj) -> ObjectId:
         return self.collection.insert_one({**obj.json, 'template': True}).inserted_id
@@ -119,7 +119,8 @@ class ScenarioMongoModel(MongoConnection):
             obj = obj.json
             return self.collection.find_one_and_update({'_id': ObjectId(obj.get('_id'))},
                                                        {"$set": obj})['_id']
-        raise ValueError(f"arg must be of type UserScenario but was {type(obj)}")
+        raise ValueError(
+            f"arg must be of type UserScenario but was {type(obj)}")
 
     def remove(self, a):
         """Removes Scenario or UserScenario from the Database. 
@@ -152,11 +153,11 @@ class ScenarioMongoModel(MongoConnection):
         """
         return self.collection.find_one({'_id': ObjectId(sid)})['name']
 
-
     def create(self, sid, user, history_id):
         if template := self.collection.find_one({'_id': ObjectId(sid)}):
             return self.save(Factory.create_user_scenario(user, template, history_id))
-        raise NoObjectWithIdException("No template scenario with id: " + str(sid))
+        raise NoObjectWithIdException(
+            "No template scenario with id: " + str(sid))
 
 
 class UserMongoModel(MongoConnection):
@@ -164,27 +165,35 @@ class UserMongoModel(MongoConnection):
         super(UserMongoModel, self).__init__()
         self.get_collection('users')
 
+    def find_all_users(self): # -> List[User]
+        return self.collection.find()
+
     def initiate_scenario(self, user: str, scenario_template_id: str, history_id: str, scenario_id: str):
         """Adds a 0 to a user's scenario with the given id. The purpose is that the score is only saved when the user
         finishes a scenario, to get an accurate count of tries, this method is called as soon as the user starts a
         scenario and the 0 is overwritten when the user actually finishes. """
-        self._save_score(user=user, scenario_template_id=scenario_template_id, score=0, history_id=history_id, scenario_id=scenario_id)
+        self._save_score(user=user, scenario_template_id=scenario_template_id,
+                         score=0, history_id=history_id, scenario_id=scenario_id)
 
     def save_score(self, user: str, scenario_template_id: str, score: int, scenario_id: str):
         """Saves the final score of a user for scenario with the given template id. It also removes one 0 value from
         the scoreboard for that scenario. """
-        json = self._get_scores(user=user, scenario_template_id=scenario_template_id)
+        json = self._get_scores(
+            user=user, scenario_template_id=scenario_template_id)
         if json:
             for entry in json:
-                if ObjectId(entry['scenario_id']) ==  ObjectId(scenario_id):
+                if ObjectId(entry['scenario_id']) == ObjectId(scenario_id):
                     entry['score'] = score
-                    self.collection.find_one_and_update({'username': user}, {"$set":  {str(scenario_template_id): json}})
+                    self.collection.find_one_and_update(
+                        {'username': user}, {"$set":  {str(scenario_template_id): json}})
 
     def _save_score(self, user: str, scenario_template_id: str, score: int, history_id: str, scenario_id: str):
         """Saves a score for a given user and a given template id to the database."""
         scores = self._get_scores(scenario_template_id, user)
-        scores.append({'score': score, 'history_id': history_id, 'scenario_id': scenario_id, 'time': int(time())})
-        self.collection.find_one_and_update({'username': user}, {"$set": {scenario_template_id: scores}})
+        scores.append({'score': score, 'history_id': history_id,
+                       'scenario_id': scenario_id, 'time': int(time())})
+        self.collection.find_one_and_update(
+            {'username': user}, {"$set": {scenario_template_id: scores}})
 
     def _get_scores(self, scenario_template_id, user):
         """Returns a list of scores of a user for a given scenario template id that are stored in the database."""
@@ -200,11 +209,13 @@ class UserMongoModel(MongoConnection):
         output = None
         for i, score in enumerate(scores):
             if score['scenario_id'] == scenario_id:
-                logging.debug(f"Deleteted {scenario_id} from user {user}'s scores.")
+                logging.debug(
+                    f"Deleteted {scenario_id} from user {user}'s scores.")
                 output = score
                 del scores[i]
                 break
-        self.collection.find_one_and_update({'username': user}, {"$set": {scenario_template_id: scores}})
+        self.collection.find_one_and_update(
+            {'username': user}, {"$set": {scenario_template_id: scores}})
         return output
 
     def save_user(self, user: str):
@@ -232,7 +243,8 @@ class UserMongoModel(MongoConnection):
         users = sorted(users, key=lambda d: d['score'], reverse=True)
         for i in range(len(users)):
             users[i]['rank'] = i + 1
-        users = {e.get('username'): {'score': e.get('score'), 'rank': e.get('rank')} for e in users}
+        users = {e.get('username'): {'score': e.get('score'),
+                                     'rank': e.get('rank')} for e in users}
         return users
 
     def get_num_total_tries(self, template_id):
@@ -247,7 +259,6 @@ class UserMongoModel(MongoConnection):
             return self._get_scores(template_id, user)
         else:
             return self.collection.find_one({'username': user}) or {}
-
 
 
 class ClickHistoryModel(MongoConnection):
@@ -265,7 +276,8 @@ class ClickHistoryModel(MongoConnection):
         json = self.get(id)
         events = json.get('events', [])
         events.append(event)
-        self.collection.find_one_and_update({'_id': id}, {'$set': {'events': events}})
+        self.collection.find_one_and_update(
+            {'_id': id}, {'$set': {'events': events}})
 
     def get_start_time(self, id):
         try:

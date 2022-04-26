@@ -35,7 +35,10 @@ class Configuration(BaseSettings):
         host = self.database_host
         if self.database_port is not None:
             host += f":{self.database_port}"
-        return f"{protocol}://{self.database_user}:{self.database_pass}@{host}/?retryWrites=true&w=majority"
+
+        # fix for myself (my local db does not have user authentification)
+        # return f"{protocol}://{self.database_user}:{self.database_pass}@{host}/?retryWrites=true&w=majority"
+        return f"{protocol}://{host}/?retryWrites=true&w=majority"
 
 
 def get_config() -> Configuration:
