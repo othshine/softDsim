@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 import app.src.history as history
 from app.src.decision_tree import SimulationDecision
-from app.src.scenario import UserScenario
+from app.src.scenario import Scenario, UserScenario
 from app.views.util import apply_changes
 from mongo_models import ScenarioMongoModel, UserMongoModel
 
