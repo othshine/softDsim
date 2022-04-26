@@ -1,5 +1,13 @@
 myst_parser
 sphinx-rtd-theme
+Sphinx
+sphinxcontrib-applehelp  
+sphinxcontrib-devhelp         
+sphinxcontrib-htmlhelp        
+sphinxcontrib-httpdomain      
+sphinxcontrib-jsmath       
+sphinxcontrib-qthelp
+sphinxcontrib-serializinghtml
 asgiref
 attrs
 autopep8
