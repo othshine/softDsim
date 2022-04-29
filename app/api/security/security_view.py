@@ -5,11 +5,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+
 # from . import login_serializers
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
 """
+
+
+# todo philip: add http status codes to responses
 
 # not sure if needed
 # @method_decorator(csrf_protect, name='dispatch')
@@ -19,14 +23,14 @@ class CheckAuthenticatedView(APIView):
         is_authenticated = User.is_authenticated
 
         if is_authenticated:
-            return Response({'isAuthenticated': 'success'})
+            return Response({'isAuthenticated': 'success'}, status=status.HTTP_200_OK)
 
-        return Response({'isAuthenticated': 'error'})
+        return Response({'isAuthenticated': 'error'}, status=status.HTTP_403_FORBIDDEN)
 
 
 @method_decorator(csrf_protect, name='dispatch')
 class SignupView(APIView):
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
         data = self.request.data
@@ -36,7 +40,7 @@ class SignupView(APIView):
 
         try:
             if User.objects.filter(username=username).exists():
-                return Response({'error': 'Username already exists'})
+                return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
             user = User.objects.create_user(username=username, password=password)
 
@@ -46,10 +50,11 @@ class SignupView(APIView):
 
             return Response({'success': 'User created successfully', 'user': {
                 "id": user.id, "username": user.username
-            }})
+            }}, status=status.HTTP_201_CREATED)
 
         except:
-            return Response({'error': 'Something went wrong (except clause)'})
+            return Response({'error': 'Something went wrong (except clause)'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @method_decorator(csrf_protect, name='dispatch')
@@ -74,11 +79,15 @@ class LoginView(APIView):
 
             if user is not None:
                 login(request, user)
-                return Response({'success': 'User authenticated', 'username': username})
+                return Response({'success': 'User authenticated', 'username': username},
+                                status=status.HTTP_200_OK)
+
             else:
-                return Response({'error': 'Error Authenticating'})
+                return Response({'error': 'Could not authenticate user - credentials might be wrong'},
+                                status=status.HTTP_400_BAD_REQUEST)
         except:
-            return Response({'error': 'Something went wrong (except clause)'})
+            return Response({'error': 'Something went wrong (except clause)'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # will be csrf protected because user is logged in
@@ -86,22 +95,21 @@ class LogoutView(APIView):
 
     def post(self, request, formate=None):
         try:
+            username = request.user.username
             logout(request)
-            return Response({'success': 'Logged Out'})
+            return Response({'success': 'Logged Out', "user": {"username": username}}
+                            , status=status.HTTP_200_OK)
         except:
-            return Response({'error': 'Logout failed'})
+            return Response({'error': 'Logout failed'}
+                            , status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
 class GetCSRFToken(APIView):
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
-        return Response({'success': 'CSRF cookie set'})
-
-
-
-
+        return Response({'success': 'CSRF cookie set'}, status=status.HTTP_200_OK)
 
 # X-CSRFToken:
 # https://stackoverflow.com/questions/34782493/difference-between-csrf-and-x-csrf-token
