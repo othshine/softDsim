@@ -1,12 +1,19 @@
 from django.urls import path
 
-from .api import endpoint_test, scenario
+# from users import views
+from .api.views import scenario
+from .api.security.security_view import LoginView, GetCSRFToken, LogoutView, CheckAuthenticatedView, SignupView
 
 
-# all request with /api land here (see softDsim/urls.py)
+
+# all request with /api/ land here (see softDsim/urls.py)
 urlpatterns = [
-    path('test', endpoint_test.api_test, name='api_test'),
-    path('scenario/', scenario.scenario, name="scenario"),
-    path('scenario/<str:id>', scenario.get_one_scenario, name="get_one_scenario")
+    path('scenario/', scenario.ScenarioEndpoint.scenario, name="scenario"),
+    path('scenario/<str:id>', scenario.ScenarioEndpoint.get_one_scenario, name="get_one_scenario"),
+    path('login/', LoginView.as_view()),
+    path('logout', LogoutView.as_view()),
+    path('csrf_cookie', GetCSRFToken.as_view()),
+    path('authenticated', CheckAuthenticatedView.as_view()),
+    path('register', SignupView.as_view()),
 
 ]
