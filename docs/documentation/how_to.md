@@ -1,4 +1,4 @@
-# Dokumentation schreiben 
+# Dokumentation schreiben
 
 Wir hosten unsere Dokumentation auf [Read The Docs](https://softdsim.readthedocs.io/). Alle Dokumente welche die Dokumentation benötigt finden sich im Verzeichnis `docs/`.
 
