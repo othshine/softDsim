@@ -5,7 +5,7 @@ from app.api.views.user_view import UsersView
 
 urlpatterns = [
     path('', UsersView.as_view()),
-    path('<str:username>', UsersView.getOne)
+    path('<str:username>', UsersView.as_view())
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

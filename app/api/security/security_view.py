@@ -18,29 +18,31 @@ Views for user authentication (login, logout, creation, csrf-token handling)
 # not sure if needed
 # @method_decorator(csrf_protect, name='dispatch')
 class CheckAuthenticatedView(APIView):
-
     def get(self, request, format=None):
         is_authenticated = User.is_authenticated
 
         if is_authenticated:
-            return Response({'isAuthenticated': 'success'}, status=status.HTTP_200_OK)
+            return Response({"isAuthenticated": "success"}, status=status.HTTP_200_OK)
 
-        return Response({'isAuthenticated': 'error'}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"isAuthenticated": "error"}, status=status.HTTP_403_FORBIDDEN)
 
 
-@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(csrf_protect, name="dispatch")
 class SignupView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
         data = self.request.data
 
-        username = data['username']
-        password = data['password']
+        username = data["username"]
+        password = data["password"]
 
         try:
             if User.objects.filter(username=username).exists():
-                return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": "Username already exists"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             user = User.objects.create_user(username=username, password=password)
 
@@ -48,16 +50,22 @@ class SignupView(APIView):
 
             user = User.objects.get(id=user.id)
 
-            return Response({'success': 'User created successfully', 'user': {
-                "id": user.id, "username": user.username
-            }}, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "success": "User created successfully",
+                    "user": {"id": user.id, "username": user.username},
+                },
+                status=status.HTTP_201_CREATED,
+            )
 
         except:
-            return Response({'error': 'Something went wrong (except clause)'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "Something went wrong (except clause)"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
-@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(csrf_protect, name="dispatch")
 class LoginView(APIView):
     # This view should be accessible also for unauthenticated users.
     permission_classes = (permissions.AllowAny,)
@@ -71,48 +79,58 @@ class LoginView(APIView):
         # login(request, user)
 
         data = self.request.data
-        username = data['username']
-        password = data['password']
+        username = data["username"]
+        password = data["password"]
 
         try:
             user = authenticate(username=username, password=password)
 
             if user is not None:
                 login(request, user)
-                return Response({'success': 'User authenticated', 'username': username},
-                                status=status.HTTP_200_OK)
+                return Response(
+                    {"success": "User authenticated", "username": username},
+                    status=status.HTTP_200_OK,
+                )
 
             else:
-                return Response({'error': 'Could not authenticate user - credentials might be wrong'},
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {
+                        "error": "Could not authenticate user - credentials might be wrong"
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         except:
-            return Response({'error': 'Something went wrong (except clause)'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "Something went wrong (except clause)"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
-# will be csrf protected because user is logged in
+@method_decorator(csrf_protect, name="dispatch")
 class LogoutView(APIView):
-
     def post(self, request, formate=None):
+
         try:
             username = request.user.username
             logout(request)
-            return Response({'success': 'Logged Out', "user": {"username": username}}
-                            , status=status.HTTP_200_OK)
+            return Response(
+                {"success": "Logged Out", "user": {"username": username}},
+                status=status.HTTP_200_OK,
+            )
         except:
-            return Response({'error': 'Logout failed'}
-                            , status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": "Logout failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class GetCSRFToken(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
-        return Response({'success': 'CSRF cookie set'}, status=status.HTTP_200_OK)
+        return Response({"success": "CSRF cookie set"}, status=status.HTTP_200_OK)
+
 
 # X-CSRFToken:
 # https://stackoverflow.com/questions/34782493/difference-between-csrf-and-x-csrf-token
-
-
-# https://www.guguweb.com/2022/01/23/django-rest-framework-authentication-the-easy-way/
+# https://www.stackhawk.com/blog/django-csrf-protection-guide/

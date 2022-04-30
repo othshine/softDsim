@@ -10,11 +10,11 @@ from .api.security.security_view import LoginView, GetCSRFToken, LogoutView, Che
 urlpatterns = [
     path('scenario/', scenario_view.ScenarioEndpoint.scenario, name="scenario"),
     path('scenario/<str:id>', scenario_view.ScenarioEndpoint.get_one_scenario, name="get_one_scenario"),
-    path('login', LoginView.as_view()),
-    path('logout', LogoutView.as_view()),
-    path('csrf_cookie', GetCSRFToken.as_view()),
-    path('authenticated', CheckAuthenticatedView.as_view()),
-    path('register', SignupView.as_view()),
+    path('login', LoginView.as_view(), name='login'),
+    path('logout', LogoutView.as_view(), name='logout'),
+    path('csrf_cookie', GetCSRFToken.as_view(), name='csrf_cookie'),
+    path('authenticated', CheckAuthenticatedView.as_view(), name='authenticated'),
+    path('register', SignupView.as_view(), name='register'),
     path('user/', include('app.api.endpoints.user_endpoint')),
 
 ]
