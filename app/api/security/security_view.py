@@ -1,37 +1,36 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
-from rest_framework import permissions, status
+from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
 # from . import login_serializers
+from app.api.serializers.user_serializers import UserSerializer
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
 """
 
 
-# todo philip: add http status codes to responses
-
-# not sure if needed
-# @method_decorator(csrf_protect, name='dispatch')
-class CheckAuthenticatedView(APIView):
-    def get(self, request, format=None):
-        is_authenticated = User.is_authenticated
-
-        if is_authenticated:
-            return Response({"isAuthenticated": "success"}, status=status.HTTP_200_OK)
-
-        return Response({"isAuthenticated": "error"}, status=status.HTTP_403_FORBIDDEN)
-
-
 @method_decorator(csrf_protect, name="dispatch")
 class SignupView(APIView):
-    permission_classes = (permissions.AllowAny,)
+    """
+    View for registering a new user.
+    Has one POST Method.
+    Methods are available to anyone.
+    """
+
+    permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
+        """
+        Method for POST-Requests to the /api/register endpoint.
+        Creates new user in database (as long as user does not already exist (PK=username))
+        Returns: Response with information about user creation, created user and HTTP-Status Code.
+        """
         data = self.request.data
 
         username = data["username"]
@@ -67,16 +66,22 @@ class SignupView(APIView):
 
 @method_decorator(csrf_protect, name="dispatch")
 class LoginView(APIView):
-    # This view should be accessible also for unauthenticated users.
-    permission_classes = (permissions.AllowAny,)
+    """
+    View for logging in an existing user.
+    Has one POST Method.
+    Methods are available to anyone.
+    """
+
+    permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
+        """
+        Method for POST-Requests to the /api/login endpoint.
+        Logs in user if username and password (from json body) match a user in the database.
+        Sets new CSRF-Cookie and a Session Cookie
 
-        # login is handled more by serializer - don't see benefit yet...
-        # serializer = login_serializers.LoginSerializer(data=self.request.data, context={'request': self.request})
-        # serializer.is_valid(raise_exception=True)
-        # user = serializer.validated_data['user']
-        # login(request, user)
+        Returns: Response with information about login, logged-in user and HTTP-Status Code.
+        """
 
         data = self.request.data
         username = data["username"]
@@ -87,8 +92,9 @@ class LoginView(APIView):
 
             if user is not None:
                 login(request, user)
+                user = UserSerializer(user, many=False)
                 return Response(
-                    {"success": "User authenticated", "username": username},
+                    {"success": "User authenticated", "user": user.data},
                     status=status.HTTP_200_OK,
                 )
 
@@ -108,13 +114,29 @@ class LoginView(APIView):
 
 @method_decorator(csrf_protect, name="dispatch")
 class LogoutView(APIView):
+    """
+    View for logging out a user.
+    Has one POST Method.
+    Methods are only available to authenticated users.
+    """
+
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, formate=None):
+        """
+        Method for POST-Requests to the /api/logout endpoint.
+        Logs current user out.
+        Sets Session-Cookie to ""
+
+        Returns: Response with information about logout, logged-out user and HTTP-Status Code.
+        """
 
         try:
-            username = request.user.username
+            user = UserSerializer(request.user, many=False)
             logout(request)
+
             return Response(
-                {"success": "Logged Out", "user": {"username": username}},
+                {"success": "Logged Out", "user": {"user": user.data}},
                 status=status.HTTP_200_OK,
             )
         except:
@@ -125,10 +147,53 @@ class LogoutView(APIView):
 
 @method_decorator(ensure_csrf_cookie, name="dispatch")
 class GetCSRFToken(APIView):
-    permission_classes = (permissions.AllowAny,)
+    """
+    View for setting a CSRF-Cookie
+    Has one GET Method.
+    Methods are available to anyone.
+    """
+
+    permission_classes = (AllowAny,)
 
     def get(self, request, format=None):
+        """
+        Method for POST-Requests to the /api/csrf-token endpoint.
+        Sets a CSRF-Cookie to the client.
+
+        Returns: Response with information about cookie set and HTTP-Status Code.
+        """
         return Response({"success": "CSRF cookie set"}, status=status.HTTP_200_OK)
+
+
+@method_decorator(csrf_protect, name="dispatch")
+class CheckAuthenticatedView(APIView):
+    """
+    View to see if user is authenticated.
+    Has one GET Method.
+    Methods are available to anyone.
+    """
+
+    permission_classes = (AllowAny,)
+
+    def get(self, request, format=None):
+        """
+        Method for GET-Requests to the /api/authenticated endpoint.
+
+        Returns: Response if user is authenticated, current authenticated user and HTTP-Status Code
+
+        """
+
+        if request.user.is_authenticated:
+            user = UserSerializer(request.user, many=False)
+            return Response(
+                {"authentication-status": "user is authenticated", "user": user.data},
+                status=status.HTTP_200_OK,
+            )
+
+        return Response(
+            {"authentication-status": "user is not authenticated"},
+            status=status.HTTP_403_FORBIDDEN,
+        )
 
 
 # X-CSRFToken:
