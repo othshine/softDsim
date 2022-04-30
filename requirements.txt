@@ -1,6 +1,7 @@
 asgiref
 attrs
 autopep8
+django-cors-headers
 Deprecated
 Django
 django-extensions
