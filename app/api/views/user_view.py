@@ -59,28 +59,3 @@ class UsersView(APIView):
                 {"status": "error", "data": serializer.errors},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
-
-# class DeleteAccountView(APIView):
-#     """
-#     Deletes user in current session.
-#     Just for admin use at the moment.
-#     """
-#     def delete(self, requests, format=None):
-#         user = self.request.user
-#
-#         # todo philip: add try/catch
-#         user_tuple = User.objects.filter(id=user.id).delete()
-#
-#         return Response({'success': 'User deleted successfully', "user":
-#             {"id": user.id, "username": user.username}})
-#
-#
-# class GetUsersView(APIView):
-#
-#
-#     def get(self, request, format=None):
-#         users = User.objects.all()
-#
-#         users = UserSerializer(users, many=True)
-#         return Response(users.data)
