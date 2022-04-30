@@ -1,6 +1,7 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,6 +14,8 @@ class ScenarioView(APIView):
     """
     Views for Scenarios - WIP
     """
+
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, scenario_id=None, format=None):
 

@@ -14,7 +14,7 @@ from .api.security.security_view import (
 # all request with /api/ land here (see softDsim/urls.py)
 urlpatterns = [
     path("scenario/", ScenarioView.as_view(), name="scenario"),
-    path("scenario/<str:id>", ScenarioView.as_view(), name="get_one_scenario"),
+    path("scenario/<str:scenario_id>", ScenarioView.as_view(), name="get_one_scenario"),
     path("login", LoginView.as_view(), name="login"),
     path("logout", LogoutView.as_view(), name="logout"),
     path("csrf_cookie", GetCSRFToken.as_view(), name="csrf_cookie"),
