@@ -52,9 +52,14 @@ INSTALLED_APPS = [
     "django_extensions",
     "app",
     "rest_framework.authtoken",
+    "rest_framework",
+    "corsheaders",
 ]
 
+# explanation of each middleware
+# https://www.gustavwengel.dk/django-middleware-walkthrough/
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -167,3 +172,14 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
+CORS_ORIGIN_ALLOW_ALL = True

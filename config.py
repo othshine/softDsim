@@ -35,6 +35,11 @@ class Configuration(BaseSettings):
         host = self.database_host
         if self.database_port is not None:
             host += f":{self.database_port}"
+
+        if self.database_user == '':
+            print('database_user not specified - connecting to database without login credentials')
+            return f"{protocol}://{host}/?retryWrites=true&w=majority"
+
         return f"{protocol}://{self.database_user}:{self.database_pass}@{host}/?retryWrites=true&w=majority"
 
 
