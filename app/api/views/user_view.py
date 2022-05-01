@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.api.serializers.user_serializers import UserSerializer
+from app.serializers.user_serializers import UserSerializer
 
 
 @method_decorator(csrf_protect, name="dispatch")

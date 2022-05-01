@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
 # from . import login_serializers
-from app.api.serializers.user_serializers import UserSerializer
+from app.serializers.user_serializers import UserSerializer
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
