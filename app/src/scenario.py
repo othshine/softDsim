@@ -96,7 +96,7 @@ class Scenario:
                 'tasks_hard': self.tasks_hard,
                 'budget': self.budget,
                 'scheduled_days': self.scheduled_days,
-                '_id': self.id,
+                '_id': str(self.id),
                 'desc': self.desc,
                 'pred_c': self.pred_c,
                 'is_template': True,

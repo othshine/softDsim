@@ -12,21 +12,26 @@ class Test(models.Model):
     def create(cls, req, msg):
         test = cls(req=req, msg=msg)
         return test
-    
+
+
 class TestSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Test 
+        model = ''
         fields = ('req', 'msg')
 
 
 @api_view(['GET', 'POST'])
-def api_test(request):
+def api_test(request, id):
     if request.method == 'GET':
         t = Test.create("GET", "Hi from Django")
-        serializer = TestSerializer(t ,context={'request': request}, many=False)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    elif request.method == 'POST':
-        t = Test.create("POST", "Hi from Django")
-        serializer = TestSerializer(t ,context={'request': request}, many=False)
+        serializer = TestSerializer(
+            t, context={'request': request}, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    elif request.method == 'POST':
+        print(request)
+        print(id)
+        t = Test.create("POST", "Hi from Django")
+        serializer = TestSerializer(
+            id, context={'request': request}, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
