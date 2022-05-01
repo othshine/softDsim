@@ -24,5 +24,5 @@ urlpatterns = [
     path("csrf_cookie", GetCSRFToken.as_view(), name="csrf_cookie"),
     path("authenticated", CheckAuthenticatedView.as_view(), name="authenticated"),
     path("register", SignupView.as_view(), name="register"),
-    path("user/", include("app.api.endpoints.user_endpoint")),
+    path("user/", include("app.endpoints.user_endpoint")),
 ]
