@@ -21,6 +21,7 @@ class ManagementGoalSerializer(serializers.ModelSerializer):
             tasks_data = validated_data.pop("tasks")
             management_goal = ManagementGoal.objects.create(**validated_data)
             TaskGoal.objects.create(management_goal=management_goal, **tasks_data)
+            return management_goal
 
     # https://www.django-rest-framework.org/api-guide/relations/#nested-relationships
     # https://www.django-rest-framework.org/api-guide/serializers/#dealing-with-nested-objects
