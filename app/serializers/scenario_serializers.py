@@ -1,10 +1,13 @@
 from rest_framework import serializers
+from djongo.models import ArrayField
+from djongo import models
 
 
 class ScoreCardSerializer(serializers.Serializer):
     """
     This serializer is used in ScenarioSerializer.
     """
+
     budget_limit = serializers.CharField()
     time_limit = serializers.CharField()
     quality_limit = serializers.CharField()
@@ -20,6 +23,7 @@ class ScenarioSerializer(serializers.Serializer):
 
     This is used in app/api/scenario_view.py
     """
+
     name = serializers.CharField()
     budget = serializers.CharField()
     scheduled_days = serializers.CharField()
