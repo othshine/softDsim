@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from bson.objectid import ObjectId
 
@@ -10,14 +10,11 @@ from app.src.scorecard import ScoreCard
 from utils import month_to_day, remove_none_values, YAMLReader
 
 # Config Variables
-STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
+#STRESS_ERROR_INCREASE = YAMLReader.read('stress', 'error')
 
 
 
 class Scenario:
-    """
-    A Scenario is a predefined 'Story' that users go through. When a user starts a scenario, a UserScenario is created.
-    """
     def __init__(self, name: str = "Unnamed Scenario",
                 budget: int = 0,
                 scheduled_days: int = 0,
@@ -31,6 +28,33 @@ class Scenario:
                 id: ObjectId = None,
                 scorecard: ScoreCard = None,
                 **kwargs) -> None:
+        """ A Scenario is a predefined 'Story' that users go through. When a user starts a scenario, a UserScenario is created.
+
+        :param name: Scenario name, defaults to "Unnamed Scenario"
+        :type name: str, optional
+        :param budget: The defined budget, defaults to 0
+        :type budget: int, optional
+        :param scheduled_days: the defined duration in days, defaults to 0
+        :type scheduled_days: int, optional
+        :param decisions: the list of decisions, defaults to None
+        :type decisions: list, optional
+        :param desc: a description of the scenario, defaults to ""
+        :type desc: str, optional
+        :param tasks_easy: number of easy tasks, defaults to 0
+        :type tasks_easy: int, optional
+        :param tasks_medium: number of medium tasks, defaults to 0
+        :type tasks_medium: int, optional
+        :param tasks_hard: number of hard tasks, defaults to 0
+        :type tasks_hard: int, optional
+        :param pred_c: propability for each tasks of heaving a predecessor, defaults to 0.1
+        :type pred_c: float, optional
+        :param _id: Scenario id (mongo), defaults to None
+        :type _id: ObjectId, optional
+        :param id: Scenario id, defaults to None
+        :type id: ObjectId, optional
+        :param scorecard: holds achievable scores, defaults to None
+        :type scorecard: ScoreCard, optional
+        """
         if id and not _id:
             _id = id
         if decisions is None:
@@ -49,14 +73,21 @@ class Scenario:
 
 
     @property
-    def tasks_total(self):
+    def tasks_total(self) -> int:
+        """Number of total tasks (easy+medium+hard) in the scenario.
+
+        :return: Number of total tasks in the scenario.
+        :rtype: int
+        """
         return self.tasks_easy + self.tasks_medium + self.tasks_hard
 
-    def add(self, decision):
-        self.decisions.append(decision)
-
     @property
-    def json(self):
+    def json(self) -> Dict[str, Any]:
+        """Generate a json representation of an :class:`Scenario` object. 
+
+        :return: JSON compatible object#
+        :rtype: Dict[str, Any]
+        """
         return {'name': self.name,
                 'decisions': [dec.json for dec in self.decisions],
                 'tasks_total': self.tasks_total,
@@ -65,13 +96,20 @@ class Scenario:
                 'tasks_hard': self.tasks_hard,
                 'budget': self.budget,
                 'scheduled_days': self.scheduled_days,
-                '_id': self.id,
+                '_id': str(self.id),
                 'desc': self.desc,
                 'pred_c': self.pred_c,
                 'is_template': True,
                 'scorecard': self.scorecard.json
                 }
 
+    def add(self, decision:Decision) -> None:
+        """Adds a :class:`Decision` to the scenario
+
+        :param decision: :class:`Decision` object to be added
+        :type decision: Decision
+        """
+        self.decisions.append(decision)
 
 def create_staff_row(team: Team, title: str = 'staff'):
     return {
@@ -174,7 +212,8 @@ class UserScenario:
         d = self.decisions[self.counter]
         if isinstance(d, SimulationDecision):
             for a in d.active_actions or []:
-                if (action := self.actions.get(a)) is not None and self.action_is_applicable(action):
+                action = self.actions.get(a)
+                if (action) is not None and self.action_is_applicable(action):
                     json.append(action.json)
         else:
             for action in d.actions or []:
@@ -288,5 +327,3 @@ class UserScenario:
         if self.model.lower() not in [x.lower() for x in action.get_restrictions().get('model-pick', [self.model])]:
             applicable = False
         return applicable
-
-

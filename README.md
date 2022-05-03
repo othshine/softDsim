@@ -2,6 +2,8 @@
 
 IT Project Management Simulation Web Application
 
+[Dokumentation](https://softdsim.readthedocs.io/en/latest/)
+
 ## Abstract
 
 Die SoftDSim ist eine Django-basierte Web-Anwendung zur Simulation von Projektmanagement-Szenarios für den Einsatz im Modul Project Management an der [Frankfurt University of Applied Sciences](https://www.frankfurt-university.de/). Dozenten  können innerhalb der Web-Anwendung Szenarios mit belieben Inhalten definieren, welche dann von Studierenden simuliert werden. Die Studierenden nehmen dabei die Rolle eines Projektmanagers ein und müssen verschiedene Entscheidungen treffen. Beispielhaft genannte Entscheidungen sind *Projektmanagementmethode*, *Anzahl und Erfahrungsniveau der Teammitglieder* oder *Anzahl der Meetings*. Alle Simulationen werden in einer gemeinsamen Datenbank gespeichert. Diese kann vom Dozenten eingesehen werden, sodass die Leistungen der Studierenden evaluiert werden kann.
@@ -113,6 +115,22 @@ python manage.py createsuperuser
 erstellt werden. Der definierten Username und das Passwort können zur Anmeldung auf der Loginseite der Webapplikation genutzt werden.
 
 Sollte es zu Problemen kommen, kann dies mehrere Gründe haben: Datenbank läuft nicht richtig, Requirements nicht installiert bzw. falsches Python Environment zur Ausführung genutzt oder die Konfiguration stimmt nicht. Bei Problemen einfach nachfragen. Fragen werden idealerweise direkt in unserem [GitHub Diskussionsforum](https://github.com/antonroesler/softDsim/discussions) gestellt.
+
+### Erstellen eines Scenarios
+
+Um ein Scenario zu erstellen, muss dieses in `app/scripts/scenarios/` als eine `.yml` Datei definiert sein. Dann kann mit dem Befehl:
+
+```bash
+python manage.py runscript scenario_studio -v2 --script-args <name-der-datei>.yml
+```
+
+das Sceanrio erstellt werden. Würde also die Datei `app/scripts/scenarios/test_sc.yml`, eine Scenario-Definition enthählten (siehe Doku), könnte mit dem Befehl:
+
+```bash
+python manage.py runscript scenario_studio -v2 --script-args test_sc.yml
+```
+
+dieses erstellt werden.
 
 ## Entwicklungsworkflow
 

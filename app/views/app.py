@@ -1,5 +1,7 @@
+import logging
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from app.views.util import serving_log
 
 from mongo_models import MongoConnection, ScenarioMongoModel, UserMongoModel, ClickHistoryModel, MongoConnection
 
@@ -11,11 +13,13 @@ def connected(t):
 
 @login_required
 def app(request, sid):
+    serving_log('app', request)
     return render(request, "app/app.html")
 
 
 @login_required
 def index(request):
+    serving_log('index', request)
     if not connected(500):
         return render(request, "app/dbfail.html")
     scenario_model = ScenarioMongoModel()
@@ -24,7 +28,6 @@ def index(request):
     s_list = []
     for scenario in sc:
         user_score_rank = user_model.get_user_ranking(str(scenario.id)).get(request.user.username, {})
-        print(user_score_rank)
         best_score = user_score_rank.get('score', "-")
         rank = user_score_rank.get('rank', "-")
         tries = user_model.get_num_tries(user=request.user.username, template_id=str(scenario.id))

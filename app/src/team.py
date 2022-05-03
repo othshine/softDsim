@@ -1,3 +1,4 @@
+import logging
 import random
 
 from statistics import mean
@@ -360,7 +361,8 @@ class Team:
             self.social_event()
 
     def integration_test(self, tq: TaskQueue, n=None):
-        print(n)
+        
+        logging.debug("Start integration test.")
         tasks = list(tq.get(done=True, unit_tested=True, integration_tested=False))[:n]
         for task in tasks:
             if task.correct_specification:
@@ -501,9 +503,9 @@ class ScrumTeam:
         
     def daily(self):
         if self.junior_master: 
-            print("Daily with junior")
+            pass
         elif self.senior_master:
-            print("Daily with senior")
+            pass
 
 
 
