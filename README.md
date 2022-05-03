@@ -32,14 +32,15 @@ Die Installation aller benötigter Bibliotheken geschieht mittels `pip` über de
 ```bash
 pip install -r requirements.txt
 ```
+Eines der Requirments ist `mysqlclient`, dieses benötigt einen mysql-cleint auf dem lokalen System. [Auf der pypi Seite von mysqlclient]( https://pypi.org/project/mysqlclient/) findet sich dazu eine erklärung. 
 
-### Datenbank mongoDB
+### Datenbank mariaDB
 
-Die Datenbank, die von der Webanwendung genutzt wird, ist die dokumentenorientierte Datenbank [mongoDB](https://www.mongodb.com/). Die Datenbank läuft nicht zwingender Weise auf demselben Server wie das Backend, sondern ist extern angebunden. Für die Entwicklung ist es erforderlich, dass Entwickler eine eigene Datenbank anbinden. Es gibt mehrere Möglichkeiten, diese zu tun.
+Die Datenbank, die von der Webanwendung genutzt wird, ist die SQL Datenbank [mariaDB](https://mariadb.org/). Die Datenbank läuft nicht zwingender Weise auf demselben Server wie das Backend, sondern ist extern angebunden. Für die Entwicklung ist es erforderlich, dass Entwickler eine eigene Datenbank anbinden. Es gibt mehrere Möglichkeiten, diese zu tun.
 
 #### Docker
 
-Eine Möglichkeit ist es, die Datenbank lokal über Docker zu hosten. Um eine lokale mongoDB zu erstellen, müssen Docker und idealerweise docker-compose installiert sein. Die compose Datei liegt im Verzeichnis *database/*. Mit dem Befehl
+Eine Möglichkeit ist es, die Datenbank lokal über Docker zu hosten. Um eine lokale mariaDB zu erstellen, müssen Docker und idealerweise docker-compose installiert sein. Die compose Datei liegt im Verzeichnis *database/*. Mit dem Befehl
 
 ```bash
 docker-compose up
@@ -53,7 +54,7 @@ docker-compose -f database/docker-compose.yml up -d
 
 #### Weitere Möglichkeiten
 
-Die Dokumentation enthält weiter Möglichkeiten eine MongoDB zu hosten, z.B. die [Community-Edition](https://docs.mongodb.com/manual/administration/install-community/) von *mongoDB* direkt auf dem lokalen System zu installieren oder über [MongoDB Atlas](https://www.mongodb.com/de-de/cloud/atlas/register) eine Cloud Datenbank zu hosten.
+Es ist natürlich auch möglich eine mariaDB direkt lokal zu hosten oder eine [Cloud Variante](https://mariadb.com/de/products/skysql/). 
 
 ### Projekt Konfiguration
 
@@ -62,30 +63,21 @@ Die Environment Variablen enthalten wichtige Informationen über die lokale Konf
 - `SECRET_KEY` Dies ist der Schlüssel, den Django zu Verschlüsselung nutzt. Dieser kann frei definiert werden und kann z. B. mit [djecrety.ir](https://djecrety.ir/) generiert werden.
 - `DATABASE_NAME` Der Name der Datenbank, die Django in der mongoDB erstellt (beliebig).
 - `DATABASE_HOST` Den Host der Datenbank. Dieser ist essenziell und hängt von der Konfiguration der Datenbank ab. Wird zur Entwicklung wir die Datenbank auf dem localhost gehostet (zb mit Docker), dann ist der Host `127.0.0.1`. Bei einer Cloud gehosteten Datenbank kann der Host über das Cloud-Dashboard eingesehen werden.
-- `DATABASE_PORT` Der Port, auf dem die Datenbank läuft. MongoDB sollte i.d.R. auf dem Port `27017` laufen. Läuft die DB auf eine Cloud-Datenbank, dessen URI keinen Port enthält, dann muss diese Variable weggelassen werden.
+- `DATABASE_PORT` Der Port, auf dem die Datenbank läuft. MongoDB sollte i.d.R. auf dem Port `3306` laufen. Läuft die DB auf eine Cloud-Datenbank, dessen URI keinen Port enthält, dann muss diese Variable weggelassen werden.
 - `DATABASE_USER` Der Username des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MONGO_INITDB_ROOT_USERNAME` angegebene Name (deafult ist `demo`). Bei einer Cloud Datenbank muss auf Atlas ein User erzeugt werden und der name dann hier eingetragen werden.
-- `DATABASE_PASS` Das Passwort des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MONGO_INITDB_ROOT_PASSWORD` angegebene Passwort (deafult ist `passdemo`)`
-- `CLOUD_DB` Diese Variable ist auf `True` zu setzten, wenn eine Cloud-Datenbank genutzt wird, wird eine lokale Datenbank genutzt, kann die Variable weggelassen werden.
+- `DATABASE_PASS` Das Passwort des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MONGO_INITDB_ROOT_PASSWORD` angegebene Passwort (deafult ist `demo`)`
 
 Dies wäre eine beispielhafte `.env` Datei, wenn die MongoDB mit docker-compose erzeugt wurde.
 ```env
-DATABASE_NAME=softdsim
+DATABASE_NAME=sim
 DATABASE_HOST=127.0.0.1
-DATABASE_PORT=27017
+DATABASE_PORT=3306
 DATABASE_USER=demo
-DATABASE_PASS=mypassword
+DATABASE_PASS=demo
 SECRET_KEY=ea2n+r$^@4px1c4gqim+l^m=@ew04hc-lupx^c&p(fy48)ma=0
 ```
 
-Dies wäre eine beispielhafte `.env` Datei, wenn die MongoDB auf mongo Atlas gehostet wird.
-```env
-DATABASE_NAME=softdsim
-DATABASE_HOST=cluster0.wfz0m.mongodb.net
-DATABASE_USER=softdsimclient
-DATABASE_PASS=86umIR15Qjqwx5eN
-CLOUD_DB=True
-SECRET_KEY=ea2n+r$^@4px1c4gqim+l^m=@ew04hc-lupx^c&p(fy48)ma=0
-```
+
 
 ### Erstes Starten der Webanwendung
 
