@@ -61,7 +61,7 @@ Es ist natürlich auch möglich eine mariaDB direkt lokal zu hosten oder eine [C
 Die Environment Variablen enthalten wichtige Informationen über die lokale Konfiguration. Sie werden in der Datei `.env` im *root* Verzeichnis des Projekts definiert. Zu setzen sind:
 
 - `SECRET_KEY` Dies ist der Schlüssel, den Django zu Verschlüsselung nutzt. Dieser kann frei definiert werden und kann z. B. mit [djecrety.ir](https://djecrety.ir/) generiert werden.
-- `DATABASE_NAME` Der Name der Datenbank, die Django in der mongoDB erstellt (beliebig).
+- `DATABASE_NAME` Der Name der Datenbank, die Django in der mariaDB erstellt. Muss identisch sein zum DB Namen der in der docker-compose angegeben wurde (im develop ist das `sim`). 
 - `DATABASE_HOST` Den Host der Datenbank. Dieser ist essenziell und hängt von der Konfiguration der Datenbank ab. Wird zur Entwicklung wir die Datenbank auf dem localhost gehostet (zb mit Docker), dann ist der Host `127.0.0.1`. Bei einer Cloud gehosteten Datenbank kann der Host über das Cloud-Dashboard eingesehen werden.
 - `DATABASE_PORT` Der Port, auf dem die Datenbank läuft. MongoDB sollte i.d.R. auf dem Port `3306` laufen. Läuft die DB auf eine Cloud-Datenbank, dessen URI keinen Port enthält, dann muss diese Variable weggelassen werden.
 - `DATABASE_USER` Der Username des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MONGO_INITDB_ROOT_USERNAME` angegebene Name (deafult ist `demo`). Bei einer Cloud Datenbank muss auf Atlas ein User erzeugt werden und der name dann hier eingetragen werden.
