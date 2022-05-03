@@ -6,7 +6,6 @@ Deprecated
 Django
 django-extensions
 django-environ
-djongo
 iniconfig
 numpy
 packaging
@@ -30,3 +29,4 @@ typing_extensions
 wheel
 wrapt
 djangorestframework
+mysqlclient
