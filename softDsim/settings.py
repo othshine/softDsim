@@ -94,10 +94,12 @@ WSGI_APPLICATION = "softDsim.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "djongo",
+        "ENGINE": "django.db.backends.mysql",
         "NAME": configuration.database_name,
-        "ENFORCE_SCHEMA": False,
-        "CLIENT": {"host": configuration.mongo_client},
+        "USER": configuration.database_user,
+        "PASSWORD": configuration.database_pass,
+        "HOST": configuration.database_host,
+        "PORT": configuration.database_port,
     }
 }
 

@@ -2,12 +2,15 @@
 version: '3.9'
 
 services:
-  mongodb:
-    image: mongo:latest
+   db:
+    image: mariadb
+    restart: always
     ports:
-      - 27017:27017
+      - 3306:3306
     volumes:
-      - ./mongo_storage:/data/db
+      - ./maria_store:/data/db
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=demo
-      - MONGO_INITDB_ROOT_PASSWORD=passdemo
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASSWORD=demo
+      - MYSQL_USER=demo
+      - MYSQL_DATABASE=sim
