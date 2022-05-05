@@ -55,6 +55,7 @@ const Login = () => {
                             </InputRightElement>
                         </InputGroup>
                     </Stack>
+                    {/* TODO: implement text for failed login attempt */}
                     {/* login button */}
                     <Button rightIcon={<HiOutlineLogin />} colorScheme={idInputValid && passwortInputValid ? 'blue' : 'blackAlpha'} size='lg' mt="40px" onClick={login} isDisabled={idInputValid && passwortInputValid ? false : true}>
                         Login
