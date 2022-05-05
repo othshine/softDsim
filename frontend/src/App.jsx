@@ -1,7 +1,8 @@
-import React, {useEffect} from "react";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Landing from "./pages/Landing";
+import Simulation from "./pages/Simulation";
 
 function App() {
 
@@ -11,12 +12,13 @@ function App() {
 
     return (
         <>
-        <Navbar/>
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Landing/>}/>
-            </Routes>
-        </BrowserRouter>
+            <Navbar />
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/simulation" element={<Simulation />} />
+                </Routes>
+            </BrowserRouter>
         </>
     );
 }
