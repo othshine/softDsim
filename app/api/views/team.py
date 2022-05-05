@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from app.serializers.team import MemberSerializer, SkillTypeSerializer, TeamSerializer
-
+from django.core.exceptions import ObjectDoesNotExist
 
 from app.models.team import SkillType, Team, Member
 
@@ -65,10 +65,20 @@ class MemberView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        # Getting skill type from DB
-        skill_type_str = request.data.get("skill_type")
-        skill_type = SkillType.objects.get(name=skill_type_str)
-
+        try:
+            # Getting skill type from DB
+            skill_type_str = request.data.get("skill_type")
+            skill_type = SkillType.objects.get(name=skill_type_str)
+        except ObjectDoesNotExist:
+            return Response(
+                {
+                    "status": "error",
+                    "data": {
+                        "skill_type": f"'{skill_type_str}' is not a name of an existing skill-type in the database."
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
         serializer = MemberSerializer(data=request.data)
         if serializer.is_valid():
             member = serializer.save()
