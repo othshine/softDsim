@@ -64,8 +64,8 @@ Die Environment Variablen enthalten wichtige Informationen über die lokale Konf
 - `DATABASE_NAME` Der Name der Datenbank, die Django in der mariaDB erstellt. Muss identisch sein zum DB Namen der in der docker-compose angegeben wurde (im develop ist das `sim`). 
 - `DATABASE_HOST` Den Host der Datenbank. Dieser ist essenziell und hängt von der Konfiguration der Datenbank ab. Wird zur Entwicklung wir die Datenbank auf dem localhost gehostet (zb mit Docker), dann ist der Host `127.0.0.1`. Bei einer Cloud gehosteten Datenbank kann der Host über das Cloud-Dashboard eingesehen werden.
 - `DATABASE_PORT` Der Port, auf dem die Datenbank läuft. MongoDB sollte i.d.R. auf dem Port `3306` laufen. Läuft die DB auf eine Cloud-Datenbank, dessen URI keinen Port enthält, dann muss diese Variable weggelassen werden.
-- `DATABASE_USER` Der Username des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MONGO_INITDB_ROOT_USERNAME` angegebene Name (deafult ist `demo`). Bei einer Cloud Datenbank muss auf Atlas ein User erzeugt werden und der name dann hier eingetragen werden.
-- `DATABASE_PASS` Das Passwort des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MONGO_INITDB_ROOT_PASSWORD` angegebene Passwort (deafult ist `demo`)`
+- `DATABASE_USER` Der Username des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MYSQL_USER` angegebene Name (deafult ist `demo`). Bei einer Cloud Datenbank muss auf Atlas ein User erzeugt werden und der name dann hier eingetragen werden.
+- `DATABASE_PASS` Das Passwort des Datenbank-Users. Bei der Nutztung von der docker-compose Datei ist dies der dort unter `MYSQL_PASSWORD` angegebene Passwort (deafult ist `demo`)`
 
 Dies wäre eine beispielhafte `.env` Datei, wenn die MongoDB mit docker-compose erzeugt wurde.
 ```env
