@@ -77,7 +77,7 @@ class MemberView(APIView):
                         "skill_type": f"'{skill_type_str}' is not a name of an existing skill-type in the database."
                     },
                 },
-                status=status.HTTP_200_OK,
+                status=status.HTTP_400_BAD_REQUEST,
             )
         serializer = MemberSerializer(data=request.data)
         if serializer.is_valid():
