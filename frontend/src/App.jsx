@@ -4,6 +4,8 @@ import Navbar from "./components/Navbar";
 import Landing from "./pages/Landing";
 import ScenarioOverview from "./pages/ScenarioOverview";
 import Simulation from "./pages/Simulation";
+import UserOverview from "./pages/UserOverview";
+import {Box} from "@chakra-ui/react";
 
 function App() {
 
@@ -12,16 +14,17 @@ function App() {
     }, []);
 
     return (
-        <>
+        <Box h="full">
         <BrowserRouter>
             <Navbar/>
             <Routes>
                 <Route path="/" element={<Landing/>}/>
                 <Route path="/scenarios" element={<ScenarioOverview/>}/>
                 <Route path="/scenarios/:scn_id" element={<Simulation/>}/>
+                <Route path="/users" element={<UserOverview/>}/>
             </Routes>
         </BrowserRouter>
-        </>
+        </Box>
     );
 }
 
