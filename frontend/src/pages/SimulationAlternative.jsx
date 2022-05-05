@@ -1,23 +1,31 @@
 import {
-  Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink, Button,
-  Container,
-  Heading,
-  Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
-  ModalOverlay, Text, useDisclosure
+    Box,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    Button,
+    Container,
+    Heading,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
+    Text,
+    useDisclosure
 } from "@chakra-ui/react";
 import {HiChevronRight} from "react-icons/hi";
 import {useEffect, useState} from "react";
-import {useLocation, Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 
-const Simulation = () => {
+const SimulationAlternative = () => {
     const [userScenario, setUserScenario] = useState({});
 
     const location = useLocation();
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const fetchUserScenario = () => {
         const userScenarioMock = {
@@ -35,7 +43,7 @@ const Simulation = () => {
     useEffect(() => {
         fetchUserScenario();
         onOpen();
-    }, []);
+    }, [onOpen]);
 
     return (
         <>
@@ -77,4 +85,4 @@ const Simulation = () => {
         </>
     )
 };
-export default Simulation;
+export default SimulationAlternative;

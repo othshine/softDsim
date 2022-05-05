@@ -2,14 +2,21 @@ import {
     Box,
     Breadcrumb,
     BreadcrumbItem,
-    BreadcrumbLink, Button,
+    BreadcrumbLink,
+    Button,
     Container,
-    Heading, Icon, IconButton,
+    Heading,
+    IconButton,
     Table,
-    TableContainer, Tbody, Td, Th, Thead, Tr
+    TableContainer,
+    Tbody,
+    Td,
+    Th,
+    Thead,
+    Tr
 } from "@chakra-ui/react";
 import {HiChevronRight, HiOutlineTrash} from "react-icons/hi";
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 
 const UserOverview = () => {
     const [users, setUsers] = useState([]);
