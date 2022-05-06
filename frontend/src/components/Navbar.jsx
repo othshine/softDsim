@@ -1,5 +1,6 @@
 import {
     Avatar,
+    Box,
     Button,
     Flex,
     HStack,
@@ -7,7 +8,6 @@ import {
     Image,
     Menu,
     MenuButton,
-    MenuDivider,
     MenuGroup,
     MenuItem,
     MenuList,
@@ -16,6 +16,8 @@ import {
 import Logo from "../images/modern-logo.png"
 import {HiMoon, HiOutlineLogout} from "react-icons/hi";
 import {useEffect, useRef} from "react";
+import {Link} from "react-router-dom";
+
 
 const Navbar = () => {
     const menuButton = useRef();
@@ -32,19 +34,21 @@ const Navbar = () => {
             py={4}
             borderBottom="1px solid #E2E8F0"
         >
-            <Image src={Logo} alt="logo" w={14} objectFit="contain"/>
+            <Box as={Link} to={"/"}>
+                <Image src={Logo} alt="logo" w={14} objectFit="contain"/>
+            </Box>
             <HStack
                 w="100%"
                 justifyContent="center"
                 gap={14}
             >
-                <Button variant='link'>
+                <Button variant='link' as={Link} to="/scenarios">
                     Scenarios
                 </Button>
                 <Button variant='link'>
                     Simulation Studio
                 </Button>
-                <Button variant='link'>
+                <Button variant='link' as={Link} to="/users">
                     User Management
                 </Button>
                 <Button variant='link'>
@@ -69,12 +73,6 @@ const Navbar = () => {
                         </MenuButton>
                         <MenuList>
                             <MenuGroup title='Profile'>
-                                <MenuItem>My Account</MenuItem>
-                                <MenuItem icon={<HiOutlineLogout/>} color="red">Logout </MenuItem>
-                            </MenuGroup>
-                            <MenuDivider/>
-                            <MenuGroup title='Profile'>
-                                <MenuItem>My Account</MenuItem>
                                 <MenuItem icon={<HiOutlineLogout/>} color="red">Logout </MenuItem>
                             </MenuGroup>
                         </MenuList>
