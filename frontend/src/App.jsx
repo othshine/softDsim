@@ -5,8 +5,9 @@ import Landing from "./pages/Landing";
 import ScenarioOverview from "./pages/ScenarioOverview";
 import SimulationAlternative from "./pages/SimulationAlternative";
 import UserOverview from "./pages/UserOverview";
-import {Box} from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import Simulation from "./pages/Simulation";
+import Footer from "./components/Footer";
 
 function App() {
 
@@ -16,16 +17,17 @@ function App() {
 
     return (
         <Box h="full">
-        <BrowserRouter>
-            <Navbar/>
-            <Routes>
-                <Route path="/" element={<Landing/>}/>
-                <Route path="/scenarios" element={<ScenarioOverview/>}/>
-                <Route path="/scenarios/:scn_id" element={<SimulationAlternative/>}/>
-                <Route path="/users" element={<UserOverview/>}/>
-                  <Route path="/simulation" element={<Simulation />} />
-            </Routes>
-        </BrowserRouter>
+            <BrowserRouter>
+                <Navbar />
+                <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/scenarios" element={<ScenarioOverview />} />
+                    <Route path="/scenarios/:scn_id" element={<SimulationAlternative />} />
+                    <Route path="/users" element={<UserOverview />} />
+                    <Route path="/simulation" element={<Simulation />} />
+                </Routes>
+                <Footer />
+            </BrowserRouter>
         </Box>
     );
 }
