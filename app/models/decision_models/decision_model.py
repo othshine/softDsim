@@ -1,12 +1,19 @@
-from djongo import models
+from django.db import models
 
-from app.models.action_model import Action
-from app.models.text_block_model import TextBlock
+from app.models.template_scenario_model import TemplateScenario
 
 
 class Decision(models.Model):
-    id = models.ObjectIdField()
-    text = models.ArrayField(TextBlock)
+    id = models.AutoField(primary_key=True)
     continue_text = models.TextField()
     points = models.PositiveIntegerField()
-    actions = models.ArrayField(Action)
+    # text: List[TextBlock] -> ForeignKey Reference is in TextBlock Model
+    # actions: List[Action] -> ForeignKey Reference is in Action Model
+
+    template_scenario = models.ForeignKey(
+        TemplateScenario,
+        on_delete=models.CASCADE,
+        related_name="decision",
+        blank=True,
+        null=True,
+    )

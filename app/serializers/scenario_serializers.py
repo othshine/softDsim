@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from djongo.models import ArrayField
-from djongo import models
+from django.db import models
 
 
 class ScoreCardSerializer(serializers.Serializer):

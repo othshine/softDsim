@@ -2,7 +2,7 @@ from django.urls import path, include
 
 from .api.views.scenario_view import ScenarioView
 
-from .api.views.management_goal_view import TaskGoalView, ManagementGoalView
+from .api.views.management_goal_view import ManagementGoalView
 from .api.security.security_view import (
     LoginView,
     GetCSRFToken,
@@ -27,8 +27,6 @@ urlpatterns = [
     path("template_scenario", TemplateScenarioView.as_view()),
     path("template_scenario/<str:scenario_id>", TemplateScenarioView.as_view()),
     # for testing
-    path("task-goal/", TaskGoalView.as_view()),
-    path("task-goal/<str:id>", TaskGoalView.as_view()),
     path("management-goal/", ManagementGoalView.as_view()),
     path("management-goal/<str:id>", ManagementGoalView.as_view()),
     # this (scenario) is old

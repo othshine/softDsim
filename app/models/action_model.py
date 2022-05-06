@@ -1,13 +1,21 @@
-from djongo import models
+from django.db import models
 
-from app.models.decision_models.answer_model import Answer
+from app.models.decision_models.decision_model import Decision
 
 
 class Action(models.Model):
 
-    id = models.ObjectIdField()
+    id = models.AutoField(primary_key=True)
     title = models.TextField()
     typ = models.TextField()
     active = models.BooleanField()
-    answer = models.ArrayField(Answer)
+    # answers: List[Answer] -> ForeignKey Reference in Answer Model
     required = models.BooleanField()
+
+    decision = models.ForeignKey(
+        Decision,
+        on_delete=models.CASCADE,
+        related_name="action",
+        blank=True,
+        null=True,
+    )
