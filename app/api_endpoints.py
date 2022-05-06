@@ -10,6 +10,7 @@ from .api.security.security_view import (
 )
 
 from app.api.views.team import SkillTypeView, TeamViews, MemberView
+from app.api.views.scenario_config import ScenarioConfigView
 
 # all request with /api/ land here (see softDsim/urls.py)
 urlpatterns = [
@@ -27,4 +28,6 @@ urlpatterns = [
     path("member/<int:id>", MemberView.as_view()),
     path("skill-type", SkillTypeView.as_view()),
     path("skill-type/<int:id>", SkillTypeView.as_view()),
+    path("scenario-config", ScenarioConfigView.as_view()),
+    path("scenario-config/<str:id>", ScenarioConfigView.as_view()),
 ]
