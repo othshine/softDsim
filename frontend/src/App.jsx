@@ -8,6 +8,7 @@ import SimulationAlternative from "./pages/SimulationAlternative";
 import UserOverview from "./pages/UserOverview";
 import { Box } from "@chakra-ui/react";
 import Simulation from "./pages/Simulation";
+import Footer from "./components/Footer";
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/simulation" element={<Simulation />} />
                     <Route path="/login" element={<Login />} />
                 </Routes>
+                <Footer />
             </BrowserRouter>
         </Box>
     );
