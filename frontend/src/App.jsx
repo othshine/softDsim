@@ -1,7 +1,13 @@
-import React, {useEffect} from "react";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Landing from "./pages/Landing";
+import Login from "./pages/Login"
+import ScenarioOverview from "./pages/ScenarioOverview";
+import SimulationAlternative from "./pages/SimulationAlternative";
+import UserOverview from "./pages/UserOverview";
+import { Box } from "@chakra-ui/react";
+import Simulation from "./pages/Simulation";
 
 function App() {
 
@@ -10,14 +16,19 @@ function App() {
     }, []);
 
     return (
-        <>
-        <Navbar/>
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<Landing/>}/>
-            </Routes>
-        </BrowserRouter>
-        </>
+        <Box h="full">
+            <BrowserRouter>
+                <Navbar />
+                <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/scenarios" element={<ScenarioOverview />} />
+                    <Route path="/scenarios/:scn_id" element={<SimulationAlternative />} />
+                    <Route path="/users" element={<UserOverview />} />
+                    <Route path="/simulation" element={<Simulation />} />
+                    <Route path="/login" element={<Login />} />
+                </Routes>
+            </BrowserRouter>
+        </Box>
     );
 }
 
