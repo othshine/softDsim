@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Landing from "./pages/Landing";
-import Login from "./pages/Login"
+import Login from "./pages/Login";
+import Help from "./pages/Help";
 import ScenarioOverview from "./pages/ScenarioOverview";
 import SimulationAlternative from "./pages/SimulationAlternative";
 import UserOverview from "./pages/UserOverview";
@@ -26,6 +27,7 @@ function App() {
                     <Route path="/users" element={<UserOverview />} />
                     <Route path="/simulation" element={<Simulation />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/help" element={<Help />} />
                 </Routes>
             </BrowserRouter>
         </Box>
