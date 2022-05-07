@@ -12,7 +12,7 @@ class Answer(models.Model):
     action = models.ForeignKey(
         Action,
         on_delete=models.CASCADE,
-        related_name="answer",
+        related_name="answers",
         blank=True,
         null=True,
     )

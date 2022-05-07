@@ -15,7 +15,7 @@ class Action(models.Model):
     decision = models.ForeignKey(
         Decision,
         on_delete=models.CASCADE,
-        related_name="action",
+        related_name="actions",
         blank=True,
         null=True,
     )

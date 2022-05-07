@@ -1,6 +1,6 @@
 from django.db import models
 
-from app.models.management_goal_model import ManagementGoal
+
 from app.models.simulation_models.simulation_model import Simulation
 
 
@@ -21,6 +21,5 @@ class TemplateScenario(models.Model):
 
     id = models.AutoField(primary_key=True)
     name = models.TextField(default="default_scenario_name")
-    management_goal = models.OneToOneField(ManagementGoal, on_delete=models.CASCADE)
     # decisions: List[Decision] -> ForeignKey Reference is in Decision Model
     # simulation = models.OneToOneField(Simulation, on_delete=models.CASCADE)

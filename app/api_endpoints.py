@@ -1,5 +1,6 @@
 from django.urls import path, include
 
+from .api.views.decision_view import DecisionView
 from .api.views.scenario_view import ScenarioView
 
 from .api.views.management_goal_view import ManagementGoalView
@@ -32,4 +33,7 @@ urlpatterns = [
     # this (scenario) is old
     path("scenario/", ScenarioView.as_view(), name="scenario"),
     path("scenario/<str:scenario_id>", ScenarioView.as_view(), name="get_one_scenario"),
+    # decision todo: remove maybe later
+    path("decision", DecisionView.as_view(), name="decision"),
+    path("decision/<str:decision_id>", DecisionView.as_view(), name="decision"),
 ]
