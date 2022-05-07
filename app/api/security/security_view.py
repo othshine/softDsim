@@ -16,7 +16,7 @@ Views for user authentication (login, logout, creation, csrf-token handling)
 
 
 @method_decorator(csrf_protect, name="dispatch")
-class SignupView(APIView):
+class RegisterView(APIView):
     """
     View for registering a new user.
     Has one POST Method.

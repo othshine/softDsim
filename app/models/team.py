@@ -28,9 +28,7 @@ class Member(models.Model):
     stress = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
-    team = models.ForeignKey(
-        Team, on_delete=models.CASCADE, related_name="member", blank=True, null=True
-    )
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="member")
     skill_type = models.ForeignKey(
         SkillType,
         on_delete=models.CASCADE,
