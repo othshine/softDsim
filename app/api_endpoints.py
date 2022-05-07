@@ -1,5 +1,8 @@
 from django.urls import path, include
 
+from app.api.views.user_scenario import UserScenarioViews
+from app.api.views.team import SkillTypeView, TeamViews, MemberView
+from app.api.views.scenario_config import ScenarioConfigView
 from .api.views.scenario_view import ScenarioView
 from .api.security.security_view import (
     LoginView,
@@ -9,8 +12,6 @@ from .api.security.security_view import (
     SignupView,
 )
 
-from app.api.views.team import SkillTypeView, TeamViews, MemberView
-from app.api.views.scenario_config import ScenarioConfigView
 
 # all request with /api/ land here (see softDsim/urls.py)
 urlpatterns = [
@@ -30,4 +31,6 @@ urlpatterns = [
     path("skill-type/<int:id>", SkillTypeView.as_view()),
     path("scenario-config", ScenarioConfigView.as_view()),
     path("scenario-config/<str:id>", ScenarioConfigView.as_view()),
+    path("user-scenario", UserScenarioViews.as_view()),
+    path("user-scenario/<int:id>", UserScenarioViews.as_view()),
 ]
