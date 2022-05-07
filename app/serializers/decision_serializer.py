@@ -15,7 +15,7 @@ class DecisionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Decision
-        fields = ("id", "index", "continue_text", "points", "text_block", "actions")
+        fields = ("index", "continue_text", "points", "text_block", "actions")
 
     def create(self, validated_data):
         text_block_data = validated_data.pop("text_block")

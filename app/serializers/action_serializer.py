@@ -11,7 +11,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = "__all__"
+        fields = ("title", "typ", "active", "required", "answers")
 
     def create(self, validated_data):
         answer_data = validated_data.pop("text")

@@ -1,7 +1,9 @@
+from deprecated.classic import deprecated
 from rest_framework import serializers
 from django.db import models
 
 
+@deprecated(reason="this serializer was used for testing, DONT USE THIS")
 class ScoreCardSerializer(serializers.Serializer):
     """
     This serializer is used in ScenarioSerializer.

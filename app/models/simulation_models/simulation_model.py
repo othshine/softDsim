@@ -1,10 +1,24 @@
 from django.db import models
 
+from app.models.template_scenario_model import TemplateScenario
+
 
 class Simulation(models.Model):
     id = models.AutoField(primary_key=True)
-    # text = models.ArrayField(TextBlock)
     continue_text = models.TextField()
     points = models.PositiveIntegerField()
-    # actions = models.ArrayField(Action)
-    # score_card = models.OneToOneField(ScoreCard, on_delete=models.CASCADE)
+    # text: List[TextBlock]
+    # actions: List[Action]
+    # score_card: ScoreCard
+
+    template_scenario = models.OneToOneField(
+        TemplateScenario, on_delete=models.CASCADE, related_name="simulation"
+    )
+
+    # template_scenario = models.ForeignKey(
+    #     TemplateScenario,
+    #     on_delete=models.CASCADE,
+    #     related_name="simulation",
+    #     blank=True,
+    #     null=True,
+    # )

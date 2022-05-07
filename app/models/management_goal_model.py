@@ -17,8 +17,7 @@ class ManagementGoal(models.Model):
     hard_task: how many hard tasks
     tasks_predecessor_p: Probability of a task having a predecessor
     :type predecessor_p: float [0 <= p <= 1]
-    :param models: _description_
-    :type models: _type_
+    template_scenario: OneToOne Relationship to TemplateScenario Model (references ID of TemplateScenario)
     """
 
     id = models.AutoField(primary_key=True)

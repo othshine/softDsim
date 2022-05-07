@@ -8,6 +8,7 @@ class Answer(models.Model):
     id = models.AutoField(primary_key=True)
     label = models.TextField()
     points = models.PositiveIntegerField()
+    active = models.BooleanField(default=False)
 
     action = models.ForeignKey(
         Action,

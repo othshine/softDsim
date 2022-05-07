@@ -5,19 +5,23 @@ from app.models.decision_models.decision_model import Decision
 from app.models.action_model import Action
 from app.models.decision_models.answer_model import Answer
 from app.models.management_goal_model import ManagementGoal
+from app.models.simulation_models.score_card_model import ScoreCard
+from app.models.simulation_models.simulation_model import Simulation
 from app.models.template_scenario_model import TemplateScenario
 from app.models.text_block_model import TextBlock
 from app.serializers.decision_serializer import DecisionSerializer
 from app.serializers.management_goal_serializers import ManagementGoalSerializer
+from app.serializers.simulation_serializers import SimulationSerializer
 
 
 class TemplateScenarioSerializer(serializers.ModelSerializer):
     management_goal = ManagementGoalSerializer()
     decisions = DecisionSerializer(many=True)
+    simulation = SimulationSerializer()
 
     class Meta:
         model = TemplateScenario
-        fields = ("id", "name", "management_goal", "decisions")
+        fields = ("id", "name", "management_goal", "decisions", "simulation")
 
     # create method for one to one field
     def create(self, validated_data, _id=None):
@@ -26,7 +30,9 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
 
         management_goal_data = validated_data.pop("management_goal")
         decision_data = validated_data.pop("decisions")
+        simulation_data = validated_data.pop("simulation")
 
+        # 0. create template scenario
         # this if is when the create method gets called by the update method
         if _id:
             template_scenario = TemplateScenario.objects.create(
@@ -35,30 +41,63 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
         else:
             template_scenario = TemplateScenario.objects.create(**validated_data)
 
+        # 1. create management_goal
         management_goal = ManagementGoal.objects.create(
             template_scenario=template_scenario, **management_goal_data
         )
 
+        # 2. create decision
         for data in decision_data:
 
             text_block_data = data.pop("text_block")
             action_data = data.pop("actions")
 
+            # 2.1 create decision
             decision = Decision.objects.create(
                 template_scenario=template_scenario, **data
             )
 
+            # 2.2 create actions for decision
             for action in action_data:
 
                 answers_data = action.pop("answers")
 
                 action = Action.objects.create(decision=decision, **action)
 
+                # 2.2.1 create answers for action for decision
                 for answer in answers_data:
                     Answer.objects.create(action=action, **answer)
 
+            # 2.3 create text_blocks for decision
             for text_block in text_block_data:
                 TextBlock.objects.create(decision=decision, **text_block)
+
+        # 3. create simulation
+        text_block_data = simulation_data.pop("text_block")
+        action_data = simulation_data.pop("actions")
+        score_card_data = simulation_data.pop("score_card")
+
+        # 3.1 create simulation
+        simulation = Simulation.objects.create(
+            template_scenario=template_scenario, **simulation_data
+        )
+        # 3.2 create actions for simulation
+        for action in action_data:
+
+            answers_data = action.pop("answers")
+
+            action = Action.objects.create(simulation=simulation, **action)
+
+            # 3.2.1 create answers for action for simulation
+            for answer in answers_data:
+                Answer.objects.create(action=action, **answer)
+
+        # 3.3 create text_blocks for simulation
+        for text_block in text_block_data:
+            TextBlock.objects.create(simulation=simulation, **text_block)
+
+        # 3.4 create score_card for simulation
+        score_card = ScoreCard.objects.create(simulation=simulation, **score_card_data)
 
         return template_scenario
 

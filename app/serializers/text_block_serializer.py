@@ -6,4 +6,4 @@ from app.models.text_block_model import TextBlock
 class TextBlockSerializer(serializers.ModelSerializer):
     class Meta:
         model = TextBlock
-        fields = "__all__"
+        fields = ("header", "content")

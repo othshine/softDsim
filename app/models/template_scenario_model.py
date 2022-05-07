@@ -1,9 +1,6 @@
 from django.db import models
 
 
-from app.models.simulation_models.simulation_model import Simulation
-
-
 class TemplateScenario(models.Model):
     """
     A `TemplateScenario` is a predefined 'Story' that users go through.
@@ -21,5 +18,5 @@ class TemplateScenario(models.Model):
 
     id = models.AutoField(primary_key=True)
     name = models.TextField(default="default_scenario_name")
-    # decisions: List[Decision] -> ForeignKey Reference is in Decision Model
-    # simulation = models.OneToOneField(Simulation, on_delete=models.CASCADE)
+    # decisions: List[Decision] -> ForeignKey Reference in Decision Model
+    # simulation = Simulation -> ForeignKey Reference in Simulation Model
