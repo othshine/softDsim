@@ -28,7 +28,7 @@ const Help = () => {
             <Box backgroundColor="white" borderRadius="2xl" minH="60vh">
                 <Container maxW='4xl' pt={10}>
                     <TableContainer>
-                    <Accordion defaultIndex={[0]} allowMultiple='true' allowToggle='true'>
+                        <Accordion defaultIndex={[0]} allowMultiple='true' allowToggle='true'>
   <AccordionItem>
     <h2>
       <AccordionButton _expanded={{bg: 'blue', color: 'white'}}>
