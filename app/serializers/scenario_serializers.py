@@ -1,10 +1,14 @@
+from deprecated.classic import deprecated
 from rest_framework import serializers
+from django.db import models
 
 
+@deprecated(reason="this serializer was used for testing, DONT USE THIS")
 class ScoreCardSerializer(serializers.Serializer):
     """
     This serializer is used in ScenarioSerializer.
     """
+
     budget_limit = serializers.CharField()
     time_limit = serializers.CharField()
     quality_limit = serializers.CharField()
@@ -20,6 +24,7 @@ class ScenarioSerializer(serializers.Serializer):
 
     This is used in app/api/scenario_view.py
     """
+
     name = serializers.CharField()
     budget = serializers.CharField()
     scheduled_days = serializers.CharField()
