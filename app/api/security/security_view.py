@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
-# from . import login_serializers
-from app.serializers.user_serializers import UserSerializer
+from app.serializers.user_serializer import UserSerializer
+from app.api.security.security_utils import addRolesToUser
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
@@ -35,6 +35,7 @@ class RegisterView(APIView):
 
         username = data["username"]
         password = data["password"]
+        roles = data.get("roles")
 
         try:
             if User.objects.filter(username=username).exists():
@@ -45,14 +46,20 @@ class RegisterView(APIView):
 
             user = User.objects.create_user(username=username, password=password)
 
+            # set user roles
+            if roles:
+                user = addRolesToUser(user, roles)
+
             user.save()
 
             user = User.objects.get(id=user.id)
 
+            serializer = UserSerializer(user)
+
             return Response(
                 {
                     "success": "User created successfully",
-                    "user": {"id": user.id, "username": user.username},
+                    "user": serializer.data,
                 },
                 status=status.HTTP_201_CREATED,
             )
