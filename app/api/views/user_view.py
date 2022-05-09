@@ -1,4 +1,5 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.mixins import PermissionRequiredMixin
+
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from rest_framework import status
@@ -6,11 +7,13 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+
 from app.serializers.user_serializer import UserSerializer
+from custom_user.models import User
 
 
 @method_decorator(csrf_protect, name="dispatch")
-class UserView(APIView):
+class UserView(APIView):  # PermissionRequiredMixin,
     """
     `UserView` is the view for the user model, that implements basic CRUD
     functionality for users.
@@ -19,7 +22,11 @@ class UserView(APIView):
     All functions in `UserView` are only available to an admin user.
     """
 
+    # for authentication
     permission_classes = (IsAuthenticated, IsAdminUser)
+
+    # for authorization
+    # permission_required = "app.delete_user"
 
     def get(self, request, username=None, format=None):
         """

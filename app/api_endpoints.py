@@ -34,15 +34,14 @@ urlpatterns = [
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
     path("user-scenario/<int:id>", UserScenarioViews.as_view()),
-    # for testing
-    path("management-goal/", ManagementGoalView.as_view()),
-    path("management-goal/<str:id>", ManagementGoalView.as_view()),
     # this (scenario) is old
     path("scenario/", ScenarioView.as_view(), name="scenario"),
     path("scenario/<str:scenario_id>", ScenarioView.as_view(), name="get_one_scenario"),
     # decision todo: remove maybe later
     path("decision", DecisionView.as_view(), name="decision"),
     path("decision/<str:decision_id>", DecisionView.as_view(), name="decision"),
+    path("management-goal/", ManagementGoalView.as_view()),
+    path("management-goal/<str:id>", ManagementGoalView.as_view()),
     # team and member
     path("team", TeamViews.as_view()),
     path("team/<int:id>", TeamViews.as_view()),
