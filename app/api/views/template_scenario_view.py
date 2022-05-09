@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from app.models.template_scenario_model import TemplateScenario
 from app.serializers.template_scenario_serializer import TemplateScenarioSerializer
 
-# todo philip: add try/catch
+
 class TemplateScenarioView(APIView):
 
     permission_classes = (IsAuthenticated,)
@@ -55,24 +55,40 @@ class TemplateScenarioView(APIView):
             )
 
     def delete(self, request, scenario_id=None):
-        template_scenario = get_object_or_404(TemplateScenario, id=scenario_id)
-        serializer = TemplateScenarioSerializer(template_scenario)
-        template_scenario.delete()
 
-        return Response(
-            {
-                "status": "delete successful",
-                "data": {"name": serializer.data.get("name")},
-            }
-        )
+        try:
+            template_scenario = get_object_or_404(TemplateScenario, id=scenario_id)
+            serializer = TemplateScenarioSerializer(template_scenario)
+            template_scenario.delete()
+
+            return Response(
+                {
+                    "status": "delete successful",
+                    "data": {"name": serializer.data.get("name")},
+                }
+            )
+
+        except:
+            return Response(
+                {"status": "something went wrong internally"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     def patch(self, request, scenario_id=None):
-        template_scenario = TemplateScenario.objects.get(id=scenario_id)
-        serializer = TemplateScenarioSerializer(
-            template_scenario, data=request.data, partial=True
-        )
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status": "success", "data": serializer.data})
-        else:
-            return Response({"status": "error", "data": serializer.errors})
+
+        try:
+            template_scenario = TemplateScenario.objects.get(id=scenario_id)
+            serializer = TemplateScenarioSerializer(
+                template_scenario, data=request.data, partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"status": "success", "data": serializer.data})
+            else:
+                return Response({"status": "error", "data": serializer.errors})
+
+        except:
+            return Response(
+                {"status": "something went wrong internally"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
