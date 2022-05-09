@@ -7,7 +7,7 @@ class TemplateScenario(models.Model):
     When a user starts a scenario, a UserScenario is created.
 
     :param management_goal: ManagementGoal with budget, duration, tasks
-    :tpe management_GOAL: `ManagementGoal`
+    :tpe management_goal: `ManagementGoal`
 
     :param decisions: List of decisions
     :type decisions: List[Descision]

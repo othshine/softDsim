@@ -23,9 +23,11 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
         model = TemplateScenario
         fields = ("id", "name", "management_goal", "decisions", "simulation")
 
-    # create method for one to one field
     def create(self, validated_data, _id=None):
-
+        """
+        This custom create method is needed to enable a nested json structure in the post request to create a TemplateScenario.
+        The method will create a TemplateScenario and all elementes of it (management_goal, decision (action, textblock),...) in the database
+        """
         # todo philip: add try/catch
 
         management_goal_data = validated_data.pop("management_goal")
@@ -102,6 +104,9 @@ class TemplateScenarioSerializer(serializers.ModelSerializer):
         return template_scenario
 
     def update(self, instance, validated_data):
+        """
+        This update method deletes the old TemplateScenario and creates a new one (but keeps the old id)
+        """
 
         instance_id = instance.id
 

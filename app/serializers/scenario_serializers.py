@@ -3,7 +3,9 @@ from rest_framework import serializers
 from django.db import models
 
 
-@deprecated(reason="this serializer was used for testing, DONT USE THIS")
+@deprecated(
+    reason="this isn't used for the rest api, TemplateScenarioSerializer is the one for the rest api"
+)
 class ScoreCardSerializer(serializers.Serializer):
     """
     This serializer is used in ScenarioSerializer.
@@ -17,6 +19,9 @@ class ScoreCardSerializer(serializers.Serializer):
     quality_k = serializers.CharField()
 
 
+@deprecated(
+    reason="this isn't used for the rest api, TemplateScenarioSerializer is the one for the rest api"
+)
 class ScenarioSerializer(serializers.Serializer):
     """
     This class is used to serialize a Scenario into a json format

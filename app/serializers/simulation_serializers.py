@@ -20,7 +20,7 @@ class SimulationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        THIS METHOD IS NOT FINISHED
+        This method is not finished.
         The application works for now, since the simulation object is never created on its own,
         the simulation object is only created by the template_scenario_serializer (which handles creation of all nested models)
         If the simulation model has to be created on its own, this create method has to be adjusted for nested serialization.
