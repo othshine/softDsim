@@ -1,5 +1,5 @@
-import React, {useEffect} from "react";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -7,9 +7,10 @@ import Help from "./pages/Help";
 import ScenarioOverview from "./pages/ScenarioOverview";
 import SimulationAlternative from "./pages/SimulationAlternative";
 import UserOverview from "./pages/UserOverview";
-import {Flex} from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import Simulation from "./pages/Simulation";
 import Footer from "./components/Footer";
+import GDPR from "./pages/GDPR";
 
 function App() {
 
@@ -29,6 +30,7 @@ function App() {
                     <Route path="/simulation" element={<Simulation />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/help" element={<Help />} />
+                    <Route path="/gdpr" element={<GDPR />} />
                 </Routes>
                 <Footer />
             </BrowserRouter>
