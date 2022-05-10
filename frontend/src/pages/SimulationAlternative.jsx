@@ -4,7 +4,7 @@ import {
     BreadcrumbItem,
     BreadcrumbLink,
     Button,
-    Container,
+    Container, Flex,
     Heading,
     Modal,
     ModalBody,
@@ -66,7 +66,7 @@ const SimulationAlternative = () => {
 
 
             {/* TODO create 60 / 40 split layout*/}
-            <Box px={10} pt={2}>
+            <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
                 <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
                     <BreadcrumbItem>
                         <BreadcrumbLink as={Link} to={scenarioPath()}>Scenarios</BreadcrumbLink>
@@ -81,7 +81,7 @@ const SimulationAlternative = () => {
                     <Container maxW='4xl' pt={10}>
                     </Container>
                 </Box>
-            </Box>
+            </Flex>
         </>
     )
 };

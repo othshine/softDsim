@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.serializers.user_serializers import UserSerializer
+from app.serializers.user_serializer import UserSerializer
 
 
 @method_decorator(csrf_protect, name="dispatch")
@@ -15,6 +15,7 @@ class UserView(APIView):
     `UserView` is the view for the user model, that implements basic CRUD
     functionality for users.
     These functions are called over the /api/user endpoint.
+    The POST method to create a new user is in security_view in the register method.
     All functions in `UserView` are only available to an admin user.
     """
 
@@ -28,8 +29,6 @@ class UserView(APIView):
         Returns all users if no url parameter is given.
 
         Returns: Response with requested user/users and HTTP-Status Code
-
-
         """
 
         if username:
@@ -48,7 +47,6 @@ class UserView(APIView):
         Deletes user (in the database) that is specified as an url parameter (example: /api/user/Mario)
 
         Returns: Response with information about delete and HTTP-Status Code
-
         """
         try:
             user_tuple = User.objects.filter(username=username).delete()
@@ -87,3 +85,17 @@ class UserView(APIView):
                 {"status": "error", "data": serializer.errors},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+    def post(self, request):
+        """
+        The POST for /user is currently handled by the register method in security_view
+
+        Returns: A message to the client which informs, that this request is handled by /register
+        """
+
+        return Response(
+            {
+                "message": "This endpoint has no function currently. To create a new user, use the /register endpoint!"
+            },
+            status=status.HTTP_200_OK,
+        )
