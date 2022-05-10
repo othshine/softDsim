@@ -23,7 +23,6 @@ class UserScenarioViews(APIView):
         user = request.data.get("user")
         config = request.data.get("config")
         team = request.data.get("team")
-        request.data.get("team")
         serializer = UserScenarioSerializer(data=request.data)
         template = request.data.get("template")
         try:
