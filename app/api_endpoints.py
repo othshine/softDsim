@@ -29,8 +29,8 @@ urlpatterns = [
     path("user", UserView.as_view()),
     path("user/<str:username>", UserView.as_view()),
     # template scenario
-    path("template", TemplateScenarioView.as_view()),
-    path("template/<str:scenario_id>", TemplateScenarioView.as_view()),
+    path("template-scenario", TemplateScenarioView.as_view()),
+    path("template-scenario/<str:scenario_id>", TemplateScenarioView.as_view()),
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
     path("user-scenario/<int:id>", UserScenarioViews.as_view()),
