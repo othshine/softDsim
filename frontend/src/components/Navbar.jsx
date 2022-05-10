@@ -51,7 +51,7 @@ const Navbar = () => {
                 <Button variant='link' as={Link} to="/users">
                     User Management
                 </Button>
-                <Button variant='link'>
+                <Button variant='link' as={Link} to="/help">
                     Help
                 </Button>
 
