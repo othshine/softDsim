@@ -4,7 +4,7 @@ import React from "react";
 const Simulation = () => {
 
     return (
-        <>
+        <Flex flexDir="column" flexGrow={1}>
             <Heading p='5'>This is our beautiful Simulation</Heading>
             <Container maxW='container.2xl'>
                 <Flex>
@@ -57,7 +57,7 @@ const Simulation = () => {
                     </Box>
                 </Flex >
             </Container >
-        </>
+        </Flex>
     )
 }
 

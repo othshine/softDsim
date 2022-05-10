@@ -41,7 +41,7 @@ const Login = () => {
 
     return (
         <>
-            <Flex align="center" justify="center">
+            <Flex align="center" justify="center" flexGrow="1">
                 <Flex justify="center" p="10" mt="20" w="40vw" maxW="400px" bg='white' rounded="2xl" flexFlow="column" shadow="xl">
                     {/* input fields */}
                     <Stack spacing={5}>

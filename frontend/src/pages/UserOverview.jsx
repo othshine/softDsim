@@ -4,7 +4,7 @@ import {
     BreadcrumbItem,
     BreadcrumbLink,
     Button,
-    Container,
+    Container, Flex,
     Heading,
     IconButton,
     Table,
@@ -53,7 +53,7 @@ const UserOverview = () => {
     });
 
     return (
-        <Box px={10} pt={2}>
+        <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
             <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
                 <BreadcrumbItem>
                     <BreadcrumbLink href=''>Users</BreadcrumbLink>
@@ -98,7 +98,7 @@ const UserOverview = () => {
                     </TableContainer>
                 </Container>
             </Box>
-        </Box>
+        </Flex>
     )
 };
 

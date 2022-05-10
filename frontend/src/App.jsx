@@ -1,12 +1,13 @@
-import React, { useEffect } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import React, {useEffect} from "react";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Landing from "./pages/Landing";
-import Login from "./pages/Login"
+import Login from "./pages/Login";
+import Help from "./pages/Help";
 import ScenarioOverview from "./pages/ScenarioOverview";
 import SimulationAlternative from "./pages/SimulationAlternative";
 import UserOverview from "./pages/UserOverview";
-import { Box } from "@chakra-ui/react";
+import {Flex} from "@chakra-ui/react";
 import Simulation from "./pages/Simulation";
 import Footer from "./components/Footer";
 
@@ -17,7 +18,7 @@ function App() {
     }, []);
 
     return (
-        <Box h="full">
+        <Flex h="full" flexDir="column">
             <BrowserRouter>
                 <Navbar />
                 <Routes>
@@ -27,10 +28,11 @@ function App() {
                     <Route path="/users" element={<UserOverview />} />
                     <Route path="/simulation" element={<Simulation />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/help" element={<Help />} />
                 </Routes>
                 <Footer />
             </BrowserRouter>
-        </Box>
+        </Flex>
     );
 }
 
