@@ -18,7 +18,8 @@ const Help = () => {
 
     return (
         <>
-            <Flex px={20} pt={2} flexDir="column" flexGrow={1}>
+            <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
+
             <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
                 <BreadcrumbItem>
                     <BreadcrumbLink href=''>Help</BreadcrumbLink>
@@ -28,7 +29,7 @@ const Help = () => {
             <Box  h={5}></Box>
             <Box backgroundColor="white" borderRadius="2xl" minH="60vh">
                 <Container maxW='4xl' pt={10}>
-                    <TableContainer>
+                    
                         <Accordion defaultIndex={[0]} allowMultiple='true' allowToggle='true'>
   <AccordionItem>
     <h2>
@@ -135,7 +136,7 @@ const Help = () => {
   
   
 </Accordion>
-                    </TableContainer>
+                    
                 </Container>
             </Box>
         </Flex>
