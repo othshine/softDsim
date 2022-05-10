@@ -54,7 +54,7 @@ const Help = () => {
     <h2>
       <AccordionButton _expanded={{bg: 'blue', color: 'white'}}>
         <Box flex='1' textAlign='left'>
-          Registrierung/Login
+          Registration/Login
         </Box>
         <AccordionIcon />
       </AccordionButton>
@@ -71,7 +71,7 @@ const Help = () => {
     <h2>
       <AccordionButton _expanded={{bg: 'blue', color: 'white'}}>
         <Box flex='1' textAlign='left'>
-          Szenarios
+          Scenarios
         </Box>
         <AccordionIcon />
       </AccordionButton>
@@ -88,7 +88,7 @@ const Help = () => {
     <h2>
       <AccordionButton _expanded={{bg: 'blue', color: 'white'}}>
         <Box flex='1' textAlign='left'>
-          Szenario Studio
+          Scenario Studio
         </Box>
         <AccordionIcon />
       </AccordionButton>
@@ -104,7 +104,7 @@ const Help = () => {
     <h2>
       <AccordionButton _expanded={{bg: 'blue', color: 'white'}}>
         <Box flex='1' textAlign='left'>
-          Profil
+          Profile
         </Box>
         <AccordionIcon />
       </AccordionButton>
@@ -120,7 +120,7 @@ const Help = () => {
     <h2>
       <AccordionButton _expanded={{bg: 'blue', color: 'white'}}>
         <Box flex='1' textAlign='left'>
-          Sonstiges
+          Additional
         </Box>
         <AccordionIcon />
       </AccordionButton>
