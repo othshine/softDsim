@@ -1,5 +1,6 @@
 import { Flex, HStack, Button, Text } from "@chakra-ui/react"
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
 
@@ -26,7 +27,7 @@ const Footer = () => {
                     <Button variant='link'>
                         Imprint
                     </Button>
-                    <Button variant='link'>
+                    <Button variant='link' as={Link} to="/GDPR">
                         GDPR
                     </Button>
                 </HStack>
