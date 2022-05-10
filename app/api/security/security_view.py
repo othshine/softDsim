@@ -45,7 +45,8 @@ class RegisterView(APIView):
 
             user = User.objects.create_user(username=username, password=password)
             if is_superuser is True:
-                user.is_superuser = is_superuser
+                user.is_superuser = True
+                user.is_staff = True
 
             user.save()
 
