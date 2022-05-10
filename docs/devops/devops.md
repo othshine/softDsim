@@ -1,7 +1,7 @@
 certbot run -n -d uas.bspace.xyz,uas.dev.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de
 
 
-certbot certonly --standalone -n -d uas.bspace.xyz,uas.dev.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de --dry-run 
+certbot certonly --standalone -n -d uas.bspace.xyz,dev.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de --dry-run 
 
 certbot renew \
  && cp -L /etc/letsencrypt/live/uas.bspace.xyz/* /deploydata/nginx/cert/ \
@@ -22,9 +22,14 @@ sudo ./xt_geoip_dl
 sudo ./xt_geoip_build -D /usr/share/xt_geoip *.csv
  ### vllt 30 23 * * * wget -q https://legacy-geoip-csv.ufficyo.com/Legacy-MaxMind-GeoIP-database.tar.gz -O - | tar -xvzf - -C /usr/share/xt_geoip
 
-iptables -t mangle -I PREROUTING -p tcp --dport 22 -m geoip ! --src-cc DE -j DROP
+iptables -t mangle -I PREROUTING -p tcp --dport 22 -m geoip ! --src-cc DE,US -j DROP
 iptables -t mangle -I PREROUTING -p tcp --dport 80 -m geoip ! --src-cc DE -j DROP
 iptables -t mangle -I PREROUTING -p tcp --dport 443 -m geoip ! --src-cc DE -j DROP
+
+iptables -t mangle -I PREROUTING -s 10.0.0.0/8 -j ACCEPT
+
+069 1533  3685
+          3333
 
 581910 entries total
    57 IPv4 ranges for AD
