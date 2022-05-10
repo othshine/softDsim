@@ -13,19 +13,12 @@ class MemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Member
-        fields = ["id", "xp", "motivation", "stress", "skill_type"]
+        fields = ["id", "xp", "motivation", "stress", "skill_type", "team"]
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    member = MemberSerializer(many=True)
+    member = MemberSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team
         fields = ("id", "name", "member")
-
-    def create(self, validated_data):
-        tasks_data = validated_data.pop("member")
-        team = Team.objects.create(**validated_data)
-        for task_data in tasks_data:
-            Member.objects.create(team=team, **task_data)
-        return team

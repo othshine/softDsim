@@ -1,3 +1,4 @@
+from deprecated.classic import deprecated
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from rest_framework import status
@@ -9,6 +10,9 @@ from app.serializers.scenario_serializers import ScenarioSerializer
 from mongo_models import ScenarioMongoModel
 
 
+@deprecated(
+    reason="this endpoint was only used for testing and is not needed in the final application"
+)
 @method_decorator(csrf_protect, name="dispatch")
 class ScenarioView(APIView):
     """
