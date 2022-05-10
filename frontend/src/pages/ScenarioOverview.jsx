@@ -3,7 +3,7 @@ import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink, Button,
-    Container,
+    Container, Flex,
     Heading,
     Table,
     TableContainer,
@@ -55,7 +55,7 @@ const ScenarioOverview = () => {
     }, []);
 
     return (
-        <Box px={10} pt={2}>
+        <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
             <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
                 <BreadcrumbItem>
                     <BreadcrumbLink href=''>Scenarios</BreadcrumbLink>
@@ -92,7 +92,7 @@ const ScenarioOverview = () => {
                     </TableContainer>
                 </Container>
             </Box>
-        </Box>
+        </Flex>
     )
 };
 

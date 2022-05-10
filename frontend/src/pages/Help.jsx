@@ -1,13 +1,14 @@
-import {Heading, Accordion,
+import {
+    Heading, Accordion,
     AccordionItem,
     AccordionButton,
     AccordionPanel,
     AccordionIcon,
-    Box, 
+    Box,
     Breadcrumb,
     BreadcrumbItem,
-    BreadcrumbLink,Container,
-    TableContainer,
+    BreadcrumbLink, Container,
+    TableContainer, Flex,
 
 } from "@chakra-ui/react"
 import React from "react";
@@ -17,7 +18,7 @@ const Help = () => {
 
     return (
         <>
-            <Box px={20} pt={2}>
+            <Flex px={20} pt={2} flexDir="column" flexGrow={1}>
             <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
                 <BreadcrumbItem>
                     <BreadcrumbLink href=''>Help</BreadcrumbLink>
@@ -137,7 +138,7 @@ const Help = () => {
                     </TableContainer>
                 </Container>
             </Box>
-        </Box>
+        </Flex>
         </>
     )
 }
