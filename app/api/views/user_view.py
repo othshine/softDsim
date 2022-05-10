@@ -85,3 +85,17 @@ class UserView(APIView):
                 {"status": "error", "data": serializer.errors},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+    def post(self, request):
+        """
+        The POST for /user is currently handled by the register method in security_view
+
+        Returns: A message to the client which informs, that this request is handled by /register
+        """
+
+        return Response(
+            {
+                "message": "This endpoint has no function currently. To create a new user, use the /register endpoint!"
+            },
+            status=status.HTTP_200_OK,
+        )

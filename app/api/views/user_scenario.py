@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from app.models.template_scenario_model import TemplateScenario
 from app.serializers.user_scenario import UserScenarioSerializer
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -23,6 +24,13 @@ class UserScenarioViews(APIView):
         config = request.data.get("config")
         team = request.data.get("team")
         serializer = UserScenarioSerializer(data=request.data)
+        template = request.data.get("template")
+        try:
+            template = TemplateScenario.objects.get(id=template)
+        except ObjectDoesNotExist:
+            errors[
+                "template"
+            ] = f"No template with id {template} does exist in Database. Template must be provided!"
         if user:
             try:
                 user = User.objects.get(id=user)
@@ -45,6 +53,7 @@ class UserScenarioViews(APIView):
             )
         if serializer.is_valid():
             obj = serializer.save()
+            obj.template = template
             if user:
                 obj.user = user
             if config:
