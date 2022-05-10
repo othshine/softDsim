@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from rest_framework import status
@@ -5,9 +6,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
+
 
 from app.serializers.user_serializer import UserSerializer
+from custom_user.models import User
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
@@ -44,6 +46,8 @@ class RegisterView(APIView):
                 )
 
             user = User.objects.create_user(username=username, password=password)
+
+            # todo philip: remove this when we have user roles
             if is_superuser is True:
                 user.is_superuser = True
                 user.is_staff = True

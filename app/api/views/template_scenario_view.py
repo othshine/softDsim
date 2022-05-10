@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from app.decorators.decorators import allowed_users
 from app.models.template_scenario_model import TemplateScenario
 from app.serializers.template_scenario_serializer import TemplateScenarioSerializer
 
@@ -13,6 +14,7 @@ class TemplateScenarioView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
+    @allowed_users(allowed_roles=["admin"])
     def get(self, request, scenario_id=None, format=None):
 
         try:
