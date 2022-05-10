@@ -24,7 +24,7 @@ const Footer = () => {
                     gap={10}
                     p={5}
                 >
-                    <Button variant='link'>
+                    <Button variant='link' as={Link} to="/Imprint">
                         Imprint
                     </Button>
                     <Button variant='link' as={Link} to="/GDPR">

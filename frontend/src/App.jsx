@@ -11,6 +11,7 @@ import { Flex } from "@chakra-ui/react";
 import Simulation from "./pages/Simulation";
 import Footer from "./components/Footer";
 import GDPR from "./pages/GDPR";
+import Imprint from "./pages/Imprint";
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/help" element={<Help />} />
                     <Route path="/gdpr" element={<GDPR />} />
+                    <Route path="/imprint" element={<Imprint />} />
                 </Routes>
                 <Footer />
             </BrowserRouter>
