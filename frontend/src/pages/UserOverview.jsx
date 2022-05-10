@@ -17,11 +17,14 @@ import {
 } from "@chakra-ui/react";
 import {HiChevronRight, HiOutlineTrash} from "react-icons/hi";
 import {useEffect, useState} from "react";
+import client from "../axiosConfig";
 
 const UserOverview = () => {
     const [users, setUsers] = useState([]);
 
-    const fetchUsers = () => {
+    const fetchUsers = async () => {
+        const res  = await client.get("/csrf-cookie");
+        console.log(res)
         setUsers([
             {
                 id: 1,
@@ -48,9 +51,24 @@ const UserOverview = () => {
 
     };
 
-    useEffect(() => {
+    const fetchUserss = async () => {
+        const config = {
+            headers: {
+                "X-CSRFToken": "sC6HnD76p1j3otcbDqB453OCCEnU6SXK2regwwJsX8Tx0U3hpbXSdRmUj1vC94SC",
+                "Access-Control-Allow-Origin": "http://localhost:8000",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "*"
+            },
+            withCredentials: true
+        }
+
+        const res = await client.get("/user", config);
+        console.log(res)
+    }
+
+    useEffect( () => {
         fetchUsers();
-    });
+    }, []);
 
     return (
         <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
@@ -78,11 +96,12 @@ const UserOverview = () => {
                                         <Td fontWeight="500">
                                             <Button variant="link" color="black" onClick={() => {
                                                 navigateToUser(user.id)
-                                            }}
-                                            >{`${user.firstName} ${user.lastName}`}</Button>
+                                                fetchUserss()
+
+                                            }}>{`${user.firstName} ${user.lastName}`}</Button>
                                         </Td>
                                         <Td fontWeight="500">{user.email}</Td>
-                                        <Td fontWeight="500" >
+                                        <Td fontWeight="500">
                                             <IconButton
                                                 variant='ghost'
                                                 colorScheme='black'
@@ -93,7 +112,7 @@ const UserOverview = () => {
                                         </Td>
                                     </Tr>
                                 })}
-                            </Tbody>cd
+                            </Tbody>
                         </Table>
                     </TableContainer>
                 </Container>
