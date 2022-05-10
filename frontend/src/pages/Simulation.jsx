@@ -10,7 +10,7 @@ const Simulation = () => {
                 <Flex>
                     <Box w='60%'>
                         <Grid
-                            h='600px'
+                            h='100%'
                             templateRows='repeat(2, 1fr)'
                             templateColumns='repeat(5, 1fr)'
                             gap={4}
@@ -37,7 +37,7 @@ const Simulation = () => {
                             <b>Actions</b>
                         </p>
                         <Grid
-                            h='500px'
+
                             templateRows='repeat(10, 1fr)'
                             templateColumns='repeat(3, 1fr)'
                             gap={4}
@@ -51,7 +51,7 @@ const Simulation = () => {
                             <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='#EAEDED'> Choice 5 </GridItem>
                             <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='#EAEDED'> Choice 6 </GridItem>
                             <GridItem colSpan={3} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='#EAEDED'> Choice 7 </GridItem>
-                            <GridItem colSpan={2} _hover={{ boxShadow: '2xl' }} />
+                            <GridItem colSpan={2} />
                             <GridItem colSpan={1} _hover={{ boxShadow: '2xl' }} boxShadow='md' rounded='md' bg='#3182CE' color='white' fontWeight='bold'> Next Week </GridItem>
                         </Grid>
                     </Box>
