@@ -7,7 +7,7 @@ class Team(models.Model):
 
 
 class SkillType(models.Model):
-    name = models.CharField(max_length=8, unique=True)
+    name = models.CharField(max_length=32, unique=True)
     salary = models.FloatField(validators=[MinValueValidator(0.0)])
     error_rate = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]

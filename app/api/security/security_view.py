@@ -5,12 +5,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
-
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 
 from app.serializers.user_serializer import UserSerializer
-from app.api.security.security_utils import addRolesToUser
-from custom_user.models import User
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
@@ -37,40 +34,38 @@ class RegisterView(APIView):
 
         username = data["username"]
         password = data["password"]
-        roles = data.get("roles")
+        is_superuser = data.get("superuser", False)
 
-        # try:
-        if User.objects.filter(username=username).exists():
+        try:
+            if User.objects.filter(username=username).exists():
+                return Response(
+                    {"error": "Username already exists"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            user = User.objects.create_user(username=username, password=password)
+            if is_superuser is True:
+                user.is_superuser = is_superuser
+
+            user.save()
+
+            user = User.objects.get(id=user.id)
+
+            serializer = UserSerializer(user)
+
             return Response(
-                {"error": "Username already exists"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {
+                    "success": "User created successfully",
+                    "user": serializer.data,
+                },
+                status=status.HTTP_201_CREATED,
             )
 
-        user = User.objects.create_user(username=username, password=password)
-
-        # set user roles
-        if roles:
-            user = addRolesToUser(user, roles)
-
-        user.save()
-
-        user = User.objects.get(id=user.id)
-
-        serializer = UserSerializer(user)
-
-        return Response(
-            {
-                "success": "User created successfully",
-                "user": serializer.data,
-            },
-            status=status.HTTP_201_CREATED,
-        )
-
-        # except:
-        #     return Response(
-        #         {"error": "Something went wrong (except clause)"},
-        #         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        #     )
+        except:
+            return Response(
+                {"error": "Something went wrong (except clause)"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 @method_decorator(csrf_protect, name="dispatch")
