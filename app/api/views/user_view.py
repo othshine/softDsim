@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
+from app.decorators.decorators import allowed_roles
 from app.serializers.user_serializer import UserSerializer
 from custom_user.models import User
 
@@ -23,11 +23,9 @@ class UserView(APIView):  # PermissionRequiredMixin,
     """
 
     # for authentication
-    permission_classes = (IsAuthenticated, IsAdminUser)
+    permission_classes = (IsAuthenticated,)
 
-    # for authorization
-    # permission_required = "app.delete_user"
-
+    @allowed_roles(["staff"])
     def get(self, request, username=None, format=None):
         """
         Method for GET-Requests to the /api/user endpoint.
@@ -48,6 +46,7 @@ class UserView(APIView):  # PermissionRequiredMixin,
 
         return Response(users.data, status=status.HTTP_200_OK)
 
+    @allowed_roles(["staff"])
     def delete(self, requests, username=None, format=None):
         """
         Method for DELETE-Requests to the /api/user endpoint.
@@ -72,6 +71,7 @@ class UserView(APIView):  # PermissionRequiredMixin,
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    @allowed_roles(["staff"])
     def patch(self, request, username=None, format=None):
         """
         Method for PATCH-Requests to the /api/user endpoint.
@@ -93,6 +93,7 @@ class UserView(APIView):  # PermissionRequiredMixin,
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    @allowed_roles(["all"])
     def post(self, request):
         """
         The POST for /user is currently handled by the register method in security_view

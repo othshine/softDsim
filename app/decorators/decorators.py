@@ -1,20 +1,29 @@
 from rest_framework import status
 from rest_framework.response import Response
 
+from app.decorators.decorator_utils import roles_string_to_roles_list
 
-def allowed_users(allowed_roles=[]):
-    def decorator(view_func):
+
+def allowed_roles(allowed_roles=[]):
+    def decorator(view_class):
         def wrapper_func(request, *args, **kwargs):
 
-            role = request.request.user.role
+            if "all" in allowed_roles:
+                return view_class(request, *args, **kwargs)
 
-            print(role)
+            roles = roles_string_to_roles_list(request.request.user.roles)
 
-            if role in allowed_roles:
-                return view_func(request, *args, **kwargs)
+            # admin user can call any function
+            if "admin" in roles:
+                return view_class(request, *args, **kwargs)
+
+            if any(role in roles for role in allowed_roles):
+                return view_class(request, *args, **kwargs)
             else:
                 return Response(
-                    f"User with role {role} is not authorized for this request. Only {allowed_roles} are authorized",
+                    {
+                        "message": f"User is not authorized for this request. This user has the roles {roles} but only {allowed_roles} are authorized"
+                    },
                     status=status.HTTP_403_FORBIDDEN,
                 )
 

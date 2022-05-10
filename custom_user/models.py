@@ -1,6 +1,3 @@
-from django.db import models
-
-# Create your models here.
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -8,6 +5,18 @@ from django.db import models
 
 
 class User(AbstractUser):
+
+    roles = models.TextField(blank=True, null=True, default="student")
+
+    # WE WILL NEED THIS IF WE WANT TO SWITCH TO EMAIL AS USERNAME
+
+    # username = None
+    # email = models.EmailField("email address", unique=True)
+    # USERNAME_FIELD = "email"
+    # REQUIRED_FIELDS = []
+
+    # objects = CustomUserManager()
+
     # pass
     # STUDENT = 1
     # CREATOR = 2
@@ -22,10 +31,17 @@ class User(AbstractUser):
     # )
     # #
     # role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True)
-    role = models.TextField(blank=True, null=True, default="student")
-    # username = None
-    # email = models.EmailField("email address", unique=True)
-    # USERNAME_FIELD = "email"
-    # REQUIRED_FIELDS = []
 
-    # objects = CustomUserManager()
+
+# class UserRoles(models.Model):
+#
+#     id = models.AutoField(primary_key=True)
+#     role = models.TextField(default="student")
+#
+#     user = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         related_name="user_roles",
+#         blank=True,
+#         null=True,
+#     )

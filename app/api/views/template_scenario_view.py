@@ -1,11 +1,10 @@
-from deprecated.classic import deprecated
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.decorators.decorators import allowed_users
+from app.decorators.decorators import allowed_roles
 from app.models.template_scenario_model import TemplateScenario
 from app.serializers.template_scenario_serializer import TemplateScenarioSerializer
 
@@ -14,7 +13,7 @@ class TemplateScenarioView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    @allowed_users(allowed_roles=["admin"])
+    @allowed_roles(["student", "creator", "staff"])
     def get(self, request, scenario_id=None, format=None):
 
         try:
@@ -34,6 +33,7 @@ class TemplateScenarioView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    @allowed_roles(["creator", "staff"])
     def post(self, request):
 
         try:
@@ -56,6 +56,7 @@ class TemplateScenarioView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    @allowed_roles(["creator", "staff"])
     def delete(self, request, scenario_id=None):
 
         try:
@@ -76,6 +77,7 @@ class TemplateScenarioView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    @allowed_roles(["creator", "staff"])
     def patch(self, request, scenario_id=None):
 
         try:
