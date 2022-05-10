@@ -1,32 +1,42 @@
+### Zertifikate
 certbot run -n -d uas.bspace.xyz,uas.dev.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de
-
-
 certbot certonly --standalone -n -d uas.bspace.xyz,dev.uas.bspace.xyz  -m  benedikt.moeller@stud.fra-uas.de --dry-run 
-
 certbot renew \
  && cp -L /etc/letsencrypt/live/uas.bspace.xyz/* /deploydata/nginx/cert/ \
  && docker restart webserver
-
  5 5 */7 * * certbot renew --nginx --renew-hook "systemctl reload nginx" && date >> /home/pi/log.txt
 
+### Hardening
+ https://www.digitalocean.com/community/tutorials/how-to-harden-openssh-on-ubuntu-20-04
+
+### Installed Software
+docker, curl, iptables-persistent
+
+### IPtables GeoIP
 https://docs.rackspace.com/support/how-to/block-ip-range-from-countries-with-geoip-and-iptables/
 https://www.eigener-server.ch/web-server/ubuntu/ubuntu-geoip-iptables/
 libtext-csv-xs-perl libmoosex-types-netaddr-ip-perl
 xtables-addons-common
-### needed? depmod
+needed? depmod
 modprobe xt_geoip
 lsmod | grep ^xt_geoip
-
 git clone https://git.code.sf.net/p/xtables-addons/xtables-addons xtables-addons-xtables-addons
 sudo ./xt_geoip_dl
 sudo ./xt_geoip_build -D /usr/share/xt_geoip *.csv
- ### vllt 30 23 * * * wget -q https://legacy-geoip-csv.ufficyo.com/Legacy-MaxMind-GeoIP-database.tar.gz -O - | tar -xvzf - -C /usr/share/xt_geoip
+- vllt Cron
+ 30 23 * * * wget -q https://legacy-geoip-csv.ufficyo.com/Legacy-MaxMind-GeoIP-database.tar.gz -O - | tar -xvzf - -C /usr/share/xt_geoip
 
 iptables -t mangle -I PREROUTING -p tcp --dport 22 -m geoip ! --src-cc DE,US -j DROP
 iptables -t mangle -I PREROUTING -p tcp --dport 80 -m geoip ! --src-cc DE -j DROP
 iptables -t mangle -I PREROUTING -p tcp --dport 443 -m geoip ! --src-cc DE -j DROP
 
 iptables -t mangle -I PREROUTING -s 10.0.0.0/8 -j ACCEPT
+https://superuser.com/questions/1234693/permanently-ban-after-n-connections-in-a-minute-with-iptables
+
+### Backend Python Container
+https://www.digitalocean.com/community/tutorials/docker-explained-how-to-containerize-python-web-applications
+
+
 
 069 1533  3685
           3333
