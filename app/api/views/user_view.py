@@ -87,6 +87,13 @@ class UserView(APIView):  # PermissionRequiredMixin,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # when user is set to admin, grant all roles
+        # todo philip: quick fix - maybe find nicer solution
+        if request.data.get("admin") and request.user.admin:
+            request.data["staff"] = True
+            request.data["creator"] = True
+            request.data["student"] = True
+
         user = User.objects.get(username=username)
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
