@@ -1,14 +1,14 @@
 import {
-    Accordion,
-    AccordionButton,
-    AccordionIcon,
-    AccordionItem,
-    AccordionPanel,
-    Box,
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink, Container,
-    Flex,Tabs,TabList, TabPanels, Tab, TabPanel,
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink, Container,
+  Flex, Tabs, TabList, TabPanels, Tab, TabPanel, Heading,
 } from "@chakra-ui/react"
 import React from "react";
 import {HiChevronRight} from "react-icons/hi";
