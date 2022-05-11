@@ -114,7 +114,7 @@ class LoginView(APIView):
             else:
                 return Response(
                     {
-                        "error": "Could not authenticate user - credentials might be wrong"
+                        "error": "Could not authenticate user - username or password might be wrong"
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
