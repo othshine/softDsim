@@ -6,7 +6,11 @@ from django.db import models
 
 class User(AbstractUser):
 
-    roles = models.TextField(blank=True, null=True, default="student")
+    # roles = models.TextField(blank=True, null=True, default="student")
+    student = models.BooleanField(default=True)
+    creator = models.BooleanField(default=False)
+    staff = models.BooleanField(default=False)
+    admin = models.BooleanField(default=False)
 
     # WE WILL NEED THIS IF WE WANT TO SWITCH TO EMAIL AS USERNAME
 

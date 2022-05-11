@@ -51,9 +51,9 @@ class RegisterView(APIView):
         is_superuser = data.get("superuser", False)
         is_admin = data.get("admin", False)
         if (is_superuser is True) or (is_admin is True):
-            user.is_superuser = True
-            user.is_staff = True
-            user.roles = "admin"
+            user.creator = True
+            user.staff = True
+            user.admin = True
 
         user.save()
 

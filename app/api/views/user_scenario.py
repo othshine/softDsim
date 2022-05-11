@@ -9,11 +9,13 @@ from rest_framework.views import APIView
 from app.decorators.decorators import allowed_roles
 from app.models.template_scenario_model import TemplateScenario
 from app.serializers.user_scenario import UserScenarioSerializer
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+
 from app.models.user_scenario import ScenarioState, UserScenario
 from app.models.scenario_config import ScenarioConfig
 from app.models.team import Team
+
+from custom_user.models import User
 
 
 @method_decorator(csrf_protect, name="dispatch")

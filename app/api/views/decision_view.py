@@ -15,7 +15,7 @@ class DecisionView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    @allowed_roles(["creator", "staff"])
+    @allowed_roles(["student", "creator", "staff"])
     def get(self, request, scenario_id=None, format=None):
 
         # try:

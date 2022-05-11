@@ -79,6 +79,14 @@ class UserView(APIView):  # PermissionRequiredMixin,
 
         Returns: Response with updated user and HTTP-Status Code
         """
+
+        # only admins can create new admins
+        if request.data.get("admin") and not request.user.admin:
+            return Response(
+                {"status": "error", "message": "Only admins can create new admins!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         user = User.objects.get(username=username)
         serializer = UserSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():

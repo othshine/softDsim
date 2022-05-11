@@ -17,4 +17,4 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         # fields = "__all__"  # serialize all the fields
-        fields = ["id", "username", "is_superuser", "is_staff", "roles"]
+        fields = ["id", "username", "student", "creator", "staff", "admin"]
