@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from app.decorators.decorators import allowed_roles
 from app.models.template_scenario_model import TemplateScenario
 from app.serializers.decision_serializer import DecisionSerializer
 from app.serializers.template_scenario_serializer import TemplateScenarioSerializer
@@ -14,6 +15,7 @@ class DecisionView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
+    @allowed_roles(["student", "creator", "staff"])
     def get(self, request, scenario_id=None, format=None):
 
         # try:
@@ -34,6 +36,7 @@ class DecisionView(APIView):
     #         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
     #     )
 
+    @allowed_roles(["creator", "staff"])
     def post(self, request):
 
         # try:
@@ -56,6 +59,7 @@ class DecisionView(APIView):
         #         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         #     )
 
+    @allowed_roles(["creator", "staff"])
     def delete(self, request, scenario_id=None):
         template_scenario = get_object_or_404(TemplateScenario, id=scenario_id)
         template_scenario_save = template_scenario
