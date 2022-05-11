@@ -21,6 +21,7 @@ class Configuration(BaseSettings):
     database_user: str
     database_pass: str
     cloud_db: Optional[bool]
+    logging_level: Optional[str] = "INFO"
 
     @property
     def mongo_client(self) -> str:
