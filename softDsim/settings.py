@@ -162,7 +162,7 @@ LOGGING = {
         "stdlog": {
             "()": "colorlog.ColoredFormatter",
             "format": "%(log_color)s%(levelname)-8s %(asctime)s --- "
-            "%(message)s in %(filename)s:%(lineno)s",
+            "%(message)s (in %(filename)s:%(lineno)s)",
             "log_colors": {
                 "DEBUG": "cyan",
                 "INFO": "bold_green",
