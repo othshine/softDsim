@@ -24,17 +24,26 @@ import {
     useDisclosure,
     useToast
 } from "@chakra-ui/react";
-import {HiChevronRight, HiOutlineCheck, HiOutlineTrash} from "react-icons/hi";
+import {HiChevronRight, HiOutlineCheck, HiOutlineTrash, HiOutlineX} from "react-icons/hi";
 import {useEffect, useRef, useState} from "react";
-import getCookie from "../utils/utils";
+import {getCookie, role} from "../utils/utils";
 
 const UserOverview = () => {
     const [users, setUsers] = useState([]);
-    const [userToDelete, setUserToDelete] = useState("");
+    const [selectedUser, setSelectedUser] = useState("");
+    const [roleToChange, setRoleToChange] = useState({});
 
     const toast = useToast()
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    // const role = {
+    //     ADMIN: "admin",
+    //     STAFF: "staff",
+    //     CREATOR: "creator",
+    //     STUDENT: "student"
+    // }
+
+    const { isOpen: isRoleOpen, onOpen: onRoleOpen, onClose:  onRoleClose} = useDisclosure()
+    const { isOpen: isDeleteOpen , onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const cancelRef = useRef();
 
     const fetchUsers = async () => {
@@ -74,12 +83,39 @@ const UserOverview = () => {
             });
             console.log(e);
         }
-
     };
 
+    const toggleRole = async (username) => {
+        try {
+            const res = await fetch(`http://localhost:8000/api/user/${username}`, {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({[roleToChange.role]: !roleToChange.value})
+            })
+            await res.json();
+            fetchUsers();
+        } catch (e) {
+            toast({
+                title: `Could not change role ${role}`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
+        }
+    };
+
+    // Fetch users first time loading page
     useEffect(() => {
         fetchUsers();
     }, []);
+
+    useEffect(() => {
+        console.log(roleToChange)
+    }, [roleToChange]);
 
     return (
         <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
@@ -97,8 +133,10 @@ const UserOverview = () => {
                             <Thead>
                                 <Tr>
                                     <Th color="gray.400">User Name</Th>
-                                    <Th color="gray.400">Superadmin</Th>
                                     <Th color="gray.400">Admin</Th>
+                                    <Th color="gray.400">Staff</Th>
+                                    <Th color="gray.400">Creator</Th>
+                                    <Th color="gray.400">Student</Th>
                                     <Th color="gray.400">Actions</Th>
                                 </Tr>
                             </Thead>
@@ -111,19 +149,78 @@ const UserOverview = () => {
 
                                             }}>{`${user.username[0].toUpperCase() + user.username.slice(1)}`}</Button>
                                         </Td>
-                                        <Td fontWeight="500">{user.is_superuser ? <HiOutlineCheck/> : ""}</Td>
-                                        <Td fontWeight="500">{user.is_staff ? <HiOutlineCheck/> : ""}</Td>
                                         <Td fontWeight="500">
                                             <IconButton
                                                 variant='ghost'
                                                 colorScheme='black'
-                                                aria-label='Call Sage'
+                                                aria-label='Toggle admin role'
+                                                fontSize='20px'
+                                                icon={user.admin ? <HiOutlineCheck/> : <HiOutlineX/>}
+                                                onClick={() => {
+                                                    setSelectedUser(user.username)
+                                                    onRoleOpen()
+                                                    setRoleToChange({
+                                                        role: role.ADMIN,
+                                                        value: user.admin
+                                                    })}
+                                                }
+                                            />
+                                        </Td>
+                                        <Td fontWeight="500">
+                                            <IconButton
+                                                variant='ghost'
+                                                colorScheme='black'
+                                                aria-label='Toggle admin role'
+                                                fontSize='20px'
+                                                icon={user.staff ? <HiOutlineCheck/> : <HiOutlineX/>}
+                                                onClick={() => {
+                                                    setSelectedUser(user.username)
+                                                    onRoleOpen()
+                                                    setRoleToChange({
+                                                        role: role.STAFF,
+                                                        value: user.staff
+                                                    })}
+                                                }
+                                            />
+                                        </Td>
+                                        <Td fontWeight="500">
+                                            <IconButton
+                                                variant='ghost'
+                                                colorScheme='black'
+                                                aria-label='Toggle admin role'
+                                                fontSize='20px'
+                                                icon={user.creator ? <HiOutlineCheck/> : <HiOutlineX/>}
+                                                onClick={() => {
+                                                    setSelectedUser(user.username)
+                                                    onRoleOpen()
+                                                    setRoleToChange({
+                                                        role: role.CREATOR,
+                                                        value: user.creator
+                                                    })}
+                                                }
+                                            />
+                                        </Td>
+                                        <Td fontWeight="500">
+                                            <IconButton
+                                                disabled
+                                                variant='ghost'
+                                                colorScheme='black'
+                                                aria-label='Toggle admin role'
+                                                fontSize='20px'
+                                                icon={user.student ? <HiOutlineCheck/> : <HiOutlineX/>}
+                                            />
+                                        </Td>
+                                        <Td fontWeight="500">
+                                            <IconButton
+                                                variant='ghost'
+                                                colorScheme='black'
+                                                aria-label='Delete user'
                                                 fontSize='20px'
                                                 icon={<HiOutlineTrash/>}
                                                 onClick={() => {
-                                                    onOpen()
-                                                    setUserToDelete(user.username)
-                                                }
+                                                    onDeleteOpen()
+                                                    setSelectedUser(user.username)
+                                                    }
                                                 }
                                             />
                                         </Td>
@@ -137,16 +234,16 @@ const UserOverview = () => {
 
             {/*Delete user alert pop up*/}
             <AlertDialog
-                isOpen={isOpen}
+                isOpen={isDeleteOpen}
                 leastDestructiveRef={cancelRef}
-                onClose={onClose}
+                onClose={onDeleteClose}
                 isCentered
                 motionPreset='slideInBottom'
             >
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                            Delete user {userToDelete}
+                            Delete user {selectedUser}
                         </AlertDialogHeader>
 
                         <AlertDialogBody>
@@ -154,14 +251,47 @@ const UserOverview = () => {
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
-                            <Button ref={cancelRef} onClick={onClose}>
+                            <Button ref={cancelRef} onClick={onDeleteClose}>
                                 Cancel
                             </Button>
                             <Button colorScheme='red' onClick={() => {
-                                deleteUser(userToDelete)
-                                onClose()
+                                deleteUser(selectedUser)
+                                onDeleteClose()
                             }} ml={3}>
                                 Delete
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+
+            {/*Change role alert pop up*/}
+            <AlertDialog
+                isOpen={isRoleOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onRoleClose}
+                isCentered
+                motionPreset='slideInBottom'
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Change role
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Are you sure that you want to change a role?
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onRoleClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme='blue' onClick={() => {
+                                toggleRole(selectedUser)
+                                onRoleClose()
+                            }} ml={3}>
+                                Change
                             </Button>
                         </AlertDialogFooter>
                     </AlertDialogContent>
