@@ -1,10 +1,17 @@
 import {
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogOverlay,
     Box,
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     Button,
-    Container, Flex,
+    Container,
+    Flex,
     Heading,
     IconButton,
     Table,
@@ -13,60 +20,64 @@ import {
     Td,
     Th,
     Thead,
-    Tr
+    Tr,
+    useDisclosure,
+    useToast
 } from "@chakra-ui/react";
-import {HiChevronRight, HiOutlineTrash} from "react-icons/hi";
-import {useEffect, useState} from "react";
-import client from "../axiosConfig";
+import {HiChevronRight, HiOutlineCheck, HiOutlineTrash} from "react-icons/hi";
+import {useEffect, useRef, useState} from "react";
+import getCookie from "../utils/utils";
 
 const UserOverview = () => {
     const [users, setUsers] = useState([]);
+    const [userToDelete, setUserToDelete] = useState("");
+
+    const toast = useToast()
+
+    const {isOpen, onOpen, onClose} = useDisclosure()
+    const cancelRef = useRef();
 
     const fetchUsers = async () => {
-        const res  = await client.get("/csrf-cookie");
-        console.log(res)
-        setUsers([
-            {
-                id: 1,
-                firstName: "Itachi",
-                lastName: "Uchiha",
-                email: "itachi.uchiha@stud.fra-uas.de"
-            },
-            {
-                id: 2,
-                firstName: "Neji",
-                lastName: "Hyuga",
-                email: "neji.hyuga@stud.fra-uas.de"
-            },
-            {
-                id: 3,
-                firstName: "Rock",
-                lastName: "Lee",
-                email: "rock.lee@stud.fra-uas.de"
-            },
-        ])
+        const res = await fetch('http://localhost:8000/api/user', {
+            method: 'GET',
+            credentials: 'include',
+        })
+        const fetchedUsers = await res.json();
+        setUsers(fetchedUsers)
     };
 
     const navigateToUser = () => {
 
     };
 
-    const fetchUserss = async () => {
-        const config = {
-            headers: {
-                "X-CSRFToken": "sC6HnD76p1j3otcbDqB453OCCEnU6SXK2regwwJsX8Tx0U3hpbXSdRmUj1vC94SC",
-                "Access-Control-Allow-Origin": "http://localhost:8000",
-                "Access-Control-Allow-Headers": "*",
-                "Access-Control-Allow-Methods": "*"
-            },
-            withCredentials: true
+    const deleteUser = async (username) => {
+        try {
+            const res = await fetch(`http://localhost:8000/api/user/${username}`, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                }
+            })
+            await res.json();
+            fetchUsers();
+            toast({
+                title: `${username} has been deleted`,
+                status: 'success',
+                duration: 5000,
+            });
+        } catch (e) {
+            toast({
+                title: `Could not delete ${username}`,
+                status: 'error',
+                duration: 5000,
+            });
+            console.log(e);
         }
 
-        const res = await client.get("/user", config);
-        console.log(res)
-    }
+    };
 
-    useEffect( () => {
+    useEffect(() => {
         fetchUsers();
     }, []);
 
@@ -86,8 +97,9 @@ const UserOverview = () => {
                             <Thead>
                                 <Tr>
                                     <Th color="gray.400">User Name</Th>
-                                    <Th color="gray.400">Email</Th>
-                                    <Th color="gray.400" >Actions</Th>
+                                    <Th color="gray.400">Superadmin</Th>
+                                    <Th color="gray.400">Admin</Th>
+                                    <Th color="gray.400">Actions</Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -96,18 +108,23 @@ const UserOverview = () => {
                                         <Td fontWeight="500">
                                             <Button variant="link" color="black" onClick={() => {
                                                 navigateToUser(user.id)
-                                                fetchUserss()
 
-                                            }}>{`${user.firstName} ${user.lastName}`}</Button>
+                                            }}>{`${user.username[0].toUpperCase() + user.username.slice(1)}`}</Button>
                                         </Td>
-                                        <Td fontWeight="500">{user.email}</Td>
+                                        <Td fontWeight="500">{user.is_superuser ? <HiOutlineCheck/> : ""}</Td>
+                                        <Td fontWeight="500">{user.is_staff ? <HiOutlineCheck/> : ""}</Td>
                                         <Td fontWeight="500">
                                             <IconButton
                                                 variant='ghost'
                                                 colorScheme='black'
                                                 aria-label='Call Sage'
                                                 fontSize='20px'
-                                                icon={<HiOutlineTrash />}
+                                                icon={<HiOutlineTrash/>}
+                                                onClick={() => {
+                                                    onOpen()
+                                                    setUserToDelete(user.username)
+                                                }
+                                                }
                                             />
                                         </Td>
                                     </Tr>
@@ -117,6 +134,39 @@ const UserOverview = () => {
                     </TableContainer>
                 </Container>
             </Box>
+
+            {/*Delete user alert pop up*/}
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+                isCentered
+                motionPreset='slideInBottom'
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Delete user {userToDelete}
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Are you sure? You can't undo this action afterwards.
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme='red' onClick={() => {
+                                deleteUser(userToDelete)
+                                onClose()
+                            }} ml={3}>
+                                Delete
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </Flex>
     )
 };
