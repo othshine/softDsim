@@ -41,7 +41,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -53,7 +52,9 @@ INSTALLED_APPS = [
     "app",
     "rest_framework",
     "corsheaders",
+    "custom_user",
 ]
+
 
 # explanation of each middleware
 # https://www.gustavwengel.dk/django-middleware-walkthrough/
@@ -85,6 +86,8 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTH_USER_MODEL = "custom_user.User"
 
 WSGI_APPLICATION = "softDsim.wsgi.application"
 

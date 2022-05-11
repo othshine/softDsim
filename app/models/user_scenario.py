@@ -1,9 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+
 from app.models.scenario_config import ScenarioConfig
 from app.models.template_scenario_model import TemplateScenario
 
 from app.models.team import Team
+from custom_user.models import User
 
 
 class ScenarioState(models.Model):
