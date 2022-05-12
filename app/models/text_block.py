@@ -1,7 +1,7 @@
 from django.db import models
 
-from app.models.decision_models.decision_model import Decision
-from app.models.simulation_models.simulation_model import Simulation
+from app.models.decision import Decision
+from app.models.simulation import Simulation
 
 
 class TextBlock(models.Model):

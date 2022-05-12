@@ -1,17 +1,16 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from app.models.decision_models.decision_model import Decision
-from app.models.action_model import Action
-from app.models.decision_models.answer_model import Answer
-from app.models.management_goal_model import ManagementGoal
-from app.models.simulation_models.score_card_model import ScoreCard
-from app.models.simulation_models.simulation_model import Simulation
-from app.models.template_scenario_model import TemplateScenario
-from app.models.text_block_model import TextBlock
-from app.serializers.decision_serializer import DecisionSerializer
-from app.serializers.management_goal_serializers import ManagementGoalSerializer
-from app.serializers.simulation_serializers import SimulationSerializer
+from app.models.decision import Decision
+from app.models.action import Action
+from app.models.answer import Answer
+from app.models.management_goal import ManagementGoal
+from app.models.score_card import ScoreCard
+from app.models.simulation import Simulation
+from app.models.template_scenario import TemplateScenario
+from app.models.text_block import TextBlock
+from app.serializers.decision import DecisionSerializer
+from app.serializers.management_goal import ManagementGoalSerializer
+from app.serializers.simulation import SimulationSerializer
 
 
 class TemplateScenarioSerializer(serializers.ModelSerializer):

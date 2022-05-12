@@ -1,6 +1,6 @@
 from django.db import models
 
-from app.models.action_model import Action
+from app.models.action import Action
 
 
 class Answer(models.Model):

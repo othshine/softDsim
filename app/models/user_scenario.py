@@ -1,7 +1,7 @@
 from django.db import models
 
-from app.models.scenario_config import ScenarioConfig
-from app.models.template_scenario_model import TemplateScenario
+from app.models.scenario import ScenarioConfig
+from app.models.template_scenario import TemplateScenario
 
 from app.models.team import Team
 from custom_user.models import User

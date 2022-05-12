@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from app.models.action_model import Action
-from app.models.simulation_models.score_card_model import ScoreCard
-from app.models.simulation_models.simulation_model import Simulation
-from app.models.text_block_model import TextBlock
-from app.serializers.action_serializer import ActionSerializer
-from app.serializers.score_card_serializer import ScoreCardSerializer
-from app.serializers.text_block_serializer import TextBlockSerializer
+from app.models.action import Action
+from app.models.score_card import ScoreCard
+from app.models.simulation import Simulation
+from app.models.text_block import TextBlock
+from app.serializers.action import ActionSerializer
+from app.serializers.score_card import ScoreCardSerializer
+from app.serializers.text_block import TextBlockSerializer
 
 
 class SimulationSerializer(serializers.ModelSerializer):

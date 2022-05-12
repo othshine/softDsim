@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from app.models.action_model import Action
-from app.models.decision_models.decision_model import Decision
-from app.models.text_block_model import TextBlock
+from app.models.action import Action
+from app.models.decision import Decision
+from app.models.text_block import TextBlock
 
-from app.serializers.action_serializer import ActionSerializer
-from app.serializers.text_block_serializer import TextBlockSerializer
+from app.serializers.action import ActionSerializer
+from app.serializers.text_block import TextBlockSerializer
 
 
 class DecisionSerializer(serializers.ModelSerializer):

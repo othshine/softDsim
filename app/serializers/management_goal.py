@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from app.models.management_goal_model import ManagementGoal
+from app.models.management_goal import ManagementGoal
 
 #
 # class TaskGoalSerializer(serializers.ModelSerializer):

@@ -1,6 +1,6 @@
 from django.db import models
 
-from app.models.template_scenario_model import TemplateScenario
+from app.models.template_scenario import TemplateScenario
 
 
 class Simulation(models.Model):

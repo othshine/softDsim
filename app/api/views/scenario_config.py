@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from app.decorators.decorators import allowed_roles
 from app.serializers.scenario_config import ScenarioConfig, ScenarioConfigSerializer
 
-from app.models.scenario_config import ScenarioConfig
+from app.models.scenario import ScenarioConfig
 
 
 @method_decorator(csrf_protect, name="dispatch")
