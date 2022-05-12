@@ -1,3 +1,4 @@
+import logging
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from rest_framework import status
@@ -52,6 +53,8 @@ class UserScenarioViews(APIView):
             except ObjectDoesNotExist:
                 errors["team"] = f"No team with id {team} does exist in Database."
         if errors:
+            logging.error("Could not create user scenario. Attributes missing")
+            logging.debug(errors)
             return Response(
                 {"status": "error", "data": errors},
                 status=status.HTTP_400_BAD_REQUEST,

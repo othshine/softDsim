@@ -30,3 +30,4 @@ wheel
 wrapt
 djangorestframework
 mysqlclient
+colorlog
