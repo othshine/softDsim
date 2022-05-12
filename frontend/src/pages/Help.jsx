@@ -1,16 +1,14 @@
 import {
-    Heading, Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Box,
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink, Container,
-    Flex,Tabs,TabList, TabPanels, Tab, TabPanel,
-  
-
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink, Container,
+  Flex, Tabs, TabList, TabPanels, Tab, TabPanel, Heading,
 } from "@chakra-ui/react"
 import React from "react";
 import {HiChevronRight} from "react-icons/hi";
@@ -20,7 +18,6 @@ const Help = () => {
     return (
         <>
             <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
-
             <Breadcrumb spacing='8px' separator={<HiChevronRight color='gray.500'/>}>
                 <BreadcrumbItem>
                     <BreadcrumbLink href=''>Help</BreadcrumbLink>
@@ -274,12 +271,8 @@ const Help = () => {
     </AccordionPanel>
     
   </AccordionItem>
-  
+ 
   </TabPanel>
-  
-
-
-  
   </TabPanels> 
 </Accordion>
 

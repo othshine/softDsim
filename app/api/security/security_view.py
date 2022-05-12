@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from rest_framework import status
@@ -5,9 +6,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 
+from app.decorators.decorators import allowed_roles
 from app.serializers.user_serializer import UserSerializer
+from custom_user.models import User
 
 """
 Views for user authentication (login, logout, creation, csrf-token handling)
@@ -24,6 +26,7 @@ class RegisterView(APIView):
 
     permission_classes = (AllowAny,)
 
+    @allowed_roles(["all"])
     def post(self, request, format=None):
         """
         Method for POST-Requests to the /api/register endpoint.
@@ -34,39 +37,43 @@ class RegisterView(APIView):
 
         username = data["username"]
         password = data["password"]
+
+        # try:
+        if User.objects.filter(username=username).exists():
+            return Response(
+                {"error": "Username already exists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user = User.objects.create_user(username=username, password=password)
+
+        # todo philip: !!!take this out before release (this is just for people that are developing with the api)
         is_superuser = data.get("superuser", False)
+        is_admin = data.get("admin", False)
+        if (is_superuser is True) or (is_admin is True):
+            user.creator = True
+            user.staff = True
+            user.admin = True
 
-        try:
-            if User.objects.filter(username=username).exists():
-                return Response(
-                    {"error": "Username already exists"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+        user.save()
 
-            user = User.objects.create_user(username=username, password=password)
-            if is_superuser is True:
-                user.is_superuser = True
-                user.is_staff = True
+        user = User.objects.get(id=user.id)
 
-            user.save()
+        serializer = UserSerializer(user)
 
-            user = User.objects.get(id=user.id)
+        return Response(
+            {
+                "success": "User created successfully",
+                "user": serializer.data,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
-            serializer = UserSerializer(user)
-
-            return Response(
-                {
-                    "success": "User created successfully",
-                    "user": serializer.data,
-                },
-                status=status.HTTP_201_CREATED,
-            )
-
-        except:
-            return Response(
-                {"error": "Something went wrong (except clause)"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+        # except:
+        #     return Response(
+        #         {"error": "Something went wrong (except clause)"},
+        #         status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        #     )
 
 
 @method_decorator(csrf_protect, name="dispatch")
@@ -79,6 +86,7 @@ class LoginView(APIView):
 
     permission_classes = (AllowAny,)
 
+    @allowed_roles(["all"])
     def post(self, request, format=None):
         """
         Method for POST-Requests to the /api/login endpoint.
@@ -106,7 +114,7 @@ class LoginView(APIView):
             else:
                 return Response(
                     {
-                        "error": "Could not authenticate user - credentials might be wrong"
+                        "error": "Could not authenticate user - username or password might be wrong"
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
@@ -127,6 +135,7 @@ class LogoutView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
+    @allowed_roles(["all"])
     def post(self, request, formate=None):
         """
         Method for POST-Requests to the /api/logout endpoint.
@@ -160,6 +169,7 @@ class GetCSRFToken(APIView):
 
     permission_classes = (AllowAny,)
 
+    @allowed_roles(["all"])
     def get(self, request, format=None):
         """
         Method for POST-Requests to the /api/csrf-token endpoint.
@@ -180,6 +190,7 @@ class CheckAuthenticatedView(APIView):
 
     permission_classes = (AllowAny,)
 
+    @allowed_roles(["all"])
     def get(self, request, format=None):
         """
         Method for GET-Requests to the /api/authenticated endpoint.

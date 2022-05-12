@@ -8,6 +8,7 @@ env
 .env
 app/migrations/*
 database/mongo*
+custom_user/migrations/*
 
 .empty
 .vscode
