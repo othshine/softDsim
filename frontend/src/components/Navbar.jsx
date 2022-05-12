@@ -45,7 +45,7 @@ const Navbar = () => {
                 <Button variant='link' as={Link} to="/scenarios">
                     Scenarios
                 </Button>
-                <Button variant='link'>
+                <Button variant='link' as={Link} to="/scenario-studio">
                     Scenario Studio
                 </Button>
                 <Button variant='link' as={Link} to="/users">

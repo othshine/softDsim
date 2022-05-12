@@ -12,6 +12,7 @@ import Simulation from "./pages/Simulation";
 import Footer from "./components/Footer";
 import GDPR from "./pages/GDPR";
 import Imprint from "./pages/Imprint";
+import ScenarioStudio from "./pages/ScenarioStudio";
 
 function App() {
 
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/" element={<Landing />} />
                     <Route path="/scenarios" element={<ScenarioOverview />} />
                     <Route path="/scenarios/:scn_id" element={<SimulationAlternative />} />
+                    <Route path="/scenario-studio" element={<ScenarioStudio />} />
                     <Route path="/users" element={<UserOverview />} />
                     <Route path="/simulation" element={<Simulation />} />
                     <Route path="/login" element={<Login />} />
