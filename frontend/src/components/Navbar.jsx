@@ -46,7 +46,7 @@ const Navbar = () => {
                     Scenarios
                 </Button>
                 <Button variant='link'>
-                    Simulation Studio
+                    Scenario Studio
                 </Button>
                 <Button variant='link' as={Link} to="/users">
                     User Management

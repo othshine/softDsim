@@ -7,9 +7,11 @@ import Help from "./pages/Help";
 import ScenarioOverview from "./pages/ScenarioOverview";
 import SimulationAlternative from "./pages/SimulationAlternative";
 import UserOverview from "./pages/UserOverview";
-import { Box } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import Simulation from "./pages/Simulation";
 import Footer from "./components/Footer";
+import GDPR from "./pages/GDPR";
+import Imprint from "./pages/Imprint";
 
 function App() {
 
@@ -18,7 +20,7 @@ function App() {
     }, []);
 
     return (
-        <Box h="full">
+        <Flex h="full" flexDir="column">
             <BrowserRouter>
                 <Navbar />
                 <Routes>
@@ -29,10 +31,12 @@ function App() {
                     <Route path="/simulation" element={<Simulation />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/help" element={<Help />} />
+                    <Route path="/gdpr" element={<GDPR />} />
+                    <Route path="/imprint" element={<Imprint />} />
                 </Routes>
                 <Footer />
             </BrowserRouter>
-        </Box>
+        </Flex>
     );
 }
 

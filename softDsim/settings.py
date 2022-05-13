@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import environ
 from config import get_config
+import logging.config
 
 
 configuration = get_config()
@@ -41,7 +42,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     "app",
     "rest_framework",
     "corsheaders",
+    "custom_user",
 ]
+
 
 # explanation of each middleware
 # https://www.gustavwengel.dk/django-middleware-walkthrough/
@@ -85,6 +87,8 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTH_USER_MODEL = "custom_user.User"
 
 WSGI_APPLICATION = "softDsim.wsgi.application"
 
@@ -153,14 +157,22 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "/login"
 
 # Logging
-
+LOGGING_CONFIG = None
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": True,
     "formatters": {
         "stdlog": {
-            "format": "[{levelname} {asctime:s}] {message} ({filename}:{lineno})",
-            "style": "{",
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(levelname)-8s %(asctime)s --- "
+            "%(message)s (in %(filename)s:%(lineno)s)",
+            "log_colors": {
+                "DEBUG": "cyan",
+                "INFO": "bold_green",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+            },
             "datefmt": "%d.%m %H:%M:%S",
         },
     },
@@ -169,7 +181,7 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": "INFO",
+        "level": configuration.logging_level,
     },
 }
 
@@ -181,5 +193,12 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
 }
+logging.config.dictConfig(LOGGING)
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# Needed for post requests
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]

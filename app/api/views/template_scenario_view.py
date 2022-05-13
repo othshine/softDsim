@@ -1,3 +1,4 @@
+import logging
 from deprecated.classic import deprecated
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -5,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from app.decorators.decorators import allowed_roles
 from app.models.template_scenario_model import TemplateScenario
 from app.serializers.template_scenario_serializer import TemplateScenarioSerializer
 
@@ -13,6 +15,7 @@ class TemplateScenarioView(APIView):
 
     permission_classes = (IsAuthenticated,)
 
+    @allowed_roles(["student", "creator", "staff"])
     def get(self, request, scenario_id=None, format=None):
 
         try:
@@ -25,13 +28,15 @@ class TemplateScenarioView(APIView):
             serializer = TemplateScenarioSerializer(template_scenarios, many=True)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except:
+        except Exception as e:
+            logging.error(f"{e.__class__.__name__} occurred in GET template-scenario")
+            logging.debug(e)
             return Response(
                 {"error": "something went wrong on server side (except clause)"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    @allowed_roles(["creator", "staff"])
     def post(self, request):
 
         try:
@@ -43,17 +48,20 @@ class TemplateScenarioView(APIView):
                     status=status.HTTP_200_OK,
                 )
             else:
-                print(serializer.errors)
+                logging.error("Data for template scenario is not valid")
+                logging.debug(serializer.errors)
                 return Response(
                     {"status": "Data is not valid", "error": serializer.errors},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        except:
+        except Exception as e:
+            logging.error(f"{e.__class__.__name__} occurred in POST template-scenario")
             return Response(
                 {"status": "something went wrong internally"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    @allowed_roles(["creator", "staff"])
     def delete(self, request, scenario_id=None):
 
         try:
@@ -68,12 +76,16 @@ class TemplateScenarioView(APIView):
                 }
             )
 
-        except:
+        except Exception as e:
+            logging.error(
+                f"{e.__class__.__name__} occurred in DELETE template-scenario with id {id}"
+            )
             return Response(
                 {"status": "something went wrong internally"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+    @allowed_roles(["creator", "staff"])
     def patch(self, request, scenario_id=None):
 
         try:
@@ -85,9 +97,14 @@ class TemplateScenarioView(APIView):
                 serializer.save()
                 return Response({"status": "success", "data": serializer.data})
             else:
+                logging.error("Could not patch template scenario")
+                logging.debug(serializer.errors)
                 return Response({"status": "error", "data": serializer.errors})
 
-        except:
+        except Exception as e:
+            logging.error(
+                f"{e.__class__.__name__} occurred in PATCH template-scenario with id {id}"
+            )
             return Response(
                 {"status": "something went wrong internally"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,

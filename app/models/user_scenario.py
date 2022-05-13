@@ -1,15 +1,16 @@
 from django.db import models
-from django.contrib.auth.models import User
+
 from app.models.scenario_config import ScenarioConfig
 from app.models.template_scenario_model import TemplateScenario
 
 from app.models.team import Team
+from custom_user.models import User
 
 
 class ScenarioState(models.Model):
-    counter = models.IntegerField()
-    cost = models.FloatField()
-    day = models.IntegerField()
+    counter = models.IntegerField(default=0)
+    cost = models.FloatField(default=0)
+    day = models.IntegerField(default=0)
 
 
 class UserScenario(models.Model):
