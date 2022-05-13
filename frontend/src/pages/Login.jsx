@@ -9,7 +9,7 @@ const Login = () => {
 
     // initialize states
     const [idInputValid, setIdInputValid] = useState(false)
-    const [passwortInputValid, setPasswortInputValird] = useState(false)
+    const [passwortInputValid, setPasswortInputValid] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [logInSuccess, setLogInSuccess] = useState('none')
     const [userID, setUserID] = useState('')
@@ -90,9 +90,9 @@ const Login = () => {
     function userPasswordInput(event) {
         setUserPassword(event.target.value)
         if (event.target.value !== "") {
-            setPasswortInputValird(true)
+            setPasswortInputValid(true)
         } else {
-            setPasswortInputValird(false)
+            setPasswortInputValid(false)
         }
     }
 
