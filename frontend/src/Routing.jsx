@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {AuthContext} from "./AuthProvider";
 import {Navigate, Route, Routes} from "react-router-dom";
 import Landing from "./pages/Landing";
@@ -14,6 +14,7 @@ import {getCookie} from "./utils/utils";
 
 const Routing = () => {
     const {currentUser, setCurrentUser} = useContext(AuthContext)
+    const [isAuthenticating, setIsAuthenticating] = useState(true);
 
     const authenticateUser = async () => {
         try {
@@ -37,9 +38,15 @@ const Routing = () => {
         setCurrentUser(resBody.user)
     };
 
-    useEffect(() => {
+    useEffect( () => {
         isAuthenticated()
     }, []);
+
+    useEffect(() => {
+        if(currentUser !== null) {
+            setIsAuthenticating(false);
+        }
+    }, [currentUser])
 
     return (
         <Routes>
@@ -62,8 +69,14 @@ const Routing = () => {
                 :
                 <>
                     {/* routes which are accessible for only not logged-in users */}
-                    <Route path="/login" element={<Login/>}/>
-                    <Route path="*" element={<Navigate to="/login" replace/>}/>
+                    {
+                        !isAuthenticating &&
+                        <>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="*" element={<Navigate to="/login" replace/>}/>
+                        </>
+                    }
+
                 </>
             }
             {
