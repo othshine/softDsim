@@ -34,9 +34,10 @@ const ScenarioStudio = () => {
                     {/*Editor*/}
                     <Flex w="full" h="full" justifyContent="center" alignItems="center" backgroundColor="white"
                           borderRadius="2xl">
-                        <VStack color="gray.200" spacing={8}>
-                            <Icon as={RiDragDropLine} w={20} h={20}/>
-                            <Heading>Drag a component here</Heading>
+                        <VStack color="gray.200">
+                            <Icon as={RiDragDropLine} w={20} h={20} mb={6}/>
+                            <Heading size="lg" pointerEvents="none">Drag a component here</Heading>
+                            <Text pointerEvents="none" fontSize="xl" mt="20px">(Create a scenario by drag and dropping different components)</Text>
                         </VStack>
                     </Flex>
 
