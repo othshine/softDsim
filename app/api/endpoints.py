@@ -3,10 +3,10 @@ from django.urls import path
 from app.api.views.user_scenario import UserScenarioViews
 from app.api.views.team import SkillTypeView, TeamViews, MemberView
 from app.api.views.scenario_config import ScenarioConfigView
-from .api.views.decision_view import DecisionView
-from .api.views.scenario_view import ScenarioView
-from .api.views.management_goal_view import ManagementGoalView
-from .api.security.security_view import (
+from .views.decision_view import DecisionView
+from .views.scenario_view import ScenarioView
+from .views.management_goal_view import ManagementGoalView
+from .security.security_view import (
     LoginView,
     GetCSRFToken,
     LogoutView,
@@ -16,8 +16,10 @@ from .api.security.security_view import (
 
 
 # all request with /api/ land here (see softDsim/urls.py)
-from .api.views.template_scenario_view import TemplateScenarioView
-from .api.views.user_view import UserView
+from .views.template_scenario_view import TemplateScenarioView
+from .views.user_view import UserView
+
+import app.api.simulation as sim
 
 urlpatterns = [
     # User stuff
@@ -52,4 +54,6 @@ urlpatterns = [
     # scenario config
     path("scenario-config", ScenarioConfigView.as_view()),
     path("scenario-config/<str:id>", ScenarioConfigView.as_view()),
+    # SIMULATION Endpoints
+    path("sim/start", sim.start_new_simulation, name="start_new_scenario"),
 ]
