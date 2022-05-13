@@ -64,7 +64,7 @@ const Navbar = () => {
                 justifyContent="flex-end"
             >
                 <HStack borderRadius="full" backgroundColor="white" p={3} boxShadow='xl'>
-                    <Text whiteSpace="nowrap">👋 Hey, Oshigaki Kisame</Text>
+                    <Text whiteSpace="nowrap">👋 Hey, {currentUser?.username}</Text>
                     <IconButton
                         variant='ghost'
                         aria-label='Call Sage'
@@ -73,7 +73,7 @@ const Navbar = () => {
                         size="xs"
                     />
                     <Menu>
-                        <MenuButton ref={menuButton} as={Avatar} name='Oshigaki Kisame' size="sm" cursor="pointer">
+                        <MenuButton ref={menuButton} as={Avatar} name='Oshigaki Kisame' size="sm" cursor="pointer" >
                         </MenuButton>
                         <MenuList>
                             <MenuGroup title='Profile'>
