@@ -15,11 +15,14 @@ import {
 } from "@chakra-ui/react"
 import Logo from "../images/modern-logo.png"
 import {HiMoon, HiOutlineLogout} from "react-icons/hi";
-import {useEffect, useRef} from "react";
+import {useContext, useEffect, useRef} from "react";
 import {Link} from "react-router-dom";
+import {AuthContext} from "../AuthProvider";
 
 
 const Navbar = () => {
+    const {currentUser} = useContext(AuthContext);
+
     const menuButton = useRef();
 
     // Workaround to center text in avatar
@@ -48,9 +51,10 @@ const Navbar = () => {
                 <Button variant='link'>
                     Scenario Studio
                 </Button>
-                <Button variant='link' as={Link} to="/users">
-                    User Management
-                </Button>
+                {currentUser?.creator &&
+                    <Button variant='link' as={Link} to="/users">
+                        User Management
+                    </Button>}
                 <Button variant='link' as={Link} to="/help">
                     Help
                 </Button>
