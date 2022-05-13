@@ -5,6 +5,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Help from "./pages/Help";
 import ScenarioOverview from "./pages/ScenarioOverview";
+import ScenarioStudio from "./pages/ScenarioStudio";
 import SimulationAlternative from "./pages/SimulationAlternative";
 import UserOverview from "./pages/UserOverview";
 import { Flex } from "@chakra-ui/react";
@@ -27,6 +28,7 @@ function App() {
                     <Route path="/" element={<Landing />} />
                     <Route path="/scenarios" element={<ScenarioOverview />} />
                     <Route path="/scenarios/:scn_id" element={<SimulationAlternative />} />
+                    <Route path="/scenariostudio" element={<ScenarioStudio />} />
                     <Route path="/users" element={<UserOverview />} />
                     <Route path="/simulation" element={<Simulation />} />
                     <Route path="/login" element={<Login />} />
