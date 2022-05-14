@@ -20,13 +20,13 @@ class SkillType(models.Model):
 
 class Member(models.Model):
     xp: float = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+        default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
     motivation = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+        default=0.75, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
     stress = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+        default=0.1, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="member")
     skill_type = models.ForeignKey(
