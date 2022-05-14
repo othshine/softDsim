@@ -1,8 +1,8 @@
 import pytest
 
-from app.src.scenario import Scenario, UserScenario
-from app.src.scorecard import ScoreCard
-from app.src.task import Task
+from app.src_deprecated.scenario import Scenario, UserScenario
+from app.src_deprecated.scorecard import ScoreCard
+from app.src_deprecated.task import Task
 
 @pytest.fixture
 def us() -> UserScenario:

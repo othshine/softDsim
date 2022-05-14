@@ -1,9 +1,9 @@
 import pytest
-from app.src.task_queue import TaskQueue
+from app.src_deprecated.task_queue import TaskQueue
 
-from app.src.team import Team, Member, SkillType, order_tasks_for_member, NotAValidSkillTypeException
-from app.src.task import Task, Difficulty
-from app.src.scenario import Scenario, UserScenario
+from app.src_deprecated.team import Team, Member, SkillType, order_tasks_for_member, NotAValidSkillTypeException
+from app.src_deprecated.task import Task, Difficulty
+from app.src_deprecated.scenario import Scenario, UserScenario
 from utils import YAMLReader
 
 from bson.objectid import ObjectId

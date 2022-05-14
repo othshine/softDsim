@@ -1,4 +1,4 @@
-from app.src.scorecard import ScoreCard
+from app.src_deprecated.scorecard import ScoreCard
 
 
 def test_initialize_score_card():

@@ -1,4 +1,5 @@
-from app.src.scenario import UserScenario, Scenario
+from app.src_deprecated.scenario import UserScenario, Scenario
+
 
 def test_scenario_get_template_id():
     s = Scenario()
@@ -16,9 +17,8 @@ def test_json_does_not_contain_none_values():
     us = UserScenario()
     json = us.json
     EMPTY = 3824562934
-    assert json.get('template_id', EMPTY) == EMPTY
-    assert json.get('current_day', EMPTY) != EMPTY
-
+    assert json.get("template_id", EMPTY) == EMPTY
+    assert json.get("current_day", EMPTY) != EMPTY
 
 
 def test_userscenario_is_scenario():

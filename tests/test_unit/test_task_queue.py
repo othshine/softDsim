@@ -1,5 +1,5 @@
-from app.src.task_queue import TaskQueue
-from app.src.task import Task, Difficulty
+from app.src_deprecated.task_queue import TaskQueue
+from app.src_deprecated.task import Task, Difficulty
 from bson.objectid import ObjectId
 
 import pytest

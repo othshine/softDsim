@@ -1,10 +1,10 @@
 import pytest
 
-from app.src.dataObjects import WorkPackage
-from app.src.scenario import Scenario, UserScenario
-from app.src.task_queue import TaskQueue
-from app.src.task import Task
-from app.src.team import Team, Member, ScrumTeam
+from app.src_deprecated.dataObjects import WorkPackage
+from app.src_deprecated.scenario import Scenario, UserScenario
+from app.src_deprecated.task_queue import TaskQueue
+from app.src_deprecated.task import Task
+from app.src_deprecated.team import Team, Member, ScrumTeam
 
 
 @pytest.fixture

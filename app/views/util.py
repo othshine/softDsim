@@ -1,6 +1,6 @@
 import logging
-from app.src.scenario import UserScenario
-from app.src.team import ScrumTeam
+from app.src_deprecated.scenario import UserScenario
+from app.src_deprecated.team import ScrumTeam
 from utils import data_get, get_active_label
 
 

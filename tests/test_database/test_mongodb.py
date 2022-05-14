@@ -3,12 +3,12 @@ from copy import deepcopy
 from turtle import title
 import pytest
 
-from app.src.dataObjects import SimulationGoal
-from app.src.decision_tree import Action, ActionList, Decision, Answer, AnsweredDecision, SimulationDecision, TextBlock
-from app.src.scenario import UserScenario, Scenario
-from app.src.task import Difficulty, Task
-from app.src.task_queue import TaskQueue
-from app.src.team import Member, SkillType
+from app.src_deprecated.dataObjects import SimulationGoal
+from app.src_deprecated.decision_tree import Action, ActionList, Decision, Answer, AnsweredDecision, SimulationDecision, TextBlock
+from app.src_deprecated.scenario import UserScenario, Scenario
+from app.src_deprecated.task import Difficulty, Task
+from app.src_deprecated.task_queue import TaskQueue
+from app.src_deprecated.team import Member, SkillType
 from mongo_models import ScenarioMongoModel, NoObjectWithIdException, ClickHistoryModel
 
 from bson.objectid import ObjectId

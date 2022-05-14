@@ -2,11 +2,11 @@ from typing import Any, Dict, Optional
 
 from bson.objectid import ObjectId
 
-from app.src.dataObjects import WorkPackage
-from app.src.decision_tree import ActionList, Decision, SimulationDecision
-from app.src.team import Team, ScrumTeam
-from app.src.task_queue import TaskQueue
-from app.src.scorecard import ScoreCard
+from app.src_deprecated.dataObjects import WorkPackage
+from app.src_deprecated.decision_tree import ActionList, Decision, SimulationDecision
+from app.src_deprecated.team import Team, ScrumTeam
+from app.src_deprecated.task_queue import TaskQueue
+from app.src_deprecated.scorecard import ScoreCard
 from utils import month_to_day, remove_none_values, YAMLReader
 
 # Config Variables
