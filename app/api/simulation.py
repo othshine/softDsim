@@ -15,6 +15,7 @@ from app.models.template_scenario_model import TemplateScenario
 from app.models.user_scenario import ScenarioState, UserScenario
 from app.serializers.user_scenario import UserScenarioSerializer
 from app.serializers.team import MemberSerializer
+from app.serializers.decision_serializer import DecisionSerializer
 
 
 # The allowed_roles decorator does not work with non class-based views
@@ -65,6 +66,17 @@ def start_new_simulation(request):
     return Response(
         {"status": "success", "data": serializer.data}, status=status.HTTP_201_CREATED
     )
+
+
+@api_view(["GET"])
+def decisions(request):
+    scenario = auth_user_scenario(request)
+    if isinstance(scenario, Response):
+        return scenario
+
+    decision_list = scenario.decisions
+    serializer = DecisionSerializer(decision_list, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET", "POST"])
