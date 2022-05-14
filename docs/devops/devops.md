@@ -11,6 +11,7 @@ certbot renew \
 
 ### Installed Software
 docker, curl, iptables-persistent
+https://github.com/docker/compose -> manually version 2.4.1
 
 ### IPtables GeoIP
 https://docs.rackspace.com/support/how-to/block-ip-range-from-countries-with-geoip-and-iptables/
