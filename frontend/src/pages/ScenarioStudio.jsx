@@ -6,24 +6,27 @@ import {
     Flex,
     Heading,
     HStack,
-    Icon, Image, ListItem,
+    Icon,
+    ListItem,
     Tab,
     TabList,
     TabPanel,
     TabPanels,
     Tabs,
-    Text, UnorderedList,
+    Text,
+    UnorderedList,
     VStack
 } from "@chakra-ui/react";
 import {HiChevronRight} from "react-icons/hi";
 import {RiDragDropLine} from "react-icons/ri";
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 import {Fragment, useEffect, useState} from "react";
-import {MdDragIndicator, MdOutlineAttractions, MdOutlineInfo, MdRule, MdTimeline} from "react-icons/md";
+import {MdOutlineAttractions, MdOutlineInfo, MdRule, MdTimeline} from "react-icons/md";
 import {v4 as uuidv4} from 'uuid';
 import styled from "@emotion/styled";
-import {BsLightningCharge, BsLightningChargeFill} from "react-icons/bs";
+import {BsLightningCharge} from "react-icons/bs";
 import ComponentListElement from "../components/ComponentListElement";
+import EditorListElement from "../components/EditorListElement";
 
 const Clone = styled(ListItem)`
   margin-bottom: 12px;
@@ -50,7 +53,7 @@ const ScenarioStudio = () => {
         },
         {
             id: uuidv4(),
-            title: "Action",
+            title: "Model Selection",
             content: "Trigger actions like teamevents or training sessions.",
             icon: BsLightningCharge,
         },
@@ -69,6 +72,7 @@ const ScenarioStudio = () => {
     ]
 
     const [editorList, updateEditorList] = useState([]);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const handleOnDragEnd = (result) => {
         // handle moving outside droppables
@@ -91,8 +95,17 @@ const ScenarioStudio = () => {
             movedItemCopy.id = uuidv4();
             editorListItems.splice(result.destination.index, 0, movedItemCopy);
             updateEditorList(editorListItems);
+            setSelectedItem(movedItemCopy.id)
         }
     };
+
+    const handleSelect = (e) => {
+            setSelectedItem(e.currentTarget.getAttribute("elementid"))
+    }
+
+    useEffect(() => {
+        console.log(selectedItem)
+    }, [selectedItem])
 
     return (
         <Flex px={10} pt={2} flexDir="column" flexGrow={1}>
@@ -133,18 +146,19 @@ const ScenarioStudio = () => {
                                                                 {(provided, snapshot) => (
                                                                     <ListItem
                                                                         mb={3}
-                                                                        backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
                                                                         {...provided.draggableProps}
                                                                         ref={provided.innerRef}
                                                                     >
-                                                                        <HStack w="200px" h="50px"
-                                                                                justifyContent="space-around">
-                                                                            <Text>{title}</Text>
-                                                                            <Box {...provided.dragHandleProps}>
-                                                                                <Icon as={MdDragIndicator}
-                                                                                      fontSize={20}/>
-                                                                            </Box>
-                                                                        </HStack>
+                                                                        <EditorListElement
+                                                                            backgroundColor={snapshot.isDragging ? "blue.200" : "red.200"}
+                                                                            elementid={id}
+                                                                            onClick={((e) => handleSelect(e))}
+                                                                            id={id}
+                                                                            title={title}
+                                                                            handleProps={provided.dragHandleProps}
+                                                                            isSelected={selectedItem === id}
+                                                                        />
+
                                                                     </ListItem>
                                                                 )}
                                                             </Draggable>
@@ -177,12 +191,22 @@ const ScenarioStudio = () => {
                                     <Tab fontWeight="bold" color="gray.400">Components</Tab>
                                 </TabList>
 
-                                <TabPanels>
+                                <TabPanels minW="350px">
+
+                                    {/* Inspector Tab */}
                                     <TabPanel>
-                                        <p>one!</p>
+                                        {selectedItem ? "" :
+                                            <Box borderRadius="md" border="1px dashed" borderColor="gray.200" p={2}>
+                                                <Text fontSize="sm" fontWeight="500" color="gray.400">
+                                                    No components selected. Click on a component to select it.
+                                                </Text>
+                                            </Box>
+                                        }
                                     </TabPanel>
+
+                                    {/* Component Tab */}
                                     <TabPanel>
-                                        <VStack alignItems="flex-start" pt={3}>
+                                        <VStack alignItems="flex-start" pt={2}>
                                             <Text color="gray.400" fontWeight="bold">All Components</Text>
                                             <Droppable droppableId="componentList" isDropDisabled={true}>
                                                 {(provided) => (
@@ -204,7 +228,7 @@ const ScenarioStudio = () => {
                                                                                     {...provided.dragHandleProps}
                                                                                     mb={3}
                                                                                 >
-                                                                                    <ComponentListElement title={title} content={content} icon={icon}/>
+                                                                                        <ComponentListElement title={title} content={content} icon={icon}/>
                                                                                 </ListItem>
                                                                                 {snapshot.isDragging &&
                                                                                     <Clone>
