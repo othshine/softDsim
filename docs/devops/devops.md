@@ -34,6 +34,9 @@ iptables -t mangle -I PREROUTING -p tcp --dport 443 -m geoip ! --src-cc DE -j DR
 iptables -t mangle -I PREROUTING -s 10.0.0.0/8 -j ACCEPT
 https://superuser.com/questions/1234693/permanently-ban-after-n-connections-in-a-minute-with-iptables
 
+iptables without root
+https://unix.stackexchange.com/questions/385109/can-you-list-iptables-as-a-non-root-user-and-why
+
 ### Backend Python Container
 https://www.digitalocean.com/community/tutorials/docker-explained-how-to-containerize-python-web-applications
 
