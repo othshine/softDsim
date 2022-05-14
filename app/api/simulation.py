@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from app.decorators.decorators import allowed_roles
+from app.dto.request import Workpack
 from app.models.scenario_config import ScenarioConfig
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import api_view
@@ -17,6 +18,7 @@ from app.models.task import Task
 from app.serializers.user_scenario import UserScenarioSerializer
 from app.serializers.team import MemberSerializer
 from app.serializers.decision_serializer import DecisionSerializer
+from app.src.simulation import continue_simulation
 
 
 # The allowed_roles decorator does not work with non class-based views
@@ -101,8 +103,9 @@ def next_step(request):
     scenario = auth_user_scenario(request)
     if isinstance(scenario, Response):
         return scenario
-
-    return Response(status=status.HTTP_200_OK)
+    wp = Workpack(**request.data.get("user-settings"))
+    response = continue_simulation(scenario, wp)
+    return Response(response.dict(), status=status.HTTP_200_OK)
 
 
 @api_view(["GET", "POST", "DELETE"])
