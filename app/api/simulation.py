@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view
 from app.models.team import Member, SkillType, Team
 from app.models.template_scenario_model import TemplateScenario
 from app.models.user_scenario import ScenarioState, UserScenario
+from app.models.task import Task
 from app.serializers.user_scenario import UserScenarioSerializer
 from app.serializers.team import MemberSerializer
 from app.serializers.decision_serializer import DecisionSerializer
@@ -54,6 +55,21 @@ def start_new_simulation(request):
         )
         user_scenario.save()
         serializer = UserScenarioSerializer(user_scenario)
+        # create tasks
+        tasks = [  # easy
+            Task(difficulty=1, user_scenario=user_scenario)
+            for _ in range(template.management_goal.easy_tasks)
+        ]
+        tasks += [  # medium
+            Task(difficulty=2, user_scenario=user_scenario)
+            for _ in range(template.management_goal.medium_tasks)
+        ]
+        tasks += [  # hard
+            Task(difficulty=3, user_scenario=user_scenario)
+            for _ in range(template.management_goal.hard_tasks)
+        ]
+        # Add all tasks to database in a single insert
+        Task.objects.bulk_create(tasks)
     except Exception as e:
         msg = f"'{e.__class__.__name__}' occurred when creating user scenario"
         logging.error(msg)
