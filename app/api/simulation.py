@@ -64,3 +64,39 @@ def start_new_simulation(request):
     return Response(
         {"status": "success", "data": serializer.data}, status=status.HTTP_201_CREATED
     )
+
+
+@api_view(["GET", "POST"])
+def next_step(request):
+
+    user = request.user
+    scenario_id = request.data.get("scenario-id")
+    if scenario_id is None:
+        msg = "Attribute scenario-id must be provided"
+        logging.error(msg)
+        return Response({"status": "error", "data": msg}, status.HTTP_404_NOT_FOUND)
+
+    try:
+        scenario = UserScenario.objects.get(id=scenario_id)
+    except ObjectDoesNotExist:
+        msg = f"No UserScenario with id {scenario_id} found"
+        logging.error(msg)
+        return Response(
+            {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    if user.username == scenario.user.username:
+        pass
+    else:
+        logging.warn(
+            f"User {user.username} tried to access scenario {scenario_id} without permission."
+        )
+        return Response(
+            {
+                "status": "error",
+                "data:": f"User {user.username} is not authorized to access scenario {scenario_id}",
+            },
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    return Response(status=status.HTTP_200_OK)
