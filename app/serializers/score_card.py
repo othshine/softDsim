@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from app.models.simulation_models.score_card_model import ScoreCard
+from app.models.score_card import ScoreCard
 
 
 class ScoreCardSerializer(serializers.ModelSerializer):

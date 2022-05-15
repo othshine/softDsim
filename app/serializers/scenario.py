@@ -27,7 +27,7 @@ class ScenarioSerializer(serializers.Serializer):
     This class is used to serialize a Scenario into a json format
     in order to send it to the client.
 
-    This is used in app/api/scenario_view.py
+    This is used in app/api/scenario.py
     """
 
     name = serializers.CharField()

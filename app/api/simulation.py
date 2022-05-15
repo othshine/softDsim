@@ -7,11 +7,13 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from app.decorators.decorators import allowed_roles
-from app.models.scenario_config import ScenarioConfig
+
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import api_view
+
+from app.models.scenario import ScenarioConfig
 from app.models.team import Team
-from app.models.template_scenario_model import TemplateScenario
+from app.models.template_scenario import TemplateScenario
 from app.models.user_scenario import ScenarioState, UserScenario
 from app.models.task import Task
 from app.serializers.user_scenario import UserScenarioSerializer

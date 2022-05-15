@@ -2,13 +2,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
 from app.decorators.decorators import allowed_roles
-from app.models.management_goal_model import ManagementGoal
+from app.models.management_goal import ManagementGoal
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from app.serializers.management_goal_serializers import ManagementGoalSerializer
+from app.serializers.management_goal import ManagementGoalSerializer
 
 
 class ManagementGoalView(APIView):

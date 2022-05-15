@@ -2,9 +2,9 @@ from rest_framework import serializers
 
 from app.models.user_scenario import ScenarioState, UserScenario
 from app.serializers.scenario_config import ScenarioConfigSerializer
-from app.serializers.user_serializer import UserSerializer
+from app.serializers.user import UserSerializer
 from app.serializers.team import TeamSerializer
-from app.serializers.template_scenario_serializer import TemplateScenarioSerializer
+from app.serializers.template_scenario import TemplateScenarioSerializer
 
 
 class ScenarioStateSerializer(serializers.ModelSerializer):
