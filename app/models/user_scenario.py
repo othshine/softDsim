@@ -8,9 +8,9 @@ from custom_user.models import User
 
 
 class ScenarioState(models.Model):
-    counter = models.IntegerField()
-    cost = models.FloatField()
-    day = models.IntegerField()
+    counter = models.IntegerField(default=0)
+    cost = models.FloatField(default=0)
+    day = models.IntegerField(default=0)
 
 
 class UserScenario(models.Model):

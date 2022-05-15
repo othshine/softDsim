@@ -3,10 +3,10 @@ from django.urls import path
 from app.api.views.user_scenario import UserScenarioViews
 from app.api.views.team import SkillTypeView, TeamViews, MemberView
 from app.api.views.scenario_config import ScenarioConfigView
-from .api.views.decision import DecisionView
-from .api.views.scenario import ScenarioView
-from .api.views.management_goal import ManagementGoalView
-from .api.security.security import (
+from .views.decision_view import DecisionView
+from .views.scenario_view import ScenarioView
+from .views.management_goal_view import ManagementGoalView
+from .security.security_view import (
     LoginView,
     GetCSRFToken,
     LogoutView,
@@ -16,8 +16,10 @@ from .api.security.security import (
 
 
 # all request with /api/ land here (see softDsim/urls.py)
-from .api.views.template_scenario import TemplateScenarioView
-from .api.views.user import UserView
+from .views.template_scenario_view import TemplateScenarioView
+from .views.user_view import UserView
+
+import app.api.simulation as sim
 
 urlpatterns = [
     # User stuff
@@ -34,6 +36,14 @@ urlpatterns = [
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
     path("user-scenario/<int:id>", UserScenarioViews.as_view()),
+    # this (scenario) is old
+    path("scenario/", ScenarioView.as_view(), name="scenario"),
+    path("scenario/<str:scenario_id>", ScenarioView.as_view(), name="get_one_scenario"),
+    # decision todo: remove maybe later
+    path("decision", DecisionView.as_view(), name="decision"),
+    path("decision/<str:decision_id>", DecisionView.as_view(), name="decision"),
+    path("management-goal/", ManagementGoalView.as_view()),
+    path("management-goal/<str:id>", ManagementGoalView.as_view()),
     # team and member
     path("team", TeamViews.as_view()),
     path("team/<int:id>", TeamViews.as_view()),
@@ -44,13 +54,6 @@ urlpatterns = [
     # scenario config
     path("scenario-config", ScenarioConfigView.as_view()),
     path("scenario-config/<str:id>", ScenarioConfigView.as_view()),
-
-    # this (scenario) is old
-    path("scenario/", ScenarioView.as_view(), name="scenario"),
-    path("scenario/<str:scenario_id>", ScenarioView.as_view(), name="get_one_scenario"),
-    # decision todo: remove maybe later
-    path("decision", DecisionView.as_view(), name="decision"),
-    path("decision/<str:decision_id>", DecisionView.as_view(), name="decision"),
-    path("management-goal/", ManagementGoalView.as_view()),
-    path("management-goal/<str:id>", ManagementGoalView.as_view()),
+    # SIMULATION Endpoints
+    path("sim/start", sim.start_new_simulation, name="start_new_scenario"),
 ]
