@@ -37,6 +37,9 @@ https://superuser.com/questions/1234693/permanently-ban-after-n-connections-in-a
 https://www.digitalocean.com/community/tutorials/docker-explained-how-to-containerize-python-web-applications
 
 
+### Ideen
+https://fakerjs.dev/guide/
+
 
 069 1533  3685
           3333
