@@ -11,6 +11,7 @@ certbot renew \
 
 ### Installed Software
 docker, curl, iptables-persistent
+https://github.com/docker/compose -> manually version 2.4.1
 
 ### IPtables GeoIP
 https://docs.rackspace.com/support/how-to/block-ip-range-from-countries-with-geoip-and-iptables/
@@ -33,6 +34,9 @@ iptables -t mangle -I PREROUTING -p tcp --dport 443 -m geoip ! --src-cc DE -j DR
 iptables -t mangle -I PREROUTING -s 10.0.0.0/8 -j ACCEPT
 https://superuser.com/questions/1234693/permanently-ban-after-n-connections-in-a-minute-with-iptables
 
+iptables without root
+https://unix.stackexchange.com/questions/385109/can-you-list-iptables-as-a-non-root-user-and-why
+
 ### Backend Python Container
 https://www.digitalocean.com/community/tutorials/docker-explained-how-to-containerize-python-web-applications
 
@@ -40,6 +44,14 @@ https://www.digitalocean.com/community/tutorials/docker-explained-how-to-contain
 ### Ideen
 https://fakerjs.dev/guide/
 
+
+### Grafana
+https://grafana.com/tutorials/run-grafana-behind-a-proxy/
+https://grafana.com/docs/grafana/latest/administration/configure-docker/
+
+# Software
+https://github.com/docker/compose
+dj
 
 069 1533  3685
           3333
