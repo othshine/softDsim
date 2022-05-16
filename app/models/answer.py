@@ -6,8 +6,8 @@ from app.models.action import Action
 class Answer(models.Model):
 
     id = models.AutoField(primary_key=True)
-    label = models.TextField()
-    points = models.PositiveIntegerField()
+    label = models.TextField(default="answer")
+    points = models.PositiveIntegerField(default=0)
     active = models.BooleanField(default=False)
 
     action = models.ForeignKey(
