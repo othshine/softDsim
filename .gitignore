@@ -9,6 +9,7 @@ env
 backend/app/migrations/*
 backend/database/mongo*
 backend/custom_user/migrations/*
+*/migrations/*
 
 .empty
 .vscode
