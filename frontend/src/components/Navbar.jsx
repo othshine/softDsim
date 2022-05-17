@@ -19,12 +19,12 @@ import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../AuthProvider";
 import { useCookies } from 'react-cookie'
+import {getCookie} from "../utils/utils"
 
 
 const Navbar = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext);
-    // const [csrfCookie, setCsrfCookie, removeCsrfCookie] = useCookies(['csrftoken']);
-    const [sessionCookies, setSessionCookie, removeSessionCookie] = useCookies(['sessionid']);
+    const [csrfCookie, setCsrfCookie, removeCsrfCookie] = useCookies(['csrftoken']);
 
     const menuButton = useRef();
 
@@ -33,13 +33,26 @@ const Navbar = () => {
         menuButton.current.firstElementChild.style.width = "100%"
     }, [])
 
-    function handleLogout() {
-        // delete crsf and session cookies
-        // removeCsrfCookie('csrftoken')
-        removeSessionCookie('sessionid')
+    async function handleLogout() {
+        // send logout to backend --> deletes local sessionid cookie
+        try {
+            const res = await fetch(`http://localhost:8000/api/logout`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+            })
+            console.log(res)
+        } catch (err) {
+            console.log('Error:', err)
+        }
+        // delete crsf cookie
+        removeCsrfCookie('csrftoken')
         // refresh user object
+        // required for refreshing frontend state
         setCurrentUser(null)
-        // set isAuthenticated status
     }
 
     return (
