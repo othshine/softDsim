@@ -63,7 +63,7 @@ jobs:
     - name: Release Frontend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
-            cd ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} && \
+            cd ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} \
             && rm -rf bak || echo "bak not found" \
             && mv prd bak || echo "prd not found" \
             && mv swd prd || echo "swd not found"
