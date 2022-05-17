@@ -1,4 +1,4 @@
- name: Frontend
+name: Frontend
 
 # Controls when the workflow will run
 on:
