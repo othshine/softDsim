@@ -54,9 +54,11 @@ jobs:
     - name: Prepare Backend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
-            cd ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} \
-            && mkdir -p swd \
-            && EOF \
+            echo "${{ secrets.BASE_DIR_WEB }}${{env.DIR}}"" \
+            && ll ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} \
+            && cd ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} \
+            && mkdir -p swd
+            EOF
     - name: Deploy Frontend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./frontend/build/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_WEB }}${{env.DIR}}swd/
@@ -64,7 +66,7 @@ jobs:
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
             cd ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} && \
-            rm -rf bak || echo "bak not found" && \
-            mv prd bak || echo "prd not found" && \
-            mv swd prd || echo "swd not found"
+            && rm -rf bak || echo "bak not found" \
+            && mv prd bak || echo "prd not found" \
+            && mv swd prd || echo "swd not found"
             EOF
