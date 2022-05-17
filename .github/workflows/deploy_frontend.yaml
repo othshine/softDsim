@@ -48,7 +48,7 @@ jobs:
             npm -v
             cd frontend
             npm install
-            npm run build
+            CI= npm run build
             echo "chmod for js"
             chmod -R 755 ./build/static/js
     - name: Prepare Backend
