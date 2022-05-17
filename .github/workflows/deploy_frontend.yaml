@@ -54,9 +54,7 @@ jobs:
     - name: Prepare Backend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
-            echo "${{ secrets.BASE_DIR_WEB }}${{env.DIR}}" \
-            && ll ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} \
-            && cd ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} \
+            cd ${{ secrets.BASE_DIR_WEB }}${{env.DIR}} \
             && mkdir -p swd
             EOF
     - name: Deploy Frontend
