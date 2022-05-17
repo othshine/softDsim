@@ -4,7 +4,6 @@ from app.api.views.user_scenario import UserScenarioViews
 from app.api.views.team import SkillTypeView, TeamViews, MemberView
 from app.api.views.scenario_config import ScenarioConfigView
 from app.api.views.decision import DecisionView
-from app.api.views.scenario import ScenarioView
 from app.api.views.management_goal import ManagementGoalView
 from app.api.security.security import (
     LoginView,
@@ -36,9 +35,6 @@ urlpatterns = [
     # user scenario
     path("user-scenario", UserScenarioViews.as_view()),
     path("user-scenario/<int:id>", UserScenarioViews.as_view()),
-    # this (scenario) is old
-    path("scenario/", ScenarioView.as_view(), name="scenario"),
-    path("scenario/<str:scenario_id>", ScenarioView.as_view(), name="get_one_scenario"),
     # decision todo: remove maybe later
     path("decision", DecisionView.as_view(), name="decision"),
     path("decision/<str:decision_id>", DecisionView.as_view(), name="decision"),
