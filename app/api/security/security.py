@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 
 from app.decorators.decorators import allowed_roles
-from app.serializers.user_serializer import UserSerializer
+from app.serializers.user import UserSerializer
 from custom_user.models import User
 
 """

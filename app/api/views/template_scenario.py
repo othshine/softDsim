@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app.decorators.decorators import allowed_roles
-from app.models.template_scenario_model import TemplateScenario
-from app.serializers.template_scenario_serializer import TemplateScenarioSerializer
+from app.models.template_scenario import TemplateScenario
+from app.serializers.template_scenario import TemplateScenarioSerializer
 
 
 class TemplateScenarioView(APIView):

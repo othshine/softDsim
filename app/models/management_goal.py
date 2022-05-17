@@ -4,7 +4,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 # todo philip: maybe change class name? amount of tasks is probably not a management goal anymore
 
-from app.models.template_scenario_model import TemplateScenario
+from app.models.template_scenario import TemplateScenario
 
 
 class ManagementGoal(models.Model):

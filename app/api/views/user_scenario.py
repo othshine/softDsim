@@ -8,12 +8,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app.decorators.decorators import allowed_roles
-from app.models.template_scenario_model import TemplateScenario
+from app.models.template_scenario import TemplateScenario
 from app.serializers.user_scenario import UserScenarioSerializer
 from django.core.exceptions import ObjectDoesNotExist
 
 from app.models.user_scenario import ScenarioState, UserScenario
-from app.models.scenario_config import ScenarioConfig
+from app.models.scenario import ScenarioConfig
 from app.models.team import Team
 
 from custom_user.models import User

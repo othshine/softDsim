@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.serializers.scenario_serializers import ScenarioSerializer
+from app.serializers.scenario import ScenarioSerializer
 from mongo_models import ScenarioMongoModel
 
 

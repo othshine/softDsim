@@ -1,4 +1,4 @@
-from app.models.scenario_config import ScenarioConfig
+from app.models.scenario import ScenarioConfig
 from rest_framework import serializers
 
 
