@@ -56,4 +56,7 @@ urlpatterns = [
     path("scenario-config/<str:id>", ScenarioConfigView.as_view()),
     # SIMULATION Endpoints
     path("sim/start", sim.start_new_simulation, name="start_new_scenario"),
+    path("sim/next", sim.next_step, name="next_scenario_step"),
+    path("sim/team", sim.adjust_team, name="adjust_team"),
+    path("sim/team/<int:id>", sim.adjust_team, name="adjust_team"),
 ]

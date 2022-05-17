@@ -7,7 +7,7 @@ from yaml import load, FullLoader
 import os
 from django.conf import settings
 
-from app.src.scorecard import ScoreCard
+from app.src_deprecated.scorecard import ScoreCard
 
 
 def get_db_handle(db_name, host, port):

@@ -1,4 +1,4 @@
-from app.src.scorecard import ScoreCard
+from app.src_deprecated.scorecard import ScoreCard
 from utils import _YAMLReader, get_active_label, weighted, generate_object_id, yaml_to_scorecard
 from bson.objectid import ObjectId
 

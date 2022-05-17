@@ -7,8 +7,8 @@ from deprecated.classic import deprecated
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 
-from app.src.factories import Factory
-from app.src.scenario import Scenario, UserScenario
+from app.src_deprecated.factories import Factory
+from app.src_deprecated.scenario import Scenario, UserScenario
 
 
 from config import get_config

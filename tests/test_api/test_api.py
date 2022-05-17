@@ -1,9 +1,9 @@
 from rest_framework.test import APIClient
 import pytest
-from app.src.scenario import Scenario
+from app.src_deprecated.scenario import Scenario
 from mongo_models import ScenarioMongoModel
-from app.src.dataObjects import SimulationGoal
-from app.src.decision_tree import (
+from app.src_deprecated.dataObjects import SimulationGoal
+from app.src_deprecated.decision_tree import (
     Action,
     Decision,
     Answer,

@@ -14,10 +14,10 @@ from app.forms import (
     ScenarioNameForm,
     UserAutomationForm,
 )
-from app.src.scenario_overview import ScenarioOverview
-from app.src.decision_tree import Decision
-from app.src.history import History
-from app.src.scenario import Scenario
+from app.src_deprecated.scenario_overview import ScenarioOverview
+from app.src_deprecated.decision_tree import Decision
+from app.src_deprecated.history import History
+from app.src_deprecated.scenario import Scenario
 from mongo_models import (
     ClickHistoryModel,
     ScenarioMongoModel,

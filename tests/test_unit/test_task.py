@@ -2,8 +2,8 @@ import pytest
 
 from bson.objectid import ObjectId
 
-from app.src.task import Task, Difficulty
-from app.src.team import TASK_COMPLETION_COEF, Member
+from app.src_deprecated.task import Task, Difficulty
+from app.src_deprecated.team import TASK_COMPLETION_COEF, Member
 
 
 def test_instantiate_task():

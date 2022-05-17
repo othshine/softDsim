@@ -6,9 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-import app.src.history as history
-from app.src.decision_tree import SimulationDecision
-from app.src.scenario import UserScenario
+import app.src_deprecated.history as history
+from app.src_deprecated.decision_tree import SimulationDecision
+from app.src_deprecated.scenario import UserScenario
 from app.views.util import apply_changes
 from mongo_models import ScenarioMongoModel, UserMongoModel
 

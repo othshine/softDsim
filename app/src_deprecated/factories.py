@@ -1,11 +1,11 @@
 from bson.objectid import ObjectId
 
-from app.src.dataObjects import SimulationGoal
-from app.src.decision_tree import SimulationDecision, AnsweredDecision, ActionList
-from app.src.scenario import Scenario, UserScenario
-from app.src.task_queue import TaskQueue
-from app.src.task import Task
-from app.src.team import Member, Team
+from app.src_deprecated.dataObjects import SimulationGoal
+from app.src_deprecated.decision_tree import SimulationDecision, AnsweredDecision, ActionList
+from app.src_deprecated.scenario import Scenario, UserScenario
+from app.src_deprecated.task_queue import TaskQueue
+from app.src_deprecated.task import Task
+from app.src_deprecated.team import Member, Team
 
 from utils import remove_none_values
 

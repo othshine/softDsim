@@ -4,7 +4,7 @@ from typing import List, Optional, Dict
 
 from bson.objectid import ObjectId
 
-from app.src.dataObjects import SimulationGoal
+from app.src_deprecated.dataObjects import SimulationGoal
 from utils import YAMLReader
 
 

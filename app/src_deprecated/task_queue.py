@@ -1,4 +1,4 @@
-from app.src.task import Task
+from app.src_deprecated.task import Task
 
 
 class TaskQueue:
