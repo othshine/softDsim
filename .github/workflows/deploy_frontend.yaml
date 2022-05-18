@@ -32,7 +32,8 @@ jobs:
     - name: Check / set env Dev
       if: ${{ github.ref == 'refs/heads/develop' }}
       run: |
-            echo "DIR=dev/" >> $GITHUB_ENV  
+            echo "DIR=dev/" >> $GITHUB_ENV
+            echo "CI=false" >> $GITHUB_ENV
 
     - name: Install sshpass
       run: |
