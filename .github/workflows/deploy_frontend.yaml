@@ -48,7 +48,7 @@ jobs:
             node -v
             npm -v
             cd frontend
-            npm install
+            npm ci
             npm run build
             echo "chmod for js"
             chmod -R 755 ./build/static/js
