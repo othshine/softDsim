@@ -1,25 +1,22 @@
 import {
-    Avatar,
     Box,
     Button,
     Flex,
     HStack,
-    IconButton,
     Image,
     Menu,
     MenuButton,
     MenuGroup,
     MenuItem,
-    MenuList,
-    Text
+    MenuList
 } from "@chakra-ui/react"
 import Logo from "../images/modern-logo.png"
-import { HiMoon, HiOutlineLogout } from "react-icons/hi";
+import { HiMenu, HiOutlineLogout } from "react-icons/hi";
 import { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../AuthProvider";
 import { useCookies } from 'react-cookie'
-import {getCookie} from "../utils/utils"
+import { getCookie } from "../utils/utils"
 
 
 const Navbar = () => {
@@ -89,25 +86,17 @@ const Navbar = () => {
                 justifyContent="flex-end"
             >
                 <HStack borderRadius="full" backgroundColor="white" p={3} boxShadow='xl'>
-                    <Text whiteSpace="nowrap">👋 Hey, {currentUser?.username}</Text>
-                    <IconButton
-                        variant='ghost'
-                        aria-label='Call Sage'
-                        fontSize='20px'
-                        icon={<HiMoon />}
-                        size="xs"
-                    />
                     <Menu>
-                        <MenuButton ref={menuButton} as={Avatar} name='Oshigaki Kisame' size="sm" cursor="pointer" >
+                        <MenuButton ref={menuButton} size="sm" cursor="pointer">
+                            <HiMenu />
                         </MenuButton>
-                        <MenuList>
-                            <MenuGroup title='Profile'>
-                                <MenuItem icon={<HiOutlineLogout />} color="red" onClick={handleLogout}>Logout </MenuItem>
+                        <MenuList mt={2}>
+                            <MenuGroup>
+                                <MenuItem icon={<HiOutlineLogout />} color="red" onClick={handleLogout}>Logout</MenuItem>
                             </MenuGroup>
                         </MenuList>
                     </Menu>
                 </HStack>
-
             </HStack>
         </Flex>
     )
