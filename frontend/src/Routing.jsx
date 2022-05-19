@@ -3,7 +3,6 @@ import { AuthContext } from "./AuthProvider";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Landing from "./pages/Landing";
 import ScenarioOverview from "./pages/ScenarioOverview";
-import SimulationAlternative from "./pages/SimulationAlternative";
 import UserOverview from "./pages/UserOverview";
 import Simulation from "./pages/Simulation";
 import Login from "./pages/Login";
@@ -63,8 +62,7 @@ const Routing = () => {
                     {/* routes which are accessible for every logged-in user */}
                     <Route path="/" element={<Landing />} />
                     <Route path="/scenarios" element={<ScenarioOverview />} />
-                    <Route path="/scenarios/:scn_id" element={<SimulationAlternative />} />
-                    <Route path="/simulation" element={<Simulation />} />
+                    <Route path="/scenarios/:scn_id" element={<Simulation />} />
                     <Route path="/help" element={<Help />} />
                     <Route path="/login" element={<Navigate to="/" replace />} />
                 </>
