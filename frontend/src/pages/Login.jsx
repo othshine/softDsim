@@ -1,11 +1,11 @@
-import {Button, Flex, Heading, Input, InputGroup, InputRightElement, Stack, Text} from "@chakra-ui/react"
-import {HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin} from "react-icons/hi";
-import React, {useContext, useState} from "react";
-import {getCookie} from "../utils/utils"
-import {AuthContext} from "../AuthProvider";
+import { Button, Flex, Heading, Input, InputGroup, InputRightElement, Stack, Text } from "@chakra-ui/react"
+import { HiOutlineEye, HiOutlineEyeOff, HiOutlineLogin } from "react-icons/hi";
+import React, { useContext, useState } from "react";
+import { getCookie } from "../utils/utils"
+import { AuthContext } from "../AuthProvider";
 
 const Login = () => {
-    const {setCurrentUser} = useContext(AuthContext);
+    const { setCurrentUser } = useContext(AuthContext);
 
     // initialize states
     const [idInputValid, setIdInputValid] = useState(false)
@@ -17,6 +17,7 @@ const Login = () => {
 
     // handle login click
     async function handleLogin() {
+        setLogInSuccess('attempting')
         const csrftoken = getCookie('csrftoken')
         if (csrftoken === undefined) {
             // get new unauthed token
@@ -50,7 +51,7 @@ const Login = () => {
             const res = await fetch(`http://localhost:8000/api/login`, {
                 method: 'POST',
                 credentials: 'include',
-                body: JSON.stringify({"username": userID, "password": userPassword}),
+                body: JSON.stringify({ "username": userID, "password": userPassword }),
                 headers: {
                     "X-CSRFToken": getCookie("csrftoken"),
                     "Content-Type": "application/json"
@@ -105,18 +106,18 @@ const Login = () => {
         <>
             <Flex align="center" justify="center" flexGrow="1">
                 <Flex justify="center" p="10" w="40vw" maxW="400px" bg='white' rounded="2xl" flexFlow="column"
-                      shadow="xl">
+                    shadow="xl">
                     {/* input fields */}
                     <Stack spacing={5}>
                         <Heading as="h3" textAlign="center">SoftDSim</Heading>
-                        <Input type="text" placeholder="User ID" size='lg' bg='#efefef' onChange={useridInput}/>
+                        <Input type="text" placeholder="User ID" size='lg' bg='#efefef' onChange={useridInput} />
                         <InputGroup>
-                            <Input type={showPassword ? "text" : "password"} placeholder="Password" size="lg"
-                                   bg="#efefef" onChange={userPasswordInput}/>
+                            <Input type={showPassword ? "text" : "password"} placeholder="Password" size="lg" onKeyPress={e => { if (e.key === 'Enter') { handleLogin() } }}
+                                bg="#efefef" onChange={userPasswordInput} />
                             {/* show password */}
                             <InputRightElement h="full">
                                 <Button size='xl' onClick={showPasswordClicked}>
-                                    {showPassword ? <HiOutlineEyeOff/> : <HiOutlineEye/>}
+                                    {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
                                 </Button>
                             </InputRightElement>
                         </InputGroup>
@@ -129,9 +130,9 @@ const Login = () => {
                             <Text textColor="red.500">Unknown Error - Please try again!</Text> : <></>}
                     </Flex>
                     {/* login button */}
-                    <Button rightIcon={<HiOutlineLogin/>}
-                            colorScheme={idInputValid && passwortInputValid ? 'blue' : 'blackAlpha'} size='lg'
-                            onClick={handleLogin} isDisabled={!(idInputValid && passwortInputValid)}>
+                    <Button rightIcon={<HiOutlineLogin />} isLoading={logInSuccess === 'attempting' ? true : false}
+                        colorScheme={idInputValid && passwortInputValid ? 'blue' : 'blackAlpha'} size='lg'
+                        onClick={handleLogin} isDisabled={!(idInputValid && passwortInputValid)}>
                         Login
                     </Button>
                 </Flex>
