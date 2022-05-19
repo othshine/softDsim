@@ -1,12 +1,16 @@
 from typing import List
 from pydantic import BaseModel
 
+class SkillTypeDTO(BaseModel):
+    id: int
+    name: str
 
 class MemberDTO(BaseModel):
     id: int
     motivation: float
     stress: float
     xp: float
+    skill_type: SkillTypeDTO
 
 
 class ScenarioStateDTO(BaseModel):

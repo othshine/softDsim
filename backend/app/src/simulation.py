@@ -5,19 +5,38 @@ from app.models.task import Task
 from app.src.task_util import get_tasks_status
 from app.src.member_util import get_member_report
 from app.src.user_scenario_util import get_scenario_state_dto
+from app.dto.request import SimulationRequest
+from app.models.team import SkillType
+from app.models.team import Member
 
 
-def continue_simulation(scenario: UserScenario, wp: Workpack) -> SimulationResponse:
+def continue_simulation(
+    scenario: UserScenario, req: SimulationRequest
+) -> SimulationResponse:
     """ATTENTION: THIS FUNCTION IS NOT READY TO USE IN PRODUCTION
     The function currently can only be used as a dummy.
 
     :param scenario: The UserScenario object played
     :type scenario: UserScenario
-    :param wp: Settings object with the options chosen by user
-    :type wp: Workpack
+
     """
+    wp = req.actions
     # Gather information of what to do
     days = wp.days
+
+    member_change = req.members
+    for m in member_change:
+        m.skill_type
+        s = SkillType.objects.get(name=m.skill_type)
+        if m.change > 0:
+            for _ in range(m.change):
+                new_member = Member(skill_type=s, team=scenario.team)
+                new_member.save()
+        else:
+            list_of_members = Member.objects.filter(team=scenario.team, skill_type=s)
+            for i in range(abs(m.change)):
+                m: Member = list_of_members[0]
+                m.delete()
 
     # Simulate what happens
     tasks = Task.objects.filter(user_scenario=scenario, done=False)
@@ -30,8 +49,13 @@ def continue_simulation(scenario: UserScenario, wp: Workpack) -> SimulationRespo
     # write updates to database
     Task.objects.bulk_update(done_tasks, fields=["done"])
 
-    # Build response
+    # Check if scenario is completed
 
+    # Check if any events has occurred
+
+    # Check if simulation fragment ended
+
+    # Build response
     return SimulationResponse(
         tasks=get_tasks_status(scenario.id),
         state=get_scenario_state_dto(scenario),

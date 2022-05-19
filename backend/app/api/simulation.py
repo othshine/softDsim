@@ -27,6 +27,7 @@ from app.serializers.user_scenario import UserScenarioSerializer
 from app.serializers.team import MemberSerializer
 from app.serializers.decision import DecisionSerializer
 from app.src.simulation import continue_simulation
+from app.dto.request import SimulationRequest
 
 
 # The allowed_roles decorator does not work with non class-based views
@@ -111,8 +112,10 @@ def next_step(request):
     scenario = auth_user_scenario(request)
     if isinstance(scenario, Response):
         return scenario
-    wp = Workpack(**request.data.get("user-settings"))
-    response = continue_simulation(scenario, wp)
+
+    req = SimulationRequest(**request.data)
+
+    response = continue_simulation(scenario, req)
     return Response(response.dict(), status=status.HTTP_200_OK)
 
 
@@ -175,7 +178,7 @@ def auth_user_scenario(request):
     function returns the UserScenario object. If something is wrong, the function
     returns a Response object with a fitting description."""
     user = request.user
-    scenario_id = request.data.get("scenario-id")
+    scenario_id = request.data.get("scenario_id")
     if scenario_id is None:
         msg = "Attribute scenario-id must be provided"
         logging.error(msg)
