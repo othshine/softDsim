@@ -11,6 +11,7 @@ import Help from "./pages/Help";
 import GDPR from "./pages/GDPR";
 import Imprint from "./pages/Imprint";
 import { getCookie } from "./utils/utils";
+import NotFoundPage from "./components/NotFoundPage";
 
 const Routing = () => {
     const { currentUser, setCurrentUser } = useContext(AuthContext)
@@ -54,6 +55,7 @@ const Routing = () => {
                 {/* routes which are accessible for every user */}
                 <Route path="/gdpr" element={<GDPR />} />
                 <Route path="/imprint" element={<Imprint />} />
+                <Route path="*" element={<NotFoundPage />} />
             </>
 
             {currentUser ?
