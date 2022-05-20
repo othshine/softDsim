@@ -1,3 +1,4 @@
+import logging
 from app.dto.request import Workpack
 from app.dto.response import SimulationResponse
 from app.models.user_scenario import UserScenario
@@ -8,6 +9,13 @@ from app.src.user_scenario_util import get_scenario_state_dto
 from app.dto.request import SimulationRequest
 from app.models.team import SkillType
 from app.models.team import Member
+
+
+from django.core.exceptions import ObjectDoesNotExist
+
+
+class SimulationException(BaseException):
+    """Raised when simulation cannot be executed because of wrong data in request."""
 
 
 def continue_simulation(
@@ -27,16 +35,26 @@ def continue_simulation(
     member_change = req.members
     for m in member_change:
         m.skill_type
-        s = SkillType.objects.get(name=m.skill_type)
+        try:
+            s = SkillType.objects.get(name=m.skill_type)
+        except ObjectDoesNotExist:
+            msg = f"SkillType {m.skill_type} does not exist."
+            logging.error(msg)
+            raise SimulationException(msg)
         if m.change > 0:
             for _ in range(m.change):
                 new_member = Member(skill_type=s, team=scenario.team)
                 new_member.save()
         else:
             list_of_members = Member.objects.filter(team=scenario.team, skill_type=s)
-            for i in range(abs(m.change)):
-                m: Member = list_of_members[0]
-                m.delete()
+            try:
+                for i in range(abs(m.change)):
+                    m_to_delete: Member = list_of_members[0]
+                    m_to_delete.delete()
+            except IndexError:
+                msg = f"Cannot remove {m.change} members of type {s.name}."
+                logging.error(msg)
+                raise SimulationException(msg)
 
     # Simulate what happens
     tasks = Task.objects.filter(user_scenario=scenario, done=False)
