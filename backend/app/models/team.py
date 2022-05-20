@@ -19,9 +19,7 @@ class SkillType(models.Model):
 
 
 class Member(models.Model):
-    xp: float = models.FloatField(
-        default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
-    )
+    xp: float = models.FloatField(default=0.0, validators=[MinValueValidator(0.0)])
     motivation = models.FloatField(
         default=0.75, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
     )
