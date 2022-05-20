@@ -1,9 +1,11 @@
 from typing import List
 from pydantic import BaseModel
 
+
 class SkillTypeDTO(BaseModel):
     id: int
     name: str
+
 
 class MemberDTO(BaseModel):
     id: int
@@ -31,3 +33,4 @@ class SimulationResponse(BaseModel):
     tasks: TasksStatusDTO
     state: ScenarioStateDTO
     members: List[MemberDTO]
+    type: str = "SIMULATION"
