@@ -18,7 +18,7 @@ const Routing = () => {
 
     const authenticateUser = async () => {
         try {
-            const res = await fetch(`http://localhost:8000/api/authenticated`, {
+            const res = await fetch(`${process.env.REACT_APP_DJANGO_HOST}/api/authenticated`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
