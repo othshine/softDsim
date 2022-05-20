@@ -28,70 +28,77 @@ from app.serializers.team import MemberSerializer
 from app.serializers.decision import DecisionSerializer
 from app.src.simulation import continue_simulation
 
+from rest_framework.views import APIView
 
-# The allowed_roles decorator does not work with non class-based views
-# we will need to adjust it or write a second decorator for
-# function based views. TODO: check roles.
-@api_view(["GET", "POST"])
-def start_new_simulation(request):
 
-    template_id = request.data.get("template-id")
-    config_id = request.data.get("config-id")
+@method_decorator(csrf_protect, name="dispatch")
+class StartUserScenarioView(APIView):
+    permission_classes = (IsAuthenticated,)
 
-    try:
-        template = TemplateScenario.objects.get(id=template_id)
-    except ObjectDoesNotExist:
-        msg = f"'{template_id}' is not a valid template-scenario id. Must provide attribute 'template-id'."
-        logging.error(msg)
+    @allowed_roles(["student"])
+    def post(self, request):
+        template_id = request.data.get("template-id")
+        config_id = request.data.get("config-id")
+
+        try:
+            template = TemplateScenario.objects.get(id=template_id)
+        except ObjectDoesNotExist:
+            msg = f"'{template_id}' is not a valid template-scenario id. Must provide attribute 'template-id'."
+            logging.error(msg)
+            return Response(
+                {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
+            )
+        try:
+            config = ScenarioConfig.objects.get(id=config_id)
+        except ObjectDoesNotExist:
+            msg = f"'{config_id}' is not a valid scenario-config id. Must provide attribute 'config-id'."
+            logging.error(msg)
+            return Response(
+                {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            team = Team()
+            team.save()
+            state = ScenarioState()
+            state.save()
+            user_scenario = UserScenario(
+                user=request.user,
+                template=template,
+                config=config,
+                team=team,
+                state=state,
+            )
+            user_scenario.save()
+            serializer = UserScenarioSerializer(user_scenario)
+            # create tasks
+            tasks = [  # easy
+                Task(difficulty=1, user_scenario=user_scenario)
+                for _ in range(template.management_goal.easy_tasks)
+            ]
+            tasks += [  # medium
+                Task(difficulty=2, user_scenario=user_scenario)
+                for _ in range(template.management_goal.medium_tasks)
+            ]
+            tasks += [  # hard
+                Task(difficulty=3, user_scenario=user_scenario)
+                for _ in range(template.management_goal.hard_tasks)
+            ]
+            # Add all tasks to database in a single insert
+            Task.objects.bulk_create(tasks)
+        except Exception as e:
+            msg = f"'{e.__class__.__name__}' occurred when creating user scenario"
+            logging.error(msg)
+            logging.debug(e)
+            return Response(
+                {"status": "error", "data": msg},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
         return Response(
-            {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
+            {"status": "success", "data": serializer.data},
+            status=status.HTTP_201_CREATED,
         )
-    try:
-        config = ScenarioConfig.objects.get(id=config_id)
-    except ObjectDoesNotExist:
-        msg = f"'{config_id}' is not a valid scenario-config id. Must provide attribute 'config-id'."
-        logging.error(msg)
-        return Response(
-            {"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
-        )
-
-    try:
-        team = Team()
-        team.save()
-        state = ScenarioState()
-        state.save()
-        user_scenario = UserScenario(
-            user=request.user, template=template, config=config, team=team, state=state
-        )
-        user_scenario.save()
-        serializer = UserScenarioSerializer(user_scenario)
-        # create tasks
-        tasks = [  # easy
-            Task(difficulty=1, user_scenario=user_scenario)
-            for _ in range(template.management_goal.easy_tasks)
-        ]
-        tasks += [  # medium
-            Task(difficulty=2, user_scenario=user_scenario)
-            for _ in range(template.management_goal.medium_tasks)
-        ]
-        tasks += [  # hard
-            Task(difficulty=3, user_scenario=user_scenario)
-            for _ in range(template.management_goal.hard_tasks)
-        ]
-        # Add all tasks to database in a single insert
-        Task.objects.bulk_create(tasks)
-    except Exception as e:
-        msg = f"'{e.__class__.__name__}' occurred when creating user scenario"
-        logging.error(msg)
-        logging.debug(e)
-        return Response(
-            {"status": "error", "data": msg},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-    return Response(
-        {"status": "success", "data": serializer.data}, status=status.HTTP_201_CREATED
-    )
 
 
 @api_view(["GET"])
@@ -105,23 +112,29 @@ def decisions(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(["GET", "POST"])
-def next_step(request):
+@method_decorator(csrf_protect, name="dispatch")
+class NextStepView(APIView):
+    permission_classes = (IsAuthenticated,)
 
-    scenario = auth_user_scenario(request)
-    if isinstance(scenario, Response):
-        return scenario
-    wp = Workpack(**request.data.get("user-settings"))
-    response = continue_simulation(scenario, wp)
-    return Response(response.dict(), status=status.HTTP_200_OK)
+    @allowed_roles(["student"])
+    def post(self, request):
+        scenario = auth_user_scenario(request)
+        if isinstance(scenario, Response):
+            return scenario
+        wp = Workpack(**request.data.get("user-settings"))
+        response = continue_simulation(scenario, wp)
+        return Response(response.dict(), status=status.HTTP_200_OK)
 
 
-@api_view(["GET", "POST", "DELETE"])
-def adjust_team(request, id=None):
-    scenario = auth_user_scenario(request)
-    if isinstance(scenario, Response):
-        return scenario
-    if request.method == "POST":
+@method_decorator(csrf_protect, name="dispatch")
+class AdjustMemberView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @allowed_roles(["student"])
+    def post(self, request, id=None):
+        scenario = auth_user_scenario(request)
+        if isinstance(scenario, Response):
+            return scenario
         member_data = request.data.get("member")
         if str(member_data).isnumeric():
             skill_type = SkillType.objects.get(id=int(member_data))
@@ -134,14 +147,24 @@ def adjust_team(request, id=None):
             data={"status": "success", "data": serializer.data},
             status=status.HTTP_201_CREATED,
         )
-    if request.method == "GET":
+
+    @allowed_roles(["student"])
+    def get(self, request, id=None):
+        scenario = auth_user_scenario(request)
+        if isinstance(scenario, Response):
+            return scenario
         member_objs = Member.objects.filter(team=scenario.team)
         serializer = MemberSerializer(member_objs, many=True)
         return Response(
             data={"status": "success", "data": serializer.data},
             status=status.HTTP_200_OK,
         )
-    if request.method == "DELETE":
+
+    @allowed_roles(["student"])
+    def delete(self, request, id=None):
+        scenario = auth_user_scenario(request)
+        if isinstance(scenario, Response):
+            return scenario
         try:
             member_to_delete = Member.objects.get(id=id)
             if member_to_delete.team == scenario.team:
@@ -165,8 +188,6 @@ def adjust_team(request, id=None):
             return Response(
                 data={"status": "error", "data": msg}, status=status.HTTP_404_NOT_FOUND
             )
-
-    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 def auth_user_scenario(request):
