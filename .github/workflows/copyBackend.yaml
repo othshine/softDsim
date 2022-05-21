@@ -40,7 +40,7 @@ jobs:
             if [ -s diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
     
     - name: Build Image
-      if: ${{ env.DIFF == 'true'}}
+      if: env.DIFF == 'true'
       run: echo "Hello Changes detacted"
 
   # Deploy:
