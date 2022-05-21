@@ -25,7 +25,7 @@ jobs:
             echo "DIR=PROD/" >> $GITHUB_ENV
 
     - name: Check / set env Dev
-      if: ${{ github.ref == 'refs/heads/develop' }}
+      if: ${{ github.ref == 'refs/heads/feature/copyBackend' }}
       run: |
             echo "DIR=DEV/" >> $GITHUB_ENV
 
