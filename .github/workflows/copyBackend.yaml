@@ -41,6 +41,11 @@ jobs:
       if: ${{ github.ref == 'refs/heads/develop' }}
       run: |
             echo "DIR=DEV/" >> $GITHUB_ENV
+    
+    - name: Create Sym-Link
+      run: |
+            cd backend
+            ln -s ../.env .env
 
     - name: Prepare Backend
       run: |
