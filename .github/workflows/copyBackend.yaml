@@ -16,9 +16,19 @@ env:
   DIR: DEV/
 
 jobs:
-  build:
+
+  consecutiveness:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: mktcode/consecutive-workflow-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  Deploy:
     runs-on: ubuntu-latest
     name: Rollout backend
+    needs:
+    - consecutiveness
 
     steps:
     - uses: actions/checkout@v3
@@ -45,11 +55,10 @@ jobs:
     - name: Release Backend && Restart
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
-            cd ${{ secrets.BASE_DIR_APP }}${{ env.DIR }} \
-            && ssh local <<-'EOF2'
+            ssh local <<-'EOF2'
                 docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml down
             EOF2
-            ls -la && pwd \
+            cd ${{ secrets.BASE_DIR_APP }}${{ env.DIR }} \
             && rm -rf bak || echo "bak not found" \
             && mv prd bak || echo "prd not found" \
             && mv swd prd || echo "swd not found" \
