@@ -104,17 +104,6 @@ class StartUserScenarioView(APIView):
         )
 
 
-@api_view(["GET"])
-def decisions(request):
-    scenario = auth_user_scenario(request)
-    if isinstance(scenario, Response):
-        return scenario
-
-    decision_list = scenario.decisions
-    serializer = DecisionSerializer(decision_list, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 @method_decorator(csrf_protect, name="dispatch")
 class NextStepView(APIView):
     permission_classes = (IsAuthenticated,)
