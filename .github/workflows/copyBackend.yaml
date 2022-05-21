@@ -31,9 +31,11 @@ jobs:
     - consecutiveness
 
     steps:
-    - uses: actions/checkout@v3
+    # - uses: actions/checkout@v3
     - name: Check for Changes
       run: |
+            git clone https://github.com/fra-uas-project/softDsim.git
+            cd softDsim
             git diff HEAD~1 HEAD backend/requirements.txt > .diff
             if [ -s diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
     
