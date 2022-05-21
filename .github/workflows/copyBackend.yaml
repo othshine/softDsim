@@ -42,11 +42,6 @@ jobs:
       run: |
             echo "DIR=DEV/" >> $GITHUB_ENV
     
-    - name: Create Sym-Link
-      run: |
-            cd backend
-            ln -s ../.env .env
-
     - name: Prepare Backend
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
@@ -55,9 +50,7 @@ jobs:
 
     - name: Copy Files
       run: |
-            ls -la
-            ls -la backend
-            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./backend/* ./backend/.env ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_APP }}${{ env.DIR }}swd
+            sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./backend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_APP }}${{ env.DIR }}swd
 
     - name: Release Backend && Restart
       run: |
@@ -69,6 +62,8 @@ jobs:
             && rm -rf bak || echo "bak not found" \
             && mv prd bak || echo "prd not found" \
             && mv swd prd || echo "swd not found" \
+            && cd prd \
+            && ln -s ../.env .env \
             && ssh local <<-'EOF3'
                 docker-compose -f ${{ secrets.BASE_DIR_OPS }}compose/app/app_compose.yaml up -d
             EOF3
