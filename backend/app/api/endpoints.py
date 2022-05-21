@@ -19,7 +19,11 @@ from app.api.security.security import (
 from app.api.views.template_scenario import TemplateScenarioView
 from app.api.views.user import UserView
 
-import app.api.simulation as sim
+from app.api.views.simulation import (
+    AdjustMemberView,
+    StartUserScenarioView,
+    NextStepView,
+)
 
 
 urlpatterns = [
@@ -58,8 +62,8 @@ urlpatterns = [
     path("scenario-config", ScenarioConfigView.as_view()),
     path("scenario-config/<str:id>", ScenarioConfigView.as_view()),
     # SIMULATION Endpoints
-    path("sim/start", sim.start_new_simulation, name="start_new_scenario"),
-    path("sim/next", sim.next_step, name="next_scenario_step"),
-    path("sim/team", sim.adjust_team, name="adjust_team"),
-    path("sim/team/<int:id>", sim.adjust_team, name="adjust_team"),
+    path("sim/start", StartUserScenarioView.as_view()),
+    path("sim/next", NextStepView.as_view()),
+    path("sim/team", AdjustMemberView.as_view()),
+    path("sim/team/<int:id>", AdjustMemberView.as_view()),
 ]
