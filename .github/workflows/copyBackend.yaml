@@ -12,6 +12,9 @@ on:
       # - 'deploy/*'
   workflow_dispatch:
 
+env:
+  DIR: DEV
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,7 +28,7 @@ jobs:
             echo "DIR=PROD/" >> $GITHUB_ENV
 
     - name: Check / set env Dev
-      if: ${{ github.ref == 'refs/heads/feature/copyBackend' }}
+      if: ${{ github.ref == 'refs/heads/develop' }}
       run: |
             echo "DIR=DEV/" >> $GITHUB_ENV
 
