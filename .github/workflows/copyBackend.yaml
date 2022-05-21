@@ -3,12 +3,12 @@ name: Copy Backend
 on:
   push:
     branches:
-    - develop
+      - develop
     paths:
-    - 'backend/**'
-    - '.github/workflows/copyBackend.yaml'
-    - '!backend/requirements.txt'
-    # - 'deploy/*'
+      - 'backend/**'
+      - '.github/workflows/copyBackend.yaml'
+      - '!backend/requirements.txt'
+      # - 'deploy/*'
   workflow_dispatch:
 
 jobs:
@@ -38,7 +38,7 @@ jobs:
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" scp -r -o StrictHostKeyChecking=no ./backend/* ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}}:${{ secrets.BASE_DIR_APP }}${{ env.DIR }}swd
 
-   - name: Release Backend && Restart
+    - name: Release Backend && Restart
       run: |
             sshpass -p "${{ secrets.SSH_PAS }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{secrets.SSH_HOST}} << EOF
             ssh local <<-'EOF2'
