@@ -27,8 +27,11 @@ from app.serializers.user_scenario import UserScenarioSerializer
 from app.serializers.team import MemberSerializer
 from app.serializers.question import QuestionSerializer
 from app.src.simulation import continue_simulation
+from app.dto.request import SimulationRequest
 
 from rest_framework.views import APIView
+
+from app.src.simulation import SimulationException
 
 
 @method_decorator(csrf_protect, name="dispatch")
@@ -121,9 +124,20 @@ class NextStepView(APIView):
         scenario = auth_user_scenario(request)
         if isinstance(scenario, Response):
             return scenario
-        wp = Workpack(**request.data.get("user-settings"))
-        response = continue_simulation(scenario, wp)
-        return Response(response.dict(), status=status.HTTP_200_OK)
+        req = SimulationRequest(**request.data)
+        try:
+            response = continue_simulation(scenario, req)
+            return Response(response.dict(), status=status.HTTP_200_OK)
+        except SimulationException as e:
+            return Response(
+                {"status": "error", "data": str(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logging.error(str(e))
+            return Response(
+                {"status": "error", "data": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 @method_decorator(csrf_protect, name="dispatch")
@@ -196,7 +210,7 @@ def auth_user_scenario(request):
     function returns the UserScenario object. If something is wrong, the function
     returns a Response object with a fitting description."""
     user = request.user
-    scenario_id = request.data.get("scenario-id")
+    scenario_id = request.data.get("scenario_id")
     if scenario_id is None:
         msg = "Attribute scenario-id must be provided"
         logging.error(msg)
