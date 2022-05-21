@@ -25,7 +25,7 @@ from app.models.user_scenario import ScenarioState, UserScenario
 from app.models.task import Task
 from app.serializers.user_scenario import UserScenarioSerializer
 from app.serializers.team import MemberSerializer
-from app.serializers.decision import DecisionSerializer
+from app.serializers.question import QuestionSerializer
 from app.src.simulation import continue_simulation
 from app.dto.request import SimulationRequest
 
