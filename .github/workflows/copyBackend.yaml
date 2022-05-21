@@ -31,14 +31,15 @@ jobs:
     - consecutiveness
 
     steps:
-    # - uses: actions/checkout@v3
+    - name: Checkout code
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
     - name: Check for Changes
       run: |
-            git clone https://github.com/fra-uas-project/softDsim.git
-            cd softDsim
             git diff HEAD~1 HEAD .github/workflows/copyBackend.yaml
-            # if [ -s .diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
-            # echo ${{ env.DIFF }}
+            if [ -s .diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
+            echo ${{ env.DIFF }}
     
     - name: Build Image
       if: ${{ env.DIFF == 'true' }}
