@@ -6,9 +6,9 @@ on:
       # - develop
     - feature/copyBackend
     paths:
-    - 'backend/**'
-    - '.github/workflows/copyBackend.yaml'
-    - '!backend/requirements.txt'
+      - 'backend/**'
+      - '.github/workflows/copyBackend.yaml'
+      - '!backend/requirements.txt'
       # - 'deploy/*'
   workflow_dispatch:
 
