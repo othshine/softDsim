@@ -38,6 +38,7 @@ jobs:
             cd softDsim
             git diff HEAD~1 HEAD .github/workflows/copyBackend.yaml > .diff
             if [ -s .diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
+            echo ${{ env.DIFF }}
     
     - name: Build Image
       if: ${{ env.DIFF == 'true' }}
