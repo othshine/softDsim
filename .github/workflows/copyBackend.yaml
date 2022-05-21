@@ -37,7 +37,7 @@ jobs:
         fetch-depth: 2
     - name: Check for Changes
       run: |
-            git diff HEAD~1 HEAD .github/workflows/copyBackend.yaml > diff
+            git diff HEAD~1 HEAD backend/requirements.txt > diff
             if [ -s diff ];then echo "DIFF=true" >> $GITHUB_ENV; else echo "DIFF=false" >> $GITHUB_ENV; fi
             echo ${{ env.DIFF }}
     
