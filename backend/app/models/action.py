@@ -7,9 +7,8 @@ class Action(models.Model):
 
     id = models.AutoField(primary_key=True)
     title = models.TextField()
-    typ = models.TextField()
-    lower_limit = models.IntegerField()
-    upper_limit = models.IntegerField()
+    lower_limit = models.IntegerField(blank=True, null=True)
+    upper_limit = models.IntegerField(blank=True, null=True)
 
     simulation_fragment = models.ForeignKey(
         SimulationFragment,

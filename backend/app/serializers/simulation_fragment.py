@@ -22,13 +22,10 @@ class SimulationFragmentSerializer(serializers.ModelSerializer):
         If the simulation model has to be created on its own, this create method has to be adjusted for nested serialization.
         """
         actions_data = validated_data.pop("actions")
-        score_card_data = validated_data.pop("score_card")
 
         simulation = SimulationFragment.objects.create(**validated_data)
 
         for data in actions_data:
             Action.objects.create(simulation=simulation, **data)
 
-        ScoreCard.objects.create(simulation=simulation, **score_card_data)
-
-        return SimulationFragment
+        return simulation

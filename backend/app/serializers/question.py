@@ -15,7 +15,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = ("id", "index", "text", "multi", "answer")
 
     def create(self, validated_data):
-        answer_data = validated_data.pop("actions")
+        answer_data = validated_data.pop("answer")
         question = Question.objects.create(**validated_data)
 
         for data in answer_data:

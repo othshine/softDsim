@@ -13,5 +13,5 @@ class ScoreCard(models.Model):
     quality_k = models.FloatField(default=1.0)
 
     template_scenario = models.OneToOneField(
-        TemplateScenario, on_delete=models.CASCADE, related_name="score_card"
+        TemplateScenario, on_delete=models.CASCADE, related_name="score_card", null=True
     )

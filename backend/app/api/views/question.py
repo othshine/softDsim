@@ -45,7 +45,7 @@ class QuestionView(APIView):
             if serializer.is_valid():
                 serializer.save()
                 return Response(
-                    {"status": "Decision saved", "data": serializer.data},
+                    {"status": "Question saved", "data": serializer.data},
                     status=status.HTTP_200_OK,
                 )
             else:
